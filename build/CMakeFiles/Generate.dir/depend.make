@@ -3,5 +3,6 @@
 
 CMakeFiles/Generate.dir/main.cpp.o: ../color.h
 CMakeFiles/Generate.dir/main.cpp.o: ../main.cpp
+CMakeFiles/Generate.dir/main.cpp.o: ../ray.h
 CMakeFiles/Generate.dir/main.cpp.o: ../vec3.h
 

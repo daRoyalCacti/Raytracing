@@ -11,4 +11,8 @@ struct ray {
 
 	point3 origin() const {return orig;}
 	vec3 direction() const {return dir;}
+
+	point3 at(const double t) const {
+		return orig + t*dir;
+	}
 };

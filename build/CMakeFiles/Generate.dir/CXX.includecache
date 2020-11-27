@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+/home/george/Documents/Projects/Raytracer/camera.h
+common.h
+/home/george/Documents/Projects/Raytracer/common.h
+
 /home/george/Documents/Projects/Raytracer/color.h
 vec3.h
 /home/george/Documents/Projects/Raytracer/vec3.h
@@ -18,6 +22,8 @@ cmath
 limits
 -
 memory
+-
+random
 -
 ray.h
 /home/george/Documents/Projects/Raytracer/ray.h
@@ -45,6 +51,8 @@ hittable_list.h
 /home/george/Documents/Projects/Raytracer/hittable_list.h
 sphere.h
 /home/george/Documents/Projects/Raytracer/sphere.h
+camera.h
+/home/george/Documents/Projects/Raytracer/camera.h
 iostream
 -
 

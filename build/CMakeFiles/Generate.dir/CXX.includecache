@@ -31,8 +31,8 @@ vec3.h
 /home/george/Documents/Projects/Raytracer/vec3.h
 
 /home/george/Documents/Projects/Raytracer/hittable.h
-ray.h
-/home/george/Documents/Projects/Raytracer/ray.h
+common.h
+/home/george/Documents/Projects/Raytracer/common.h
 
 /home/george/Documents/Projects/Raytracer/hittable_list.h
 hittable.h
@@ -56,6 +56,10 @@ camera.h
 iostream
 -
 
+/home/george/Documents/Projects/Raytracer/material.h
+common.h
+/home/george/Documents/Projects/Raytracer/common.h
+
 /home/george/Documents/Projects/Raytracer/ray.h
 vec3.h
 /home/george/Documents/Projects/Raytracer/vec3.h
@@ -65,6 +69,8 @@ hittable.h
 /home/george/Documents/Projects/Raytracer/hittable.h
 vec3.h
 /home/george/Documents/Projects/Raytracer/vec3.h
+material.h
+/home/george/Documents/Projects/Raytracer/material.h
 
 /home/george/Documents/Projects/Raytracer/vec3.h
 iostream

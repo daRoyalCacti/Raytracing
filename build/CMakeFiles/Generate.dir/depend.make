@@ -7,6 +7,7 @@ CMakeFiles/Generate.dir/main.cpp.o: ../common.h
 CMakeFiles/Generate.dir/main.cpp.o: ../hittable.h
 CMakeFiles/Generate.dir/main.cpp.o: ../hittable_list.h
 CMakeFiles/Generate.dir/main.cpp.o: ../main.cpp
+CMakeFiles/Generate.dir/main.cpp.o: ../material.h
 CMakeFiles/Generate.dir/main.cpp.o: ../ray.h
 CMakeFiles/Generate.dir/main.cpp.o: ../sphere.h
 CMakeFiles/Generate.dir/main.cpp.o: ../vec3.h

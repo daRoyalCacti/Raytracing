@@ -1,10 +1,13 @@
 #pragma once
 
-#include "ray.h"
+#include "common.h"
+
+struct material;
 
 struct hit_record {
 	point3 p;	//point where hit
 	vec3 normal;	//normal at hit point
+	shared_ptr<material> mat_ptr;
 	double t;	//time point was hit
 	bool front_face;	//did the hit happen on the front or back of the face
 

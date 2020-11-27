@@ -9,19 +9,29 @@ class camera {
 	vec3 vertical;
 
 	public:
-	camera() {
-		const auto aspect_ratio = 16.0/9.0;
-		const auto viewport_height = 2.0;
-		const auto viewport_width = aspect_ratio*viewport_height;
-		const auto focal_length = 1.0;
+	camera(const point3 lookfrom, const vec3 lookat, const vec3 vup, const double vfov, const double aspect_ratio) {	
+		//vfov := vertical field of view in degrees
+		//lookfrom := position of the camera
+		//lookat := point for the camera to look at
+		//vup := defines the remaining tilt of the camera - the up vector for the camera
 
-		origin = point3(0,0,0);
-		horizontal = vec3(viewport_width, 0.0, 0.0);
-		vertical = vec3(0.0, viewport_height, 0.0);
-		lower_left_corner = origin - horizontal/2 - vertical/2 - vec3(0,0,focal_length);
+		const auto theta = degrees_to_radians(vfov);
+		const auto h = tan(theta/2);
+
+		const auto viewport_height = 2.0 * h;
+		const auto viewport_width = aspect_ratio*viewport_height;
+
+		const auto w = unit_vector(lookfrom - lookat);	//vector pointing from camera to point to look at
+		const auto u = unit_vector(cross(vup, w));	//vector pointing to the right -- orthogonal to the up vector and w
+		const auto v = cross(w, u);			//the projection of the up vector on to the plane described by w (i.e. perpendicular to w)
+
+		origin = lookfrom;	//camera is positioned at 'lookfrom'
+		horizontal = viewport_width * u;	//defines the direction of horizontal through u, and how far horizontal to draw through viewport_width
+		vertical = viewport_height * v;		//defines the direction of vertical through v, and how far vertical to draw through viewport_height
+		lower_left_corner = origin - horizontal/2 - vertical/2 - w;	//w pushes the corner back to make the camera still have the origin at 'origin'
 	}
 
-	ray get_ray(const double u, const double v) const {
-		return ray(origin, lower_left_corner + u*horizontal + v*vertical - origin);
+	ray get_ray(const double s, const double t) const {
+		return ray(origin, lower_left_corner + s*horizontal + t*vertical - origin);
 	}
 };

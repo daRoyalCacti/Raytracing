@@ -13,9 +13,11 @@ void write_color(std::ostream &out, const color pixel_color, const int samples_p
 	//the component of each color is added to at each iteratio
 	//so this acts as an averge
 	const auto scale = 1.0 / samples_per_pixel;
-	r *= scale;
-	b *= scale;
-	g *= scale;
+	//gamma correcting using "gamma 2"
+	//i.e. raising the color the power of 1/gamma = 1/2
+	r = sqrt(scale * r);
+	b = sqrt(scale * b);
+	g = sqrt(scale * g);
 
 	//Write the color
 	//color is scaled to be in [0, 255]

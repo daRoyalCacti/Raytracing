@@ -4,6 +4,7 @@
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
+#include "scenes.h"
 
 #include <iostream>
 
@@ -32,36 +33,30 @@ color ray_color(const ray& r, const hittable& world, const int depth) {
 int main() {
 	//image
 	const auto aspect_ratio = 16.0 / 9.0;
-	const unsigned image_width = 400;
+	const unsigned image_width = 1920;
 	const unsigned image_height = static_cast<int>(image_width / aspect_ratio);
 	const unsigned samples_per_pixel = 100;
 	const unsigned max_depth = 50;	//max number of light bounces
 	
 	//World
-	hittable_list world;
-
-	const auto material_ground = make_shared<lambertian>(color(0.8, 0.8, 0));
-	const auto material_center = make_shared<lambertian>(color(0.1, 0.2, 0.3));
-	const auto material_left = make_shared<dielectric>(2.5);
-	const auto material_right = make_shared<metal>(color(0.8, 0.6, 0.2), 0.2);
-	const auto material_front = make_shared<dielectric>(2);
-
-	world.add(make_shared<sphere>(point3( 0.0,-100.5,-1.0), 100.0, material_ground));
-	world.add(make_shared<sphere>(point3( 0.0,   0.0,-1.0),   0.5, material_center));
-	world.add(make_shared<sphere>(point3(-1.0,   0.0,-1.0),   0.5, material_left));
-	world.add(make_shared<sphere>(point3( 1.0,   0.0,-1.0),   0.5, material_right));
-	//having a sphere with a negative radius allows for the creation of hollow spheres
-	world.add(make_shared<sphere>(point3( 0.0,   1.0,-0.75),  0.25, material_front));
-	world.add(make_shared<sphere>(point3( 0.0,   1.0,-0.75), -0.25, material_front));
+	const auto world = random_scene();
 
 	//Camera 
-	camera cam(point3(-2,2,1), point3(0,0,-1), vec3(0,1,0), 90, aspect_ratio);
+	const point3 lookfrom(13,2,3);
+	const point3 lookat(0,0,0);
+	const vec3 vup(0,1,0);
+	const auto dist_to_focus = 10.0;
+	const auto aperture = 0.1;
+	const double fov = 20.0;
+
+	camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
 
 	//Render
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 	for (int j = image_height-1; j>=0; --j) {
 		std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
+		#pragma omp parallel for
 		for (unsigned i = 0; i < image_width; ++i) {
 			color pixel_color(0,0,0);
 			for (int s = 0; s < samples_per_pixel; ++s) {

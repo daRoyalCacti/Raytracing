@@ -53,6 +53,8 @@ sphere.h
 /home/george/Documents/Projects/Raytracer/sphere.h
 camera.h
 /home/george/Documents/Projects/Raytracer/camera.h
+scenes.h
+/home/george/Documents/Projects/Raytracer/scenes.h
 iostream
 -
 
@@ -63,6 +65,14 @@ common.h
 /home/george/Documents/Projects/Raytracer/ray.h
 vec3.h
 /home/george/Documents/Projects/Raytracer/vec3.h
+
+/home/george/Documents/Projects/Raytracer/scenes.h
+hittable.h
+/home/george/Documents/Projects/Raytracer/hittable.h
+sphere.h
+/home/george/Documents/Projects/Raytracer/sphere.h
+common.h
+/home/george/Documents/Projects/Raytracer/common.h
 
 /home/george/Documents/Projects/Raytracer/sphere.h
 hittable.h

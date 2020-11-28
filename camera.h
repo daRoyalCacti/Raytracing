@@ -8,11 +8,13 @@ class camera {
 	vec3 horizontal;
 	vec3 vertical;
 	double lens_radius;
+	double time0, time1;	//shutter open/close times
 	
 	vec3 u, v, w;
 
 	public:
-	camera(const point3 lookfrom, const vec3 lookat, const vec3 vup, const double vfov, const double aspect_ratio, const double aperture, const double focus_dist) {
+	camera(const point3 lookfrom, const vec3 lookat, const vec3 vup, const double vfov, const double aspect_ratio, const double aperture, const double focus_dist,
+			const double _time0, const double _time1) : time0(_time0), time1(_time1) {
 		//vfov := vertical field of view in degrees
 		//lookfrom := position of the camera
 		//lookat := point for the camera to look at
@@ -44,6 +46,6 @@ class camera {
 		const vec3 rd = lens_radius * random_in_unit_disk();	//randomness is required to get the blur
 		const vec3 offset = u * rd.x() + v*rd.y();		//offset for where the light is coming from
 
-		return ray(origin + offset, lower_left_corner + s*horizontal + t*vertical - origin - offset);
+		return ray(origin + offset, lower_left_corner + s*horizontal + t*vertical - origin - offset, random_double(time0, time1));	//random time to simulate motion blur
 	}
 };

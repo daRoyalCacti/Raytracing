@@ -2,6 +2,7 @@
 
 #include "hittable.h"
 #include "sphere.h"
+#include "moving_sphere.h"
 #include "common.h"
 
 
@@ -39,19 +40,23 @@ hittable_list random_scene() {
 				shared_ptr<material> sphere_material;
 
 				if (choose_mat < 0.8) {
-					//diffuse
+					//diffuse (has moving spheres)
 					const auto albedo = color::random() * color::random();
-					sphere_material = make_shared<lambertian>(albedo);					
+					sphere_material = make_shared<lambertian>(albedo);	
+					const auto center2 = center + vec3(0, random_double(0, 0.5), 0);	//spheres moving downwards at random speeds				
+					world.add(make_shared<moving_sphere>(center, center2, 0.0, 1.0, 0.2, sphere_material));
 				} else if (choose_mat < 0.95) {
 					//metal
 					const auto albedo = color::random(0.5, 1);
 					const auto fuzz = random_double(0, 0.5);
 					sphere_material = make_shared<metal>(albedo, fuzz);
+					world.add(make_shared<sphere>(center, 0.2, sphere_material));
 				} else {
 					//glass
 					sphere_material = make_shared<dielectric>(1.5);
+					world.add(make_shared<sphere>(center, 0.2, sphere_material));	
 				}
-				world.add(make_shared<sphere>(center, 0.2, sphere_material));
+				
 			}
 
 		}

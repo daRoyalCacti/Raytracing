@@ -33,13 +33,13 @@ color ray_color(const ray& r, const hittable& world, const int depth) {
 int main() {
 	//image
 	const auto aspect_ratio = 16.0 / 9.0;
-	const unsigned image_width = 1920;
+	const unsigned image_width = 400;
 	const unsigned image_height = static_cast<int>(image_width / aspect_ratio);
 	const unsigned samples_per_pixel = 100;
 	const unsigned max_depth = 50;	//max number of light bounces
 	
 	//World
-	const auto world = first_scene();
+	const auto world = random_scene();
 
 	//Camera 
 	const point3 lookfrom(13,2,3);
@@ -49,7 +49,7 @@ int main() {
 	const auto aperture = 0.1;
 	const double fov = 20.0;
 
-	camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+	camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
 
 	//Render
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";

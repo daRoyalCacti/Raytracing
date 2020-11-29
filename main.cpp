@@ -7,6 +7,7 @@
 #include "scenes.h"
 
 #include <iostream>
+#include <chrono>
 
 
 color ray_color(const ray& r, const hittable& world, const int depth) {
@@ -31,11 +32,16 @@ color ray_color(const ray& r, const hittable& world, const int depth) {
 }
 
 int main() {
+	//start timing
+	const auto start = std::chrono::system_clock::now();
+	const std::time_t start_time = std::chrono::system_clock::to_time_t(start);
+	std::cerr << "Computation started at " << std::ctime(&start_time);
+
 	//image
 	const auto aspect_ratio = 16.0 / 9.0;
 	const unsigned image_width = 400;
 	const unsigned image_height = static_cast<int>(image_width / aspect_ratio);
-	const unsigned samples_per_pixel = 100;
+	const unsigned samples_per_pixel = 500;
 	const unsigned max_depth = 50;	//max number of light bounces
 	
 	//World
@@ -55,7 +61,7 @@ int main() {
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 	for (int j = image_height-1; j>=0; --j) {
-		std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
+		std::cerr << "\rScanlines remaining: " << j << " / " << image_height-1 << std::flush;
 		for (unsigned i = 0; i < image_width; ++i) {
 			color pixel_color(0,0,0);
 			#pragma omp parallel for
@@ -68,7 +74,15 @@ int main() {
 			write_color(std::cout, pixel_color, samples_per_pixel);
 		}
 	}
+	std::cerr << "\r" << std::flush;
 
-	std::cerr << "\nDone.\n";
+
+	//end timing
+	const auto end = std::chrono::system_clock::now();
+	const std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+	std::cerr << "Computation ended at " << std::ctime(&end_time);
+	
+	const std::chrono::duration<double> elapsed_seconds = end - start;
+	std::cerr << "elapsed time: " << elapsed_seconds.count() << "s  or  " << elapsed_seconds.count() / 60.0 << "m  or  " << elapsed_seconds.count() / (60.0 * 60.0) << "h\n";
 }
 

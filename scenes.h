@@ -4,6 +4,7 @@
 #include "sphere.h"
 #include "moving_sphere.h"
 #include "common.h"
+#include "bvh.h"
 
 
 hittable_list first_scene() {	
@@ -72,6 +73,8 @@ hittable_list random_scene() {
 	const auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
 	world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
-
-	return world;	
+	//hittable_list objects;
+	//objects.add(make_shared<bvh_node>(world, 0, 1));
+	return world;
+	//return objects;	
 }

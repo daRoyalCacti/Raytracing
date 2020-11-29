@@ -58,6 +58,7 @@ struct aabb {
 							// - the time for with the ray is after min but before max in all of x,y,z
 							//
 							//consider a 2D box and 3 possible rays (time increasing moving right -- collide with min first then max)
+							// - requires tab size of 8
 							//		      min.x			      max.x
 							//
 							//		    	|			      /	| tmax.x
@@ -98,4 +99,18 @@ struct aabb {
 			}				
 		return true;
 	}
+
 };
+
+inline aabb surrounding_box(const aabb box0, const aabb box1) {		//creates a larger bounding box around 2 smaller bounding boxes
+	const point3 small(	fmin(box0.min().x(),  box1.min().x()),
+				fmin(box0.min().y(),  box1.min().y()),
+				fmin(box0.min().z(),  box1.min().z()) );
+
+	const point3 big(	fmax(box0.max().x(),  box1.max().x()),
+				fmax(box0.max().y(),  box1.max().y()),
+				fmax(box0.max().z(),  box1.max().z()) );
+
+	return aabb(small, big);
+
+}

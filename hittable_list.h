@@ -1,9 +1,11 @@
 #pragma once
 
 #include "hittable.h"
+#include "aabb.h"
 
 #include <memory>
 #include <vector>
+
 
 using std::shared_ptr;
 using std::make_shared;
@@ -18,6 +20,7 @@ struct hittable_list : public hittable {
 	void add(shared_ptr<hittable> object) {objects.push_back(object);}
 
 	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override;
+	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override;
 };
 
 bool hittable_list::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {
@@ -35,4 +38,23 @@ bool hittable_list::hit(const ray& r, const double t_min, const double t_max, hi
 	}
 
 	return hit_anything;
+}
+
+bool hittable_list::bounding_box(const double time0, const double time1, aabb& output_box) const {
+	if (objects.empty()) return false;	//no objects to create bounding boxes for
+
+	aabb temp_box;
+	bool first_box = true;
+
+	for (const auto& object : objects) {
+		if (!object->bounding_box(time0, time1, temp_box)) return false;	//if bounding box returns false,  this function returns false
+											//this also makes temp_box the bounding box for object
+		output_box = first_box ? temp_box : surrounding_box(output_box, temp_box); 	//creates a bounding box around the previous large bounding box and 
+												// the bounding box for the current object
+												//If there is no previous large bounding box, output box is just the bounding box
+												// for the object
+		first_box = false;
+	}
+	
+	return true;
 }

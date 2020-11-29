@@ -13,6 +13,8 @@ struct sphere : public hittable {
 	sphere(const point3 cen, const double r, const shared_ptr<material> m): center(cen), radius(r), mat_ptr(m) {}
 
 	virtual bool hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const override;
+
+	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override;
 };
 
 bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {
@@ -50,4 +52,7 @@ bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_recor
 	return true;	//the ray collides with the sphere
 }
 
-
+bool sphere::bounding_box(const double time0, const double time1, aabb& output_box) const {
+	output_box = aabb(center - vec3(radius, radius, radius), center + vec3(radius, radius, radius));
+	return true;
+}

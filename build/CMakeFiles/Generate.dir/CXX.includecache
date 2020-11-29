@@ -8,6 +8,16 @@
 
 /home/george/Documents/Projects/Raytracer/aabb.h
 
+/home/george/Documents/Projects/Raytracer/bvh.h
+algorithm
+-
+common.h
+/home/george/Documents/Projects/Raytracer/common.h
+hittable.h
+/home/george/Documents/Projects/Raytracer/hittable.h
+hittable_list.h
+/home/george/Documents/Projects/Raytracer/hittable_list.h
+
 /home/george/Documents/Projects/Raytracer/camera.h
 common.h
 /home/george/Documents/Projects/Raytracer/common.h
@@ -41,6 +51,8 @@ aabb.h
 /home/george/Documents/Projects/Raytracer/hittable_list.h
 hittable.h
 /home/george/Documents/Projects/Raytracer/hittable.h
+aabb.h
+/home/george/Documents/Projects/Raytracer/aabb.h
 memory
 -
 vector
@@ -60,6 +72,8 @@ camera.h
 scenes.h
 /home/george/Documents/Projects/Raytracer/scenes.h
 iostream
+-
+chrono
 -
 
 /home/george/Documents/Projects/Raytracer/material.h
@@ -85,6 +99,8 @@ moving_sphere.h
 /home/george/Documents/Projects/Raytracer/moving_sphere.h
 common.h
 /home/george/Documents/Projects/Raytracer/common.h
+bvh.h
+/home/george/Documents/Projects/Raytracer/bvh.h
 
 /home/george/Documents/Projects/Raytracer/sphere.h
 hittable.h

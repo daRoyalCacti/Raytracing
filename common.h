@@ -31,6 +31,11 @@ inline double random_double(const double min, const double max) {
 	return min + (max-min)*random_double();
 }
 
+inline int random_int(const int min, const int max) {
+	//Returns a random integer from U[min,  max]
+	return static_cast<int>(random_double(min, max+1));
+}
+
 inline double clamp(const double x, const double min, const double max) {
 	//forcing x to be in [min, max]
 	if (x < min) return min;

@@ -15,6 +15,8 @@ struct moving_sphere : public hittable {
 
 	virtual bool hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const override;
 
+	virtual bool bounding_box(const double _time0, const double _time1, aabb& output_box) const override;
+
 	inline point3 center(const double time) const {
 		return center0 + (time - time0) / (time1 - time0) * (center1 - center0);
 	}
@@ -54,4 +56,11 @@ bool moving_sphere::hit(const ray& r, const double t_min, const double t_max, hi
 
 	return true;	//the ray collides with the sphere
 	
+}
+
+bool moving_sphere::bounding_box(const double _time0, const double _time1, aabb& output_box) const {
+	aabb box0(center(_time0) - vec3(radius,radius,radius), center(_time0) + vec3(radius,radius,radius));
+	aabb box1(center(_time1) - vec3(radius,radius,radius), center(_time1) + vec3(radius,radius,radius));
+	output_box = surrounding_box(box0, box1);
+	return true;
 }

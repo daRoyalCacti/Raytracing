@@ -21,5 +21,6 @@ struct hit_record {
 };
 
 struct hittable {
-	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const = 0;
+	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const = 0;	//function to tell when a ray hits the object
+	virtual bool bounding_box(const double time0, const double time1, aabb& outputtt_box) const = 0;	//function that creates a bounding box around the object
 };

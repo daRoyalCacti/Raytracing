@@ -123,8 +123,8 @@ camera two_spheres_scene_cam(const double aspect_ratio) {
 hittable_list two_perlin_spheres_scene() {
 	hittable_list objects;
 
-	const auto pertex1 = make_shared<noise_texture>(2);
-	const auto pertex2 = make_shared<noise_texture>(5);
+	const auto pertex1 = make_shared<marble_texture>(4);
+	const auto pertex2 = make_shared<turbulent_texture>(5);
 
 	objects.add(make_shared<sphere>(point3(0,-1000,0), 1000, make_shared<lambertian>(pertex1) ));
 	objects.add(make_shared<sphere>(point3(0,    2,0),    2, make_shared<lambertian>(pertex2) ));

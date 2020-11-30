@@ -3,6 +3,7 @@
 #include "common.h"
 
 #include "perlin.h"
+#include "stb_image_ne.h"
 
 struct texture {
 	virtual color value(const double u, const double v, const point3& p) const = 0;
@@ -44,14 +45,73 @@ struct checker_texture : public texture {
 
 struct noise_texture : public texture {
 	perlin noise;
-	double scale = 1.0;
+	double scale;	//how detailed the noise is, bigger number := more noise
 
-	noise_texture() {}
-	noise_texture(const double sc) : scale(sc) {}
+	noise_texture(const double sc = 1.0) : scale(sc) {}
 
 	virtual color value(const double u, const double v, const point3& p) const override {
 		return color(1,1,1) *0.5 *(1.0 + noise.noise(scale*p));	//creates a gray color
 									//needs to be scaled to go between 0 and 1 else the gamma correcting function will return NaN's
 									// (sqrt of a negative number)
+	}
+};
+
+
+struct turbulent_texture : public texture {
+	perlin noise;
+	double scale;	//how detailed the noise is, bigger number := more noise
+	int depth;	//number of layers of noise
+
+	turbulent_texture(const double sc = 1.0, const int dpt = 7) : scale(sc), depth(dpt) {}
+	
+	virtual color value(const double u, const double v, const point3& p) const override {
+		return color(1,1,1) * noise.turb(scale*p, depth);
+	}
+};
+
+
+struct marble_texture : public texture {
+	perlin noise;
+	double scale;	//how detailed the noise is, bigger number := more noise
+
+	marble_texture(const double sc = 1.0) : scale(sc) {}
+	
+	virtual color value(const double u, const double v, const point3& p) const override {
+		return color(1,1,1) * 0.5 * (1 + sin(scale*p.z() + 10* noise.turb(scale*p, 7) ) );
+	}
+};
+
+
+
+
+
+class image_texture : public texture {
+	unsigned char* data;	//the data read from file
+	int width, height;	//the width and height of the image
+	int bytes_per_scanline;
+
+	public:
+	const static int bytes_per_pixel = 3;
+
+	image_texture() : data(nullptr), width(0), height(0), bytes_per_scanline(0) {}
+
+	image_texture(const char* filename) {
+		auto components_per_pixel = bytes_per_pixel;
+
+		data = stbi_load(filename, &width, &height, &components_per_pixel, components_per_pixel);	//reading the data from disk
+
+		if (!data) {	//file not read
+			std::cerr << "ERROR: Could not load texture image file '" << filename << "'.\n";
+			width = height =0;
+		}
+		bytes_per_scanline = bytes_per_pixel * width;
+	}
+
+	~image_texture() {
+		delete data;
+	}
+
+	virtual color value(const double u, const double v, const vec3& p) const override {
+		//TODO
 	}
 };

@@ -42,6 +42,38 @@ ray.h
 vec3.h
 /home/george/Documents/Projects/Raytracer/vec3.h
 
+/home/george/Documents/Projects/Raytracer/external/stb_image.h
+stb_image.h
+/home/george/Documents/Projects/Raytracer/external/stb_image.h
+stdio.h
+-
+stdlib.h
+-
+stdarg.h
+-
+stddef.h
+-
+stdlib.h
+-
+string.h
+-
+limits.h
+-
+math.h
+-
+stdio.h
+-
+assert.h
+-
+stdint.h
+-
+emmintrin.h
+-
+intrin.h
+-
+arm_neon.h
+-
+
 /home/george/Documents/Projects/Raytracer/hittable.h
 common.h
 /home/george/Documents/Projects/Raytracer/common.h
@@ -120,11 +152,17 @@ vec3.h
 material.h
 /home/george/Documents/Projects/Raytracer/material.h
 
+/home/george/Documents/Projects/Raytracer/stb_image_ne.h
+external/stb_image.h
+/home/george/Documents/Projects/Raytracer/external/stb_image.h
+
 /home/george/Documents/Projects/Raytracer/texture.h
 common.h
 /home/george/Documents/Projects/Raytracer/common.h
 perlin.h
 /home/george/Documents/Projects/Raytracer/perlin.h
+stb_image_ne.h
+/home/george/Documents/Projects/Raytracer/stb_image_ne.h
 
 /home/george/Documents/Projects/Raytracer/vec3.h
 iostream

@@ -103,4 +103,18 @@ class perlin {
 
 		return perlin_interp(c, u, v, w);	//the actual linear interpolation
 	}
+
+	double turb(const point3& p, const int depth=7) const {
+		auto accum = 0.0;
+		auto temp_p = p;
+		auto weight = 1.0;
+
+		for (int i = 0; i < depth; i++) {
+			accum += weight * noise(temp_p);	//the actual noise
+			weight *= 0.5;				//progressive additions of noise have less impact overall
+			temp_p *= 2;				//so the noise is not all at the same place
+		}
+
+		return fabs(accum);
+	}
 };

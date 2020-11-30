@@ -11,8 +11,10 @@ CMakeFiles/Generate.dir/main.cpp.o: ../hittable_list.h
 CMakeFiles/Generate.dir/main.cpp.o: ../main.cpp
 CMakeFiles/Generate.dir/main.cpp.o: ../material.h
 CMakeFiles/Generate.dir/main.cpp.o: ../moving_sphere.h
+CMakeFiles/Generate.dir/main.cpp.o: ../perlin.h
 CMakeFiles/Generate.dir/main.cpp.o: ../ray.h
 CMakeFiles/Generate.dir/main.cpp.o: ../scenes.h
 CMakeFiles/Generate.dir/main.cpp.o: ../sphere.h
+CMakeFiles/Generate.dir/main.cpp.o: ../texture.h
 CMakeFiles/Generate.dir/main.cpp.o: ../vec3.h
 

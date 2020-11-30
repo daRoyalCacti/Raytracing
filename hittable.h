@@ -11,6 +11,8 @@ struct hit_record {
 	shared_ptr<material> mat_ptr;
 	double t;	//time point was hit
 	bool front_face;	//did the hit happen on the front or back of the face
+	double u;	//uv coords for textures
+	double v;
 
 	inline void set_face_normal(const ray& r, const vec3& outward_normal) { //function to set normal and front_face
 		front_face = dot(r.direction(), outward_normal) < 0;	//if the ray direction points against the normal, the ray collided with the front

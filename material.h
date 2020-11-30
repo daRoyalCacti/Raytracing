@@ -2,6 +2,8 @@
 
 #include "common.h"
 
+#include "texture.h"
+
 struct hit_record;
 
 struct material {
@@ -9,9 +11,10 @@ struct material {
 };
 
 struct lambertian : public material {
-	color albedo;	
+	shared_ptr<texture> albedo;
 	
-	lambertian(const color& a) : albedo(a) {}
+	lambertian(const color& a) : albedo(make_shared<solid_color>(a)) {}
+	lambertian(const shared_ptr<texture> a) : albedo(a) {}
 
 	virtual bool scatter(const ray& ray_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
 		auto scatter_direction = rec.normal + random_unit_vector();
@@ -21,24 +24,25 @@ struct lambertian : public material {
 			scatter_direction = rec.normal;
 
 		scattered = ray(rec.p, scatter_direction, ray_in.time());
-		attenuation = albedo;
+		attenuation = albedo->value(rec.u, rec.v, rec.p);
 		return true;
 	}
 };
 
 
 struct metal : public material {
-	color albedo;
+	shared_ptr<texture> albedo;
 	double fuzz;	//how much light spreads out on collison
 			//fuzz = 0 for perfect reflections
 			//fuzz = 1 for very fuzzy reflections
 
-	metal(const color& a, const double f = 0) : albedo(a), fuzz(f) {};
+	metal(const color& a, const double f = 0) : albedo(make_shared<solid_color>(a)), fuzz(f) {}
+	metal(const shared_ptr<texture> a) : albedo(a) {}
 
 	virtual bool scatter(const ray& ray_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
 		vec3 reflected = reflect(unit_vector(ray_in.direction()), rec.normal);	//the incomming ray reflected about the normal
 		scattered = ray(rec.p, reflected + fuzz * random_in_unit_sphere(), ray_in.time());	//the scattered ray
-		attenuation = albedo;
+		attenuation = albedo->value(rec.u, rec.v, rec.p);
 		return (dot(scattered.direction(), rec.normal) > 0);	//making sure scattering not away fron the normal
 	}
 };

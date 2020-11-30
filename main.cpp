@@ -41,27 +41,20 @@ int main() {
 	const auto aspect_ratio = 16.0 / 9.0;
 	const unsigned image_width = 400;
 	const unsigned image_height = static_cast<int>(image_width / aspect_ratio);
-	const unsigned samples_per_pixel = 500;
+	const unsigned samples_per_pixel = 100;
 	const unsigned max_depth = 50;	//max number of light bounces
 	
 	//World
-	const auto world = random_scene();
+	const auto world = two_perlin_spheres_scene();
 
 	//Camera 
-	const point3 lookfrom(13,2,3);
-	const point3 lookat(0,0,0);
-	const vec3 vup(0,1,0);
-	const auto dist_to_focus = 10.0;
-	const auto aperture = 0.1;
-	const double fov = 20.0;
-
-	camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
+	const auto cam = two_perlin_spheres_scene_cam(aspect_ratio);
 
 	//Render
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 	for (int j = image_height-1; j>=0; --j) {
-		std::cerr << "\rScanlines remaining: " << j << " / " << image_height-1 << std::flush;
+		std::cerr << "\rScanlines remaining: " << j+1 << " / " << image_height << std::flush;
 		for (unsigned i = 0; i < image_width; ++i) {
 			color pixel_color(0,0,0);
 			#pragma omp parallel for

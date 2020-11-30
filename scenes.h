@@ -26,10 +26,13 @@ hittable_list first_scene() {
 	return world;
 }
 
+
+
 hittable_list random_scene() {
 	hittable_list world;
 	
-	const auto ground_material = make_shared<lambertian>(color(0.5,0.5,0.5));
+	const auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+	const auto ground_material = make_shared<lambertian>(checker);
 	world.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
 
 	for (int a = -11; a<11; a++) {	//centers of spheres x
@@ -73,8 +76,69 @@ hittable_list random_scene() {
 	const auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
 	world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
-	//hittable_list objects;
-	//objects.add(make_shared<bvh_node>(world, 0, 1));
-	return world;
-	//return objects;	
+	hittable_list objects;
+	objects.add(make_shared<bvh_node>(world, 0, 1));
+	
+	return objects;	
+}
+
+
+camera random_scene_cam(const double aspect_ratio) {
+	const point3 lookfrom(13,2,3);
+	const point3 lookat(0,0,0);
+	const vec3 vup(0,1,0);
+	const auto dist_to_focus = 10.0;
+	const auto aperture = 0.1;
+	const double fov = 20.0;
+
+	return camera(lookfrom, lookat, vup, fov, aspect_ratio, aperture, dist_to_focus, 0.0, 0.35);
+}
+
+
+
+hittable_list two_spheres_scene() {
+	hittable_list objects;
+
+	const auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+
+	objects.add(make_shared<sphere>(point3(0,-10,0), 10, make_shared<lambertian>(checker) ));
+	objects.add(make_shared<sphere>(point3(0, 10,0), 10, make_shared<lambertian>(checker) ));
+
+	return objects;
+}
+
+camera two_spheres_scene_cam(const double aspect_ratio) {
+	const point3 lookfrom(13, 2, 3);
+	const point3 lookat(0, 0, 0);
+	const vec3 vup(0, 1, 0);
+	const auto dist_to_focus = 10.0;
+	const auto aperture = 0.0;
+	const double fov = 20.0;
+
+	return camera(lookfrom, lookat, vup, fov, aspect_ratio, aperture, dist_to_focus, 0.0, 0.35);
+}
+
+
+
+hittable_list two_perlin_spheres_scene() {
+	hittable_list objects;
+
+	const auto pertex1 = make_shared<noise_texture>(2);
+	const auto pertex2 = make_shared<noise_texture>(5);
+
+	objects.add(make_shared<sphere>(point3(0,-1000,0), 1000, make_shared<lambertian>(pertex1) ));
+	objects.add(make_shared<sphere>(point3(0,    2,0),    2, make_shared<lambertian>(pertex2) ));
+
+	return objects;
+}
+
+camera two_perlin_spheres_scene_cam(const double aspect_ratio) {
+	const point3 lookfrom(13, 2, 3);
+	const point3 lookat(0,0,0);
+	const vec3 vup(0, 1, 0);
+	const auto dist_to_focus = 10.0;
+	const auto aperture = 0.0;
+	const double fov = 20.0;
+
+	return camera(lookfrom, lookat, vup, fov, aspect_ratio, aperture, dist_to_focus, 0.0, 0.35);
 }

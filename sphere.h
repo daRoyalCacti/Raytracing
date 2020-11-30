@@ -15,6 +15,22 @@ struct sphere : public hittable {
 	virtual bool hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const override;
 
 	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override;
+
+	private:
+	static void get_sphere_uv(const point3& p, double& u, double& v) {
+		//p: a given point on a unit sphere
+		//u: normalised angle around Y axis (starting from x=-1)
+		//v: normalised angle around Z axis (from Y=-1 to Y=1)
+		// - normalised means in [0,1] as is standard for texture coordinates
+
+		const auto theta = acos(-p.y());			//theta and phi in standard spherical coordinates
+		const auto phi = atan2(-p.z(), p.x()) + pi;	//techically phi = atan2(p.z, -p.x) but this is discontinuous
+								// - this uses atan2(a, b) = atan2(-a,-b) + pi which is continuous
+								// - atan2(a,b) = atan(a/b)
+
+		u = phi / (2 * pi);	//simple normalisation
+		v = theta / pi;
+	}
 };
 
 bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {
@@ -48,6 +64,10 @@ bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_recor
 								//dividing by radius to make it normalised
 	rec.set_face_normal(r, outward_normal);
 	rec.mat_ptr = mat_ptr;
+
+	get_sphere_uv(outward_normal, rec.u, rec.v);	//setting the texture coordinates
+							//outward_normal is technical a vec3 not a point3 but they are the same thing
+							// - it points to the correct position on a unit sphere
 
 	return true;	//the ray collides with the sphere
 }

@@ -112,6 +112,23 @@ class image_texture : public texture {
 	}
 
 	virtual color value(const double u, const double v, const vec3& p) const override {
-		//TODO
+		if (data == nullptr)	//if not texture data, return cyan color
+			return color(0, 1, 1);
+
+		//Clamp input texture coordinates to [0,1]^2
+		const auto uu = clamp(u, 0.0, 1.0);
+		const auto vv = 1.0 - clamp(v, 0.0, 1.0);	//Flip v to image coordinates
+
+		auto i = static_cast<int>(uu*width);
+		auto j = static_cast<int>(vv*height);
+
+		//Clamp integer mapping sicne actual coordinates should be less than 1.0
+		if (i >= width)  i = width - 1;
+		if (j >= height) j = height - 1;
+
+		const auto color_scale = 1.0 / 255.0;	//to scale the input from [0,255] to [0,1]
+		const auto pixel = data + j*bytes_per_scanline + i*bytes_per_pixel;	//the pixel at coordinates (u,v)
+
+		return color(color_scale*pixel[0], color_scale*pixel[1], color_scale*pixel[2]);
 	}
 };

@@ -45,10 +45,10 @@ int main() {
 	const unsigned max_depth = 50;	//max number of light bounces
 	
 	//World
-	const auto world = two_perlin_spheres_scene();
+	const auto world = earth_scene();
 
 	//Camera 
-	const auto cam = two_perlin_spheres_scene_cam(aspect_ratio);
+	const auto cam = earth_scene_cam(aspect_ratio);
 
 	//Render
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";

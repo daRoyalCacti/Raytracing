@@ -142,3 +142,23 @@ camera two_perlin_spheres_scene_cam(const double aspect_ratio) {
 
 	return camera(lookfrom, lookat, vup, fov, aspect_ratio, aperture, dist_to_focus, 0.0, 0.35);
 }
+
+
+hittable_list earth_scene() {
+	const auto earth_texture = make_shared<image_texture>("../textures/earthmap.jpg");
+	const auto earth_surface = make_shared<lambertian>(earth_texture);
+	const auto globe = make_shared<sphere>(point3(0,0,0), 2, earth_surface);
+
+	return hittable_list(globe);
+}
+
+camera earth_scene_cam(const double aspect_ratio) {
+	const point3 lookfrom(13, 2, 3);
+	const point3 lookat(0,0,0);
+	const vec3 vup(0,1,0);
+	const auto dist_to_focus(10.0);
+	const auto aperture = 0.0;
+	const double fov = 20.0;
+
+	return camera(lookfrom, lookat, vup, fov, aspect_ratio, aperture, dist_to_focus, 0.0, 0.35);
+}

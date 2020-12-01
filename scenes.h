@@ -3,6 +3,7 @@
 #include "hittable.h"
 #include "sphere.h"
 #include "moving_sphere.h"
+#include "aarect.h"
 #include "common.h"
 #include "bvh.h"
 
@@ -16,15 +17,15 @@ struct scene {
 	camera cam_;
 	double aspect_ratio;
 
-	inline color background() {
+	inline color background() const {
 		return background_;
 	}
 
-	inline hittable_list objects() {
+	inline hittable_list objects() const {
 		return world;
 	}
 
-	inline camera cam() {
+	inline camera cam() const {
 		return cam_;
 	}
 
@@ -177,7 +178,10 @@ struct earth_scene : public scene {
 		const auto earth_surface = make_shared<lambertian>(earth_texture);
 		world.add(make_shared<sphere>(point3(0,0,0), 2, earth_surface));
 
-		set_camera(vec3(13.0, 2.0, 3.0), vec3(0.0, 0.0, 0.0));
+		const auto difflight = make_shared<diffuse_light>(color(4.0, 4.0, 4.0));
+		world.add(make_shared<xy_rect>(-5, 5, -3, 3, -6, difflight));
+
+		set_camera(vec3(13.0, 0.0, 0.0), vec3(0.0, 0.0, 0.0));
 	}
 };
 

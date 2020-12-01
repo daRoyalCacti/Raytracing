@@ -8,6 +8,12 @@
 
 /home/george/Documents/Projects/Raytracer/aabb.h
 
+/home/george/Documents/Projects/Raytracer/aarect.h
+common.h
+/home/george/Documents/Projects/Raytracer/common.h
+hittable.h
+/home/george/Documents/Projects/Raytracer/hittable.h
+
 /home/george/Documents/Projects/Raytracer/bvh.h
 algorithm
 -
@@ -103,6 +109,8 @@ camera.h
 /home/george/Documents/Projects/Raytracer/camera.h
 scenes.h
 /home/george/Documents/Projects/Raytracer/scenes.h
+render.h
+/home/george/Documents/Projects/Raytracer/render.h
 iostream
 -
 chrono
@@ -132,6 +140,18 @@ numeric
 vec3.h
 /home/george/Documents/Projects/Raytracer/vec3.h
 
+/home/george/Documents/Projects/Raytracer/render.h
+functional
+-
+common.h
+/home/george/Documents/Projects/Raytracer/common.h
+camera.h
+/home/george/Documents/Projects/Raytracer/camera.h
+hittable_list.h
+/home/george/Documents/Projects/Raytracer/hittable_list.h
+scenes.h
+/home/george/Documents/Projects/Raytracer/scenes.h
+
 /home/george/Documents/Projects/Raytracer/scenes.h
 hittable.h
 /home/george/Documents/Projects/Raytracer/hittable.h
@@ -139,6 +159,8 @@ sphere.h
 /home/george/Documents/Projects/Raytracer/sphere.h
 moving_sphere.h
 /home/george/Documents/Projects/Raytracer/moving_sphere.h
+aarect.h
+/home/george/Documents/Projects/Raytracer/aarect.h
 common.h
 /home/george/Documents/Projects/Raytracer/common.h
 bvh.h

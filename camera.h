@@ -13,6 +13,8 @@ class camera {
 	vec3 u, v, w;
 
 	public:
+	camera() {}
+
 	camera(const point3 lookfrom, const vec3 lookat, const vec3 vup, const double vfov, const double aspect_ratio, const double aperture, const double focus_dist,
 			const double _time0, const double _time1) : time0(_time0), time1(_time1) {
 		//vfov := vertical field of view in degrees

@@ -10,25 +10,28 @@
 #include <chrono>
 
 
-color ray_color(const ray& r, const hittable& world, const int depth) {
+color ray_color(const ray& r, const hittable& world, const int depth, const color& background) {
 	//collision with any object
 	hit_record rec;
 
 	//If we've reach the bounce limit, no more light is gathered
 	if (depth <= 0)
 		return color(0,0,0);
+	
+	//If the ray hits nothing, return the background color
+	if (!world.hit(r, 0.001, infinity, rec))
+		return background;
+	
 	//else keep bouncing light
-	if (world.hit(r, 0.001, infinity, rec)) {	//if any object is hit
-		ray scattered;
-		color attenuation;
-		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))	//if the ray should scatter
-			return attenuation * ray_color(scattered, world, depth-1);	//return the color of the object darkened by the number of times the ray bounced
-		return color(0,0,0);
-	}
-	//background color
-	const vec3 unit_direction = unit_vector(r.direction());
-	const auto t = 0.5*(unit_direction.y() + 1.0);
-	return (1.0-t)*color(1.0,1.0,1.0) + t*color(0.5,0.7, 1.0);
+	ray scattered;
+	color attenuation;
+	const color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);	//is black if the material doesn't emit
+
+	if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))	//if the shouldn't scatter
+		return emitted;
+
+	return emitted + attenuation * ray_color(scattered, world, depth-1, background);	//return the color of the object darkened by the number of times the ray bounced
+
 }
 
 int main() {
@@ -44,11 +47,18 @@ int main() {
 	const unsigned samples_per_pixel = 100;
 	const unsigned max_depth = 50;	//max number of light bounces
 	
+	//Scene
+	//first_scene curr_scene; //= first_scene(aspect_ratio);
+	first_scene curr_scene(aspect_ratio);
+
 	//World
-	const auto world = earth_scene();
+	const auto world = curr_scene.objects();
 
 	//Camera 
-	const auto cam = earth_scene_cam(aspect_ratio);
+	const auto cam = curr_scene.cam();
+
+	//Background color
+	const auto bckg = curr_scene.background();
 
 	//Render
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
@@ -62,7 +72,7 @@ int main() {
 				auto u = double(i + random_double()) / (image_width-1);
 				auto v = double(j + random_double()) / (image_height-1);
 				ray r = cam.get_ray(u, v);
-				pixel_color += ray_color(r, world, max_depth);
+				pixel_color += ray_color(r, world, max_depth, bckg);
 			}
 			write_color(std::cout, pixel_color, samples_per_pixel);
 		}

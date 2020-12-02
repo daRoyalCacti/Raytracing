@@ -4,6 +4,7 @@
 CMakeFiles/Generate.dir/main.cpp.o
  /home/george/Documents/Projects/Raytracer/aabb.h
  /home/george/Documents/Projects/Raytracer/aarect.h
+ /home/george/Documents/Projects/Raytracer/box.h
  /home/george/Documents/Projects/Raytracer/bvh.h
  /home/george/Documents/Projects/Raytracer/camera.h
  /home/george/Documents/Projects/Raytracer/color.h

@@ -4,6 +4,7 @@
 #include "sphere.h"
 #include "moving_sphere.h"
 #include "aarect.h"
+#include "box.h"
 #include "common.h"
 #include "bvh.h"
 
@@ -186,3 +187,29 @@ struct earth_scene : public scene {
 };
 
 
+struct cornell_box_scene : public scene {
+	cornell_box_scene(const double aspec) : scene(aspec) {
+		set_background(background_color::black);	//shouldn't matter -- can't see sky
+
+		const auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
+		const auto white = make_shared<lambertian>(color(0.73, 0.73, 0.73));
+		const auto green = make_shared<lambertian>(color(0.12, 0.45, 0.15));
+		const auto light = make_shared<diffuse_light>(color(15, 15, 15));	//very bright light
+
+		world.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));	//left wall
+		world.add(make_shared<yz_rect>(0, 555, 0, 555, 0  , red  ));	//right wall
+
+		world.add(make_shared<xz_rect>(213, 343, 227, 332, 554, light));	//small light on roof
+
+		world.add(make_shared<xz_rect>(0, 555, 0, 555, 0  , white));	//floor
+		world.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));	//roof
+
+		world.add(make_shared<xy_rect>(0, 555, 0, 555, 555, white));	//back wall
+		//world.add(make_shared<xy_rect>(0, 555, 0, 555, 0  , white));	//front wall
+		
+		world.add(make_shared<box>(point3(130, 0, 65 ), point3(295, 165, 230), white));	//small box
+		world.add(make_shared<box>(point3(265, 0, 295), point3(430, 330, 460), white));	//big box
+
+		set_camera(vec3(278, 278, -800), vec3(278, 278, 0), 40.0, 0.0); 
+	}
+};

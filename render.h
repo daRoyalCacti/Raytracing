@@ -13,6 +13,11 @@ struct render_settings {
 	unsigned samples_per_pixel;	//number of light rays per pixel
 	unsigned max_depth = 50;	//max number of light bounces
 
+	render_settings(const unsigned img_w, const unsigned samples = 100, const double aspect = 16.0 / 9.0) :
+			image_width(img_w), samples_per_pixel(samples), aspect_ratio(aspect) {
+		calc_height();
+	}
+
 	inline void calc_height() {
 		image_height = static_cast<int>(image_width / aspect_ratio);
 	}
@@ -41,17 +46,9 @@ struct render_settings {
 
 
 struct low_render_settings : public render_settings {
-	low_render_settings() {
-		image_width = 400;
-		calc_height();
-		samples_per_pixel = 100;
-	}
+	low_render_settings() : render_settings(400, 100) {}
 };
 
 struct high_render_settings : public render_settings {
-	high_render_settings() {
-		image_width = 1920;
-		calc_height();
-		samples_per_pixel = 500;
-	}
+	high_render_settings() : render_settings(1920, 500) {}
 };

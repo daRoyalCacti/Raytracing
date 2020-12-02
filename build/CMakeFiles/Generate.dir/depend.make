@@ -3,6 +3,7 @@
 
 CMakeFiles/Generate.dir/main.cpp.o: ../aabb.h
 CMakeFiles/Generate.dir/main.cpp.o: ../aarect.h
+CMakeFiles/Generate.dir/main.cpp.o: ../box.h
 CMakeFiles/Generate.dir/main.cpp.o: ../bvh.h
 CMakeFiles/Generate.dir/main.cpp.o: ../camera.h
 CMakeFiles/Generate.dir/main.cpp.o: ../color.h

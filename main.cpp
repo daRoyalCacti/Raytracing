@@ -43,8 +43,8 @@ int main() {
 
 	
 	//the main drawing
-	render_settings ren(600, 200, 1.0);			//change this to change the quality of the render
-	cornell_box_scene curr_scene(ren.aspect_ratio);	//change this to change the scene
+	render_settings ren(300, 200, 1.0);			//change this to change the quality of the render
+	big_scene2 curr_scene(ren.aspect_ratio);	//change this to change the scene
 	ren.draw(curr_scene, ray_color);
 
 

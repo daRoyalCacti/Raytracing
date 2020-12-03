@@ -5,6 +5,8 @@
 #include "moving_sphere.h"
 #include "aarect.h"
 #include "box.h"
+#include "constant_medium.h"
+
 #include "common.h"
 #include "bvh.h"
 
@@ -75,8 +77,8 @@ struct first_scene : public scene {
 	}
 };
 
-struct random_scene : public scene {
-	random_scene(const double aspect) : scene(aspect) {
+struct big_scene1 : public scene {
+	big_scene1(const double aspect) : scene(aspect) {
 		set_background(background_color::sky);
 
 
@@ -136,6 +138,75 @@ struct random_scene : public scene {
 };
 
 
+struct big_scene2 : public scene{
+	big_scene2(const double aspec) : scene(aspec) {
+		set_background(background_color::black);
+
+		hittable_list boxes1;
+		const auto ground = make_shared<lambertian>(color(0.48, 0.83, 0.53));
+
+		//generating the ground
+		const int boxes_per_side = 20;
+		const auto w = 100.0;	//width
+		for (int i = 0; i < boxes_per_side; i++) 
+			for (int j = 0; j < boxes_per_side; j++) {
+				const auto x0 = -1000.0 + i*w;
+				const auto z0 = -1000.0 + j*w;
+				const auto y0 = 0.0;
+
+				const auto x1 = x0 + w;
+				const auto z1 = z0 + w;
+				const auto y1 = random_double(1, 101);
+
+				boxes1.add(make_shared<box>(point3(x0, y0, z0), point3(x1, y1, z1), ground));
+			}
+
+		world.add(make_shared<bvh_node>(boxes1, 0, 1));
+		
+		//main light
+		const auto light = make_shared<diffuse_light>(color(7, 7, 7));
+		world.add(make_shared<xz_rect>(123, 423, 147, 412, 554, light));
+
+		//moving sphere
+		const auto center1 = point3(400, 400, 200);
+		const auto center2 = center1 + vec3(30, 30, 0);
+		const auto moving_sphere_material = make_shared<lambertian>(color(0.7, 0.3, 0.1));
+		world.add(make_shared<moving_sphere>(center1, center2, 0, 1, 50, moving_sphere_material));
+
+		//glass ball
+		world.add(make_shared<sphere>(point3(360, 150, 145), 70, make_shared<dielectric>(1.5)));
+
+		//metal ball
+		world.add(make_shared<sphere>(point3(0, 150, 145), 50, make_shared<metal>(color(0.8, 0.8, 0.9), 1.0) ));
+
+		//smoke
+		const auto boundary1 = make_shared<sphere>(point3(360, 150, 145), 70, make_shared<dielectric>(1.5));
+		world.add(make_shared<constant_medium>(boundary1, 0.2, color(0.2, 0.4, 0.9) ));
+		const auto boundary2 = make_shared<sphere>(point3(0,0,0), 5000, make_shared<dielectric>(1.5) );
+		world.add(make_shared<constant_medium>(boundary2, 0.001, color(1,1,1) ));
+
+		//Earth
+		const auto emat = make_shared<lambertian>(make_shared<image_texture>("../textures/earthmap.jpg"));
+		world.add(make_shared<sphere>(point3(400,200,400), 100, emat));
+
+		//sphere with noise texture
+		const auto pertex = make_shared<turbulent_texture>(0.1);
+		world.add(make_shared<sphere>(point3(220, 280, 300), 80, make_shared<lambertian>(pertex) ));
+
+		//box of many spheres
+		hittable_list boxes2;
+		const auto white = make_shared<lambertian>(color(0.73, 0.73, 0.73));
+		const int ns = 1000;	//number of spheres
+		for (int j = 0; j < ns; j++)
+			boxes2.add(make_shared<sphere>(point3::random(0, 165), 10, white) );
+
+		world.add(make_shared<translate>(make_shared<rotate_y>(make_shared<bvh_node>(boxes2, 0.0, 1.0), 30), vec3(-100, 270, 395) ));
+
+		set_camera(point3(478, 278, -600), point3(278, 278, 0), 40.0, 0.0);
+	}
+};
+
+
 struct two_spheres_scene : public scene {
 	two_spheres_scene(const double aspect) : scene(aspect) {
 		set_background(background_color::sky);
@@ -182,7 +253,29 @@ struct earth_scene : public scene {
 		const auto difflight = make_shared<diffuse_light>(color(4.0, 4.0, 4.0));
 		world.add(make_shared<xy_rect>(-5, 5, -3, 3, -6, difflight));
 
+
 		set_camera(vec3(13.0, 0.0, 0.0), vec3(0.0, 0.0, 0.0));
+	}
+};
+
+struct earth_atm_scene : public scene {
+	earth_atm_scene(const double aspec) : scene(aspec) {
+		set_background(background_color::black);
+
+		const auto earth_texture = make_shared<image_texture>("../textures/earthmap.jpg");
+		const auto earth_surface = make_shared<lambertian>(earth_texture);
+		world.add(make_shared<sphere>(point3(0,0,0), 2, earth_surface));
+
+		const auto difflight = make_shared<diffuse_light>(color(4.0, 4.0, 4.0));
+		world.add(make_shared<xy_rect>(-5, 5, -3, 3, -6, difflight));
+
+
+		const auto boundary = make_shared<sphere>(point3(0,0,0), 2.5, make_shared<dielectric>(1.5) );
+		world.add(make_shared<constant_medium>(boundary, 0.001, color(98.0/255.0, 140.0/255.0, 245.0/255.0)) );
+		
+
+		set_camera(vec3(13.0, 0.0, 0.0), vec3(0.0, 0.0, 0.0));
+
 	}
 };
 
@@ -219,6 +312,46 @@ struct cornell_box_scene : public scene {
 		box2 = make_shared<rotate_y>(box2, -18);
 		box2 = make_shared<translate>(box2, vec3(130,0,65));
 		world.add(box2);
+
+
+		set_camera(vec3(278, 278, -800), vec3(278, 278, 0), 40.0, 0.0); 
+	}
+};
+
+
+struct cornell_smoke_box_scene : public scene {
+	cornell_smoke_box_scene(const double aspec) : scene(aspec) {
+		set_background(background_color::black);	//shouldn't matter -- can't see sky
+
+		const auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
+		const auto white = make_shared<lambertian>(color(0.73, 0.73, 0.73));
+		const auto green = make_shared<lambertian>(color(0.12, 0.45, 0.15));
+		const auto light = make_shared<diffuse_light>(color(7, 7, 7));	//very bright light
+
+		world.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));	//left wall
+		world.add(make_shared<yz_rect>(0, 555, 0, 555, 0  , red  ));	//right wall
+
+		world.add(make_shared<xz_rect>(113, 443, 127, 432, 554, light));	//small light on roof
+
+		world.add(make_shared<xz_rect>(0, 555, 0, 555, 0  , white));	//floor
+		world.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));	//roof
+
+		world.add(make_shared<xy_rect>(0, 555, 0, 555, 555, white));	//back wall
+		//world.add(make_shared<xy_rect>(0, 555, 0, 555, 0  , white));	//front wall
+		
+
+		//big box
+		shared_ptr<hittable> box1 = make_shared<box>(point3(0,0,0), point3(165,330,165), white);
+		box1 = make_shared<rotate_y>(box1, 15);
+		box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+		world.add(make_shared<constant_medium>(box1, 0.01, color(0,0,0)) );
+		
+
+		//small box
+		shared_ptr<hittable> box2 = make_shared<box>(point3(0,0,0), point3(165,165,165), white);
+		box2 = make_shared<rotate_y>(box2, -18);
+		box2 = make_shared<translate>(box2, vec3(130,0,65));
+		world.add(make_shared<constant_medium>(box2, 0.01, color(1,1,1)));
 
 
 		set_camera(vec3(278, 278, -800), vec3(278, 278, 0), 40.0, 0.0); 

@@ -56,6 +56,16 @@ ray.h
 vec3.h
 /home/george/Documents/Projects/Raytracer/vec3.h
 
+/home/george/Documents/Projects/Raytracer/constant_medium.h
+common.h
+/home/george/Documents/Projects/Raytracer/common.h
+hittable.h
+/home/george/Documents/Projects/Raytracer/hittable.h
+material.h
+/home/george/Documents/Projects/Raytracer/material.h
+texture.h
+/home/george/Documents/Projects/Raytracer/texture.h
+
 /home/george/Documents/Projects/Raytracer/external/stb_image.h
 stb_image.h
 /home/george/Documents/Projects/Raytracer/external/stb_image.h
@@ -171,6 +181,8 @@ aarect.h
 /home/george/Documents/Projects/Raytracer/aarect.h
 box.h
 /home/george/Documents/Projects/Raytracer/box.h
+constant_medium.h
+/home/george/Documents/Projects/Raytracer/constant_medium.h
 common.h
 /home/george/Documents/Projects/Raytracer/common.h
 bvh.h

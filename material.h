@@ -113,3 +113,17 @@ struct diffuse_light : public material {
 		return emit->value(u, v, p);
 	}
 };
+
+//for scattering
+struct isotropic : public material {
+	shared_ptr<texture> albedo;
+
+	isotropic(const color c) : albedo(make_shared<solid_color>(c)) {}
+	isotropic(shared_ptr<texture> a) : albedo(a) {}
+
+	virtual bool scatter(const ray& ray_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
+		scattered = ray(rec.p, random_in_unit_sphere(), ray_in.time());	//pick a random direction for the ray to scatter
+		attenuation = albedo->value(rec.u, rec.v, rec.p);
+		return true;
+	}
+};

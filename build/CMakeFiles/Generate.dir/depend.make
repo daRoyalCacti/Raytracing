@@ -8,6 +8,7 @@ CMakeFiles/Generate.dir/main.cpp.o: ../bvh.h
 CMakeFiles/Generate.dir/main.cpp.o: ../camera.h
 CMakeFiles/Generate.dir/main.cpp.o: ../color.h
 CMakeFiles/Generate.dir/main.cpp.o: ../common.h
+CMakeFiles/Generate.dir/main.cpp.o: ../constant_medium.h
 CMakeFiles/Generate.dir/main.cpp.o: ../external/stb_image.h
 CMakeFiles/Generate.dir/main.cpp.o: ../hittable.h
 CMakeFiles/Generate.dir/main.cpp.o: ../hittable_list.h

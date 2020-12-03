@@ -46,7 +46,7 @@ struct metal : public material {
 		vec3 reflected = reflect(unit_vector(ray_in.direction()), rec.normal);	//the incomming ray reflected about the normal
 		scattered = ray(rec.p, reflected + fuzz * random_in_unit_sphere(), ray_in.time());	//the scattered ray
 		attenuation = albedo->value(rec.u, rec.v, rec.p);
-		return (dot(scattered.direction(), rec.normal) > 0);	//making sure scattering not away fron the normal
+		return (dot(scattered.direction(), rec.normal) > 0);	//making sure scattering not oppsoing the normal
 	}
 };
 

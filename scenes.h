@@ -174,14 +174,14 @@ struct big_scene2 : public scene{
 		world.add(make_shared<moving_sphere>(center1, center2, 0, 1, 50, moving_sphere_material));
 
 		//glass ball
-		world.add(make_shared<sphere>(point3(360, 150, 145), 70, make_shared<dielectric>(1.5)));
+		world.add(make_shared<sphere>(point3(260, 150, 45), 50, make_shared<dielectric>(1.5)));
 
 		//metal ball
-		world.add(make_shared<sphere>(point3(0, 150, 145), 50, make_shared<metal>(color(0.8, 0.8, 0.9), 1.0) ));
+		world.add(make_shared<sphere>(point3(0, 150, 145), 50, make_shared<metal>(color(0.8, 0.8, 0.9), 0.5) ));
 
 		//smoke
 		const auto boundary1 = make_shared<sphere>(point3(360, 150, 145), 70, make_shared<dielectric>(1.5));
-		world.add(make_shared<constant_medium>(boundary1, 0.2, color(0.2, 0.4, 0.9) ));
+		world.add(make_shared<constant_medium>(boundary1, 1.0, color(0.2, 0.4, 0.9) ));
 		const auto boundary2 = make_shared<sphere>(point3(0,0,0), 5000, make_shared<dielectric>(1.5) );
 		world.add(make_shared<constant_medium>(boundary2, 0.001, color(1,1,1) ));
 

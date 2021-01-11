@@ -22,5 +22,7 @@ CMakeFiles/Generate.dir/main.cpp.o: ../scenes.h
 CMakeFiles/Generate.dir/main.cpp.o: ../sphere.h
 CMakeFiles/Generate.dir/main.cpp.o: ../stb_image_ne.h
 CMakeFiles/Generate.dir/main.cpp.o: ../texture.h
+CMakeFiles/Generate.dir/main.cpp.o: ../triangle.h
+CMakeFiles/Generate.dir/main.cpp.o: ../triangle_mesh.h
 CMakeFiles/Generate.dir/main.cpp.o: ../vec3.h
 

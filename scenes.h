@@ -10,6 +10,9 @@
 #include "common.h"
 #include "bvh.h"
 
+#include "triangle.h"
+#include "triangle_mesh.h"
+
 enum class background_color {sky, black};
 
 
@@ -355,5 +358,34 @@ struct cornell_smoke_box_scene : public scene {
 
 
 		set_camera(vec3(278, 278, -800), vec3(278, 278, 0), 40.0, 0.0); 
+	}
+};
+
+
+
+
+struct triangle_scene : public scene {
+	triangle_scene(const double aspec) : scene(aspec) {
+		set_background(background_color::sky);	//shouldn't matter -- can't see sky
+
+		world.add(make_shared<triangle>(vec3(-0.5, 0, 0), vec3(0, 1, 10), vec3(0,0,0), 0, 0, 0, 1, 1, 0, make_shared<lambertian>(vec3(0, 1, 0)) ));
+		world.add(make_shared<sphere>(vec3(0, -100.5, -1), 100, make_shared<lambertian>(vec3(0,0,1)) ));	
+
+
+		set_camera(vec3(0, 0, -3), vec3(0, 0, 0), 40.0, 0.0); 
+	}
+};
+
+
+
+struct door_scene : public scene {
+	door_scene(const double aspec) : scene(aspec) {
+		set_background(background_color::sky);	//shouldn't matter -- can't see sky
+
+		world.add(generate_model("../models/door/door.obj"));
+		world.add(make_shared<sphere>(vec3(0, -100, -1), 100, make_shared<lambertian>(vec3(0,1,0)) ));	
+
+
+		set_camera(vec3(-3, 4, -5), vec3(0, 1, 0), 20.0, 0.0); 
 	}
 };

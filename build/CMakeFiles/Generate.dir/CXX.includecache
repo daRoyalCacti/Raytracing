@@ -209,6 +209,10 @@ common.h
 /home/jacob/Documents/Projects/Raytracer/common.h
 bvh.h
 /home/jacob/Documents/Projects/Raytracer/bvh.h
+triangle.h
+/home/jacob/Documents/Projects/Raytracer/triangle.h
+triangle_mesh.h
+/home/jacob/Documents/Projects/Raytracer/triangle_mesh.h
 
 /home/jacob/Documents/Projects/Raytracer/sphere.h
 hittable.h
@@ -229,6 +233,26 @@ perlin.h
 /home/jacob/Documents/Projects/Raytracer/perlin.h
 stb_image_ne.h
 /home/jacob/Documents/Projects/Raytracer/stb_image_ne.h
+
+/home/jacob/Documents/Projects/Raytracer/triangle.h
+hittable.h
+/home/jacob/Documents/Projects/Raytracer/hittable.h
+common.h
+/home/jacob/Documents/Projects/Raytracer/common.h
+
+/home/jacob/Documents/Projects/Raytracer/triangle_mesh.h
+triangle.h
+/home/jacob/Documents/Projects/Raytracer/triangle.h
+vector
+-
+string
+-
+assimp/Importer.hpp
+-
+assimp/scene.h
+-
+assimp/postprocess.h
+-
 
 /home/jacob/Documents/Projects/Raytracer/vec3.h
 iostream

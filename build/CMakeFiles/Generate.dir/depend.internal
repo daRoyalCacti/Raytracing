@@ -23,4 +23,6 @@ CMakeFiles/Generate.dir/main.cpp.o
  /home/jacob/Documents/Projects/Raytracer/sphere.h
  /home/jacob/Documents/Projects/Raytracer/stb_image_ne.h
  /home/jacob/Documents/Projects/Raytracer/texture.h
+ /home/jacob/Documents/Projects/Raytracer/triangle.h
+ /home/jacob/Documents/Projects/Raytracer/triangle_mesh.h
  /home/jacob/Documents/Projects/Raytracer/vec3.h

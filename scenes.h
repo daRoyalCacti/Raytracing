@@ -389,3 +389,16 @@ struct door_scene : public scene {
 		set_camera(vec3(-3, 4, -5), vec3(0, 1, 0), 20.0, 0.0); 
 	}
 };
+
+
+struct cup_scene : public scene {
+	cup_scene(const double aspec) : scene(aspec) {
+		set_background(background_color::sky);	//shouldn't matter -- can't see sky
+
+		world.add(generate_model("../models/cup/cup.obj"));
+		world.add(make_shared<sphere>(vec3(0, -100.5, -1), 100, make_shared<lambertian>(vec3(0,1,0)) ));	
+
+
+		set_camera(vec3(0, 0, -0.5), vec3(0, 0, 0), 20.0, 0.0); 
+	}
+};

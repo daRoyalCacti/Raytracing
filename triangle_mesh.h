@@ -154,7 +154,6 @@ std::shared_ptr<triangle_mesh> generate_model(const std::string file_name, const
 
 	auto current_material = make_shared<lambertian>(make_shared<image_texture>(file_dir.append(tex_paths[0]).c_str()) );
 
-
 	for (int i = 0; i < indices.size(); i += 3) {
 		triangles.add(make_shared<triangle>(	vec3(vertices[ 3*indices[i] ],		//each element of indices refers to 1 vertex
 							vertices[ 3*indices[i]  + 1],	//each vertex has 3 elements - x,y,z

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/george/Documents/Projects/Raytracer
+CXX_INCLUDES = -I/home/jacob/Documents/Projects/Raytracer
 
 CXX_FLAGS = -g -fopenmp -std=gnu++17
 

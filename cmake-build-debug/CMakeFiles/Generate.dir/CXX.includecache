@@ -6,6 +6,8 @@
 
 #IncludeRegexTransform: 
 
+/home/jacob/Documents/Projects/Raytracer/ONB.h
+
 /home/jacob/Documents/Projects/Raytracer/aabb.h
 
 /home/jacob/Documents/Projects/Raytracer/aarect.h
@@ -112,6 +114,8 @@ intrin.h
 arm_neon.h
 -
 
+/home/jacob/Documents/Projects/Raytracer/fog.h
+
 /home/jacob/Documents/Projects/Raytracer/hittable.h
 common.h
 /home/jacob/Documents/Projects/Raytracer/common.h
@@ -139,6 +143,10 @@ render.h
 /home/jacob/Documents/Projects/Raytracer/render.h
 probability.h
 /home/jacob/Documents/Projects/Raytracer/probability.h
+fog.h
+/home/jacob/Documents/Projects/Raytracer/fog.h
+pdf.h
+/home/jacob/Documents/Projects/Raytracer/pdf.h
 iostream
 -
 chrono
@@ -147,12 +155,24 @@ chrono
 /home/jacob/Documents/Projects/Raytracer/material.h
 common.h
 /home/jacob/Documents/Projects/Raytracer/common.h
+ONB.h
+/home/jacob/Documents/Projects/Raytracer/ONB.h
+probability.h
+/home/jacob/Documents/Projects/Raytracer/probability.h
 texture.h
 /home/jacob/Documents/Projects/Raytracer/texture.h
 
 /home/jacob/Documents/Projects/Raytracer/moving_sphere.h
 common.h
 /home/jacob/Documents/Projects/Raytracer/common.h
+hittable.h
+/home/jacob/Documents/Projects/Raytracer/hittable.h
+
+/home/jacob/Documents/Projects/Raytracer/pdf.h
+ONB.h
+/home/jacob/Documents/Projects/Raytracer/ONB.h
+probability.h
+/home/jacob/Documents/Projects/Raytracer/probability.h
 hittable.h
 /home/jacob/Documents/Projects/Raytracer/hittable.h
 
@@ -167,6 +187,8 @@ numeric
 /home/jacob/Documents/Projects/Raytracer/probability.h
 math.h
 -
+vec3.h
+/home/jacob/Documents/Projects/Raytracer/vec3.h
 
 /home/jacob/Documents/Projects/Raytracer/ray.h
 vec3.h

@@ -21,6 +21,23 @@ struct xy_rect : public hittable {
 		output_box = aabb(point3(x0, y0, k-small), point3(x1, y1, k+small));
 		return true;
 	}
+
+    virtual double pdf_value(const point3 &origin, const vec3 &v) const override {
+        hit_record rec;
+        if (!this->hit(ray(origin, v), 0.001, infinity, rec))
+            return 0;
+
+        const auto area = (x1-x0)*(y1-y0);
+        const auto distance_squared = rec.t * rec.t * v.length_squared();
+        const auto cosine = fabs(dot(v, rec.normal)) / v.length();
+
+        return distance_squared / (cosine * area);
+    }
+
+    virtual vec3 random(const point3 &origin) const override {
+        const auto random_point = point3(random_double(x0, x1), random_double(y0, y1), k);
+        return random_point - origin;
+    }
 };
 
 //very similar to xy rect -- see for comments
@@ -38,6 +55,23 @@ struct xz_rect : public hittable {
 		const double small = 0.0001;
 		output_box = aabb(point3(x0, k-small, z1), point3(x1, k+small, z1));
 		return true;
+	}
+
+	virtual double pdf_value(const point3 &origin, const vec3 &v) const override {
+	    hit_record rec;
+	    if (!this->hit(ray(origin, v), 0.001, infinity, rec))
+	        return 0;
+
+	    const auto area = (x1-x0)*(z1-z0);
+	    const auto distance_squared = rec.t * rec.t * v.length_squared();
+	    const auto cosine = fabs(dot(v, rec.normal)) / v.length();
+
+	    return distance_squared / (cosine * area);
+	}
+
+	virtual vec3 random(const point3 &origin) const override {
+	    const auto random_point = point3(random_double(x0, x1), k, random_double(z0, z1));
+	    return random_point - origin;
 	}
 };
 
@@ -57,6 +91,23 @@ struct yz_rect : public hittable {
 		output_box = aabb(point3(k-small, y0, z0), point3(k+small, y1, z1));
 		return true;
 	}
+
+    virtual double pdf_value(const point3 &origin, const vec3 &v) const override {
+        hit_record rec;
+        if (!this->hit(ray(origin, v), 0.001, infinity, rec))
+            return 0;
+
+        const auto area = (z1-z0)*(y1-y0);
+        const auto distance_squared = rec.t * rec.t * v.length_squared();
+        const auto cosine = fabs(dot(v, rec.normal)) / v.length();
+
+        return distance_squared / (cosine * area);
+    }
+
+    virtual vec3 random(const point3 &origin) const override {
+        const auto random_point = point3(k, random_double(y0, y1), random_double(z0, z1));
+        return random_point - origin;
+    }
 };
 
 

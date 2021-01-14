@@ -23,6 +23,11 @@ struct scene {
 	hittable_list world;
 	camera cam_;
 	double aspect_ratio;
+	shared_ptr<hittable> light;
+
+	inline shared_ptr<hittable> lights() const {
+	    return light;
+	}
 
 	inline color background() const {
 		return background_;
@@ -291,12 +296,13 @@ struct cornell_box_scene : public scene {
 		const auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
 		const auto white = make_shared<lambertian>(color(0.73, 0.73, 0.73));
 		const auto green = make_shared<lambertian>(color(0.12, 0.45, 0.15));
-		const auto light = make_shared<diffuse_light>(color(15, 15, 15));	//very bright light
+		const auto light_col = make_shared<diffuse_light>(color(15, 15, 15));	//very bright light
 
 		world.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));	//left wall
 		world.add(make_shared<yz_rect>(0, 555, 0, 555, 0  , red  ));	//right wall
 
-		world.add(make_shared<xz_rect>(213, 343, 227, 332, 554, light));	//small light on roof
+		world.add(make_shared<flip_face>(make_shared<xz_rect>(213, 343, 227, 332, 554, light_col)));	//small light on roof
+		light = make_shared<xz_rect>(213, 343, 227, 332, 554, light_col);
 
 		world.add(make_shared<xz_rect>(0, 555, 0, 555, 0  , white));	//floor
 		world.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));	//roof

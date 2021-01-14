@@ -84,7 +84,16 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/ONB.h">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/fog.h">
+			<Option target="Generate"/>
+		</Unit>
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/main.cpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/pdf.h">
 			<Option target="Generate"/>
 		</Unit>
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/probability.h">

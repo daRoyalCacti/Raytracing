@@ -4,36 +4,15 @@
 #include "scenes.h"
 #include "render.h"
 #include "probability.h"
+#include "fog.h"
+#include "pdf.h"
 
 #include <iostream>
 #include <chrono>
 
-//https://www.astro.umd.edu/~jph/HG_note.pdf
-//https://blog.demofox.org/2014/06/22/analytic-fog-density/
-//https://computergraphics.stackexchange.com/questions/227/how-are-volumetric-effects-handled-in-raytracing
-bool hit_fog(ray start, vec3 end, ray &scattered) {
-    const double lambda = 0.05;  //determines how often particles scatter - 'density of the fog'
-    const double g1 = 0.3, g2 = 0.4;   //determines how particles scatter
-    const auto length = (start.orig-end).length();
-    /*const auto prob = exp_cdf(length, lambda)
 
-    if (rand_double() > prob)
-        return false;
 
-    const auto travelled = rand_double(0, length);*/
-
-    const auto pos = rand_exp(lambda);
-
-    if (pos > length)   //the ray should scatter after the ray has collided
-        return false;
-
-    const auto theta = rand_Henyey_Greensteing(g1);
-    const auto phi = rand_Henyey_Greensteing(g2);
-    scattered = ray(start.at(pos), vec3(sin(theta)*cos(phi), sin(theta)*sin(phi), cos(phi)), start.tm + pos);
-    return true;
-}
-
-color ray_color(const ray& r, const hittable& world, const int depth, const color& background) {
+color ray_color(const ray& r, const hittable& world, const int depth, const color& background, std::function<bool (const ray, const vec3, ray&)> hit_fog, shared_ptr<hittable> lights) {
 	//collision with any object
 	hit_record rec;
 
@@ -48,19 +27,31 @@ color ray_color(const ray& r, const hittable& world, const int depth, const colo
 		return background;
 
     ray scattered;
-	/*if (hit_fog(r, rec.p, scattered)) {
-	    return fog_color * ray_color(scattered, world, depth-1, background);
-	}*/
+	if (hit_fog(r, rec.p, scattered)) {
+	    return fog_color * ray_color(scattered, world, depth-1, background, hit_fog, lights);
+	}
 
 	
 	//else keep bouncing light
 	color attenuation;
-	const color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);	//is black if the material doesn't emit
+	double pdf_val;
+	const color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);	//is black if the material doesn't emit
 
-	if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))	//if the shouldn't scatter
+
+
+	if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered, pdf_val))	//if the shouldn't scatter
 		return emitted;
 
-	return emitted + attenuation * ray_color(scattered, world, depth-1, background);	//return the color of the object darkened by the number of times the ray bounced
+	const auto p0 = make_shared<hittable_pdf>(lights, rec.p);
+	const auto p1 = make_shared<cosine_pdf>(rec.normal);
+	mixture_pdf mixed_pdf(p0, p1);
+
+	scattered = ray(rec.p, mixed_pdf.generate(), r.time());
+	pdf_val = mixed_pdf.value(scattered.direction());
+
+
+
+	return emitted + attenuation * ray_color(scattered, world, depth-1, background, hit_fog, lights) * rec.mat_ptr->scattering_pdf(r, rec, scattered) / pdf_val;	//return the color of the object darkened by the number of times the ray bounced
 
 }
 
@@ -73,9 +64,9 @@ int main() {
 
 	
 	//the main drawing
-	render_settings ren(120, 10, 10, 16.0f/9.0f);			//change this to change the quality of the render
-	big_scene1 curr_scene(ren.aspect_ratio);	//change this to change the scene
-	ren.draw(curr_scene, ray_color);
+	render_settings ren(600, 1000, 1, 1/*16.0f/9.0f*/);			//change this to change the quality of the render
+    cornell_box_scene curr_scene(ren.aspect_ratio);	//change this to change the scene
+	ren.draw(curr_scene, ray_color, no_fog);
 
 
 	//end timing

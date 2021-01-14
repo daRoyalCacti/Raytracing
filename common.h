@@ -37,6 +37,7 @@ inline int random_int(const int min, const int max) {
 }
 
 inline double clamp(const double x, const double min, const double max) {
+    if (!std::isfinite(x)) return min;
 	//forcing x to be in [min, max]
 	if (x < min) return min;
 	if (x > max) return max;

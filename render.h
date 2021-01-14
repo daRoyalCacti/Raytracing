@@ -28,8 +28,9 @@ struct render_settings {
         image_height = static_cast<int>(image_width / aspect_ratio);
 	}
 
-
-	virtual void draw(const scene &scn, std::function<color (const ray&, const hittable&, const int, const color&)> ray_color) {
+typedef std::function<bool (const ray, const vec3, ray&)> fog_func;
+	void draw(const scene &scn, std::function<color (const ray&, const hittable&, const int, const color&, fog_func, shared_ptr<hittable>)> ray_color,
+                   fog_func hit_fog) {
 		//creating a temp directory
 		std::string rand_str("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 		std::random_device rd;	
@@ -57,7 +58,7 @@ struct render_settings {
 						auto u = double(i + random_double()) / (image_width-1);
 						auto v = double(j + random_double()) / (image_height-1);
 						ray r = scn.cam().get_ray(u, v);
-						pixel_color += ray_color(r, scn.objects(), max_depth, scn.background());
+						pixel_color += ray_color(r, scn.objects(), max_depth, scn.background(), hit_fog, scn.lights());
 					}
 					write_color(out, pixel_color, samples_per_pixel);
 				}

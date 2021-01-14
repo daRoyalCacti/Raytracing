@@ -25,6 +25,15 @@ struct hit_record {
 struct hittable {
 	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const = 0;	//function to tell when a ray hits the object
 	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const = 0;	//function that creates a bounding box around the object
+
+	virtual double pdf_value(const point3& o, const vec3 &v) const {
+	    //std::cout << "bad" << std::endl;
+	    return 0.0;
+	}
+
+	virtual vec3 random(const vec3 &o) const {
+	    return vec3(1, 0, 0);
+	}
 };
 
 
@@ -35,7 +44,7 @@ struct translate : public hittable {
 	translate(const shared_ptr<hittable> p, const vec3& displacement) : ptr(p), offset(displacement) {}
 
 	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
-		const ray moved_r(r.origin() - offset, r.direction(), r.time());	//moving object by offset is same as translting axes by -offset
+		const ray moved_r(r.origin() - offset, r.direction(), r.time());	//moving object by offset is same as translating axes by -offset
 		
 		if(!ptr->hit(moved_r, t_min, t_max, rec))	//if ray doesn't hits object in new axes
 			return false;
@@ -139,3 +148,22 @@ bool rotate_y::hit(const ray& r, const double t_min, const double t_max, hit_rec
 
 	return true;
 }
+
+
+struct flip_face : public hittable {
+    shared_ptr<hittable> ptr;
+
+    flip_face(shared_ptr<hittable> p) : ptr(p) {}
+
+    virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record &rec) const override {
+        if (!ptr->hit(r, t_min, t_max, rec))
+            return false;
+
+        rec.front_face = !rec.front_face;
+        return true;
+    }
+
+    virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+        return ptr->bounding_box(time0, time1, output_box);
+    }
+};

@@ -13,7 +13,7 @@
 
 #include <png++/png.hpp>	//for writing pngs
 
-void write_color(std::ostream &out, const color pixel_color, const int samples_per_pixel) {
+void write_color(std::ostream &out, const color pixel_color, const unsigned samples_per_pixel) {
 	auto r = pixel_color.x();
 	auto g = pixel_color.y();
 	auto b = pixel_color.z();

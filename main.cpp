@@ -1,19 +1,40 @@
 #include "common.h"
 
-#include "color.h"
 #include "hittable_list.h"
-#include "sphere.h"
-#include "camera.h"
 #include "scenes.h"
 #include "render.h"
+#include "probability.h"
 
 #include <iostream>
 #include <chrono>
 
 
+bool hit_fog(ray start, vec3 end, ray &scattered) {
+    const double lambda = 0.05;  //determines how often particles scatter - 'density of the fog'
+    const double g = 0.3;   //determines how particles scatter
+    const auto length = (start.orig-end).length();
+    /*const auto prob = exp_cdf(length, lambda)
+
+    if (rand_double() > prob)
+        return false;
+
+    const auto travelled = rand_double(0, length);*/
+
+    const auto pos = rand_exp(lambda);
+
+    if (pos > length)   //the ray should scatter after the ray has collided
+        return false;
+
+    const auto theta = rand_Henyey_Greensteing(g);
+    scattered = ray(start.at(pos), vec3(cos(theta), sin(theta), start.dir.z()), start.tm + pos);
+    return true;
+}
+
 color ray_color(const ray& r, const hittable& world, const int depth, const color& background) {
 	//collision with any object
 	hit_record rec;
+
+	const color fog_color = color(0.8, 0.8, 0.8);
 
 	//If we've reach the bounce limit, no more light is gathered
 	if (depth <= 0)
@@ -22,9 +43,14 @@ color ray_color(const ray& r, const hittable& world, const int depth, const colo
 	//If the ray hits nothing, return the background color
 	if (!world.hit(r, 0.001, infinity, rec))
 		return background;
+
+    ray scattered;
+	if (hit_fog(r, rec.p, scattered)) {
+	    return fog_color * ray_color(scattered, world, depth-1, background);
+	}
+
 	
 	//else keep bouncing light
-	ray scattered;
 	color attenuation;
 	const color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);	//is black if the material doesn't emit
 
@@ -35,6 +61,7 @@ color ray_color(const ray& r, const hittable& world, const int depth, const colo
 
 }
 
+
 int main() {
 	//start timing
 	const auto start = std::chrono::system_clock::now();
@@ -43,8 +70,8 @@ int main() {
 
 	
 	//the main drawing
-	render_settings ren(1200, 1000, 10, 16.0f/9.0f);			//change this to change the quality of the render
-	cup_scene curr_scene(ren.aspect_ratio);	//change this to change the scene
+	render_settings ren(1200, 100, 10, 16.0f/9.0f);			//change this to change the quality of the render
+	big_scene1 curr_scene(ren.aspect_ratio);	//change this to change the scene
 	ren.draw(curr_scene, ray_color);
 
 

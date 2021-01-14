@@ -87,6 +87,9 @@
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/main.cpp">
 			<Option target="Generate"/>
 		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/probability.h">
+			<Option target="Generate"/>
+		</Unit>
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

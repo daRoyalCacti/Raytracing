@@ -1,5 +1,6 @@
 #pragma once
 
+#include "camera.h"
 #include "hittable.h"
 #include "sphere.h"
 #include "moving_sphere.h"

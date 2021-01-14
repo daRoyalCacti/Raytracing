@@ -131,18 +131,14 @@ vector
 /home/jacob/Documents/Projects/Raytracer/main.cpp
 common.h
 /home/jacob/Documents/Projects/Raytracer/common.h
-color.h
-/home/jacob/Documents/Projects/Raytracer/color.h
 hittable_list.h
 /home/jacob/Documents/Projects/Raytracer/hittable_list.h
-sphere.h
-/home/jacob/Documents/Projects/Raytracer/sphere.h
-camera.h
-/home/jacob/Documents/Projects/Raytracer/camera.h
 scenes.h
 /home/jacob/Documents/Projects/Raytracer/scenes.h
 render.h
 /home/jacob/Documents/Projects/Raytracer/render.h
+probability.h
+/home/jacob/Documents/Projects/Raytracer/probability.h
 iostream
 -
 chrono
@@ -168,6 +164,10 @@ algorithm
 numeric
 -
 
+/home/jacob/Documents/Projects/Raytracer/probability.h
+math.h
+-
+
 /home/jacob/Documents/Projects/Raytracer/ray.h
 vec3.h
 /home/jacob/Documents/Projects/Raytracer/vec3.h
@@ -179,6 +179,8 @@ common.h
 /home/jacob/Documents/Projects/Raytracer/common.h
 camera.h
 /home/jacob/Documents/Projects/Raytracer/camera.h
+color.h
+/home/jacob/Documents/Projects/Raytracer/color.h
 hittable_list.h
 /home/jacob/Documents/Projects/Raytracer/hittable_list.h
 scenes.h
@@ -193,6 +195,8 @@ sys/types.h
 -
 
 /home/jacob/Documents/Projects/Raytracer/scenes.h
+camera.h
+/home/jacob/Documents/Projects/Raytracer/camera.h
 hittable.h
 /home/jacob/Documents/Projects/Raytracer/hittable.h
 sphere.h

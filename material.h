@@ -35,7 +35,7 @@ struct lambertian : public material {
 
 struct metal : public material {
 	shared_ptr<texture> albedo;
-	double fuzz;	//how much light spreads out on collison
+	double fuzz;	//how much light spreads out on collision
 			//fuzz = 0 for perfect reflections
 			//fuzz = 1 for very fuzzy reflections
 
@@ -43,10 +43,14 @@ struct metal : public material {
 	metal(const shared_ptr<texture> a) : albedo(a) {}
 
 	virtual bool scatter(const ray& ray_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
-		vec3 reflected = reflect(unit_vector(ray_in.direction()), rec.normal);	//the incomming ray reflected about the normal
+		vec3 reflected = reflect(unit_vector(ray_in.direction()), rec.normal);	//the incoming ray reflected about the normal
 		scattered = ray(rec.p, reflected + fuzz * random_in_unit_sphere(), ray_in.time());	//the scattered ray
-		attenuation = albedo->value(rec.u, rec.v, rec.p);
-		return (dot(scattered.direction(), rec.normal) > 0);	//making sure scattering not oppsoing the normal
+		//attenuation = albedo->value(rec.u, rec.v, rec.p);
+		//using Schlick's formula
+		const auto unit_direction = unit_vector(ray_in.direction());
+		const auto cosine = fmin(dot(-unit_direction, rec.normal), 1.0);
+        attenuation = albedo->value(rec.u, rec.v, rec.p) + (color(1, 1, 1) - albedo->value(rec.u, rec.v, rec.p)) * pow(1-cosine, 5);
+		return (dot(scattered.direction(), rec.normal) > 0);	//making sure scattering not opposing the normal
 	}
 };
 

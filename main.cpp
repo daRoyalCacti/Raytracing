@@ -8,10 +8,12 @@
 #include <iostream>
 #include <chrono>
 
-
+//https://www.astro.umd.edu/~jph/HG_note.pdf
+//https://blog.demofox.org/2014/06/22/analytic-fog-density/
+//https://computergraphics.stackexchange.com/questions/227/how-are-volumetric-effects-handled-in-raytracing
 bool hit_fog(ray start, vec3 end, ray &scattered) {
     const double lambda = 0.05;  //determines how often particles scatter - 'density of the fog'
-    const double g = 0.3;   //determines how particles scatter
+    const double g1 = 0.3, g2 = 0.4;   //determines how particles scatter
     const auto length = (start.orig-end).length();
     /*const auto prob = exp_cdf(length, lambda)
 
@@ -25,8 +27,9 @@ bool hit_fog(ray start, vec3 end, ray &scattered) {
     if (pos > length)   //the ray should scatter after the ray has collided
         return false;
 
-    const auto theta = rand_Henyey_Greensteing(g);
-    scattered = ray(start.at(pos), vec3(cos(theta), sin(theta), start.dir.z()), start.tm + pos);
+    const auto theta = rand_Henyey_Greensteing(g1);
+    const auto phi = rand_Henyey_Greensteing(g2);
+    scattered = ray(start.at(pos), vec3(sin(theta)*cos(phi), sin(theta)*sin(phi), cos(phi)), start.tm + pos);
     return true;
 }
 
@@ -45,9 +48,9 @@ color ray_color(const ray& r, const hittable& world, const int depth, const colo
 		return background;
 
     ray scattered;
-	if (hit_fog(r, rec.p, scattered)) {
+	/*if (hit_fog(r, rec.p, scattered)) {
 	    return fog_color * ray_color(scattered, world, depth-1, background);
-	}
+	}*/
 
 	
 	//else keep bouncing light
@@ -70,7 +73,7 @@ int main() {
 
 	
 	//the main drawing
-	render_settings ren(1200, 100, 10, 16.0f/9.0f);			//change this to change the quality of the render
+	render_settings ren(120, 10, 10, 16.0f/9.0f);			//change this to change the quality of the render
 	big_scene1 curr_scene(ren.aspect_ratio);	//change this to change the scene
 	ren.draw(curr_scene, ray_color);
 

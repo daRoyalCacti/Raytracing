@@ -39,6 +39,18 @@ inline vec3 random_cosine_direction() {
     return vec3(x,y,z);
 }
 
+inline vec3 random_to_sphere(const double& radius, const double &distance_squared) {
+    const auto r1 = random_double();
+    const auto r2 = random_double();
+
+    const auto z = 1 + r2* ( sqrt(1 - radius*radius/distance_squared) - 1);
+    const auto phi = 2*pi*r1;
+
+    const auto x = cos(phi)*sqrt(1-z*z);
+    const auto y = sin(phi)*sqrt(1-z*z);
+
+    return vec3(x, y, z);
+}
 
 
 #endif //RAYTRACER_PROBABILITY_H

@@ -31,27 +31,27 @@ color ray_color(const ray& r, const hittable& world, const int depth, const colo
 	    return fog_color * ray_color(scattered, world, depth-1, background, hit_fog, lights);
 	}
 
-	
+
 	//else keep bouncing light
-	color attenuation;
-	double pdf_val;
+    scatter_record srec;
 	const color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);	//is black if the material doesn't emit
 
 
-
-	if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered, pdf_val))	//if the shouldn't scatter
+	if (!rec.mat_ptr->scatter(r, rec, srec))	//if the light shouldn't scatter
 		return emitted;
 
-	const auto p0 = make_shared<hittable_pdf>(lights, rec.p);
-	const auto p1 = make_shared<cosine_pdf>(rec.normal);
-	mixture_pdf mixed_pdf(p0, p1);
+	if (srec.is_specular)
+	    return srec.attenuation * ray_color(srec.specular_ray, world, depth-1, background, hit_fog, lights);
+
+	const auto light_ptr = make_shared<hittable_pdf>(lights, rec.p);
+	mixture_pdf mixed_pdf(light_ptr, srec.pdf_ptr);
 
 	scattered = ray(rec.p, mixed_pdf.generate(), r.time());
-	pdf_val = mixed_pdf.value(scattered.direction());
+	const auto pdf_val = mixed_pdf.value(scattered.direction());
 
 
 
-	return emitted + attenuation * ray_color(scattered, world, depth-1, background, hit_fog, lights) * rec.mat_ptr->scattering_pdf(r, rec, scattered) / pdf_val;	//return the color of the object darkened by the number of times the ray bounced
+	return emitted + srec.attenuation * ray_color(scattered, world, depth-1, background, hit_fog, lights) * rec.mat_ptr->scattering_pdf(r, rec, scattered) / pdf_val;	//return the color of the object darkened by the number of times the ray bounced
 
 }
 
@@ -65,7 +65,7 @@ int main() {
 	
 	//the main drawing
 	render_settings ren(600, 1000, 1, 1/*16.0f/9.0f*/);			//change this to change the quality of the render
-    cornell_box_scene curr_scene(ren.aspect_ratio);	//change this to change the scene
+    cornell_box_scene2 curr_scene(ren.aspect_ratio);	//change this to change the scene
 	ren.draw(curr_scene, ray_color, no_fog);
 
 

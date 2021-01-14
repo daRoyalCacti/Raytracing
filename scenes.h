@@ -23,7 +23,7 @@ struct scene {
 	hittable_list world;
 	camera cam_;
 	double aspect_ratio;
-	shared_ptr<hittable> light;
+	shared_ptr<hittable_list> light;
 
 	inline shared_ptr<hittable> lights() const {
 	    return light;
@@ -41,7 +41,7 @@ struct scene {
 		return cam_;
 	}
 
-	scene(const double aspec) : aspect_ratio(aspec) {}
+	scene(const double aspec) : aspect_ratio(aspec) {light = make_shared<hittable_list>();}
 
 	inline void set_background(const background_color& col) {
 		if (col == background_color::sky) {
@@ -302,7 +302,7 @@ struct cornell_box_scene : public scene {
 		world.add(make_shared<yz_rect>(0, 555, 0, 555, 0  , red  ));	//right wall
 
 		world.add(make_shared<flip_face>(make_shared<xz_rect>(213, 343, 227, 332, 554, light_col)));	//small light on roof
-		light = make_shared<xz_rect>(213, 343, 227, 332, 554, light_col);
+		light->add(make_shared<xz_rect>(213, 343, 227, 332, 554, shared_ptr<material>()));
 
 		world.add(make_shared<xz_rect>(0, 555, 0, 555, 0  , white));	//floor
 		world.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));	//roof
@@ -326,6 +326,46 @@ struct cornell_box_scene : public scene {
 
 		set_camera(vec3(278, 278, -800), vec3(278, 278, 0), 40.0, 0.0); 
 	}
+};
+
+
+struct cornell_box_scene2 : public scene {
+    cornell_box_scene2(const double aspec) : scene(aspec) {
+        set_background(background_color::black);	//shouldn't matter -- can't see sky
+
+        const auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
+        const auto white = make_shared<lambertian>(color(0.73, 0.73, 0.73));
+        const auto green = make_shared<lambertian>(color(0.12, 0.45, 0.15));
+        const auto light_col = make_shared<diffuse_light>(color(15, 15, 15));	//very bright light
+
+        world.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));	//left wall
+        world.add(make_shared<yz_rect>(0, 555, 0, 555, 0  , red  ));	//right wall
+
+        world.add(make_shared<flip_face>(make_shared<xz_rect>(213, 343, 227, 332, 554, light_col)));	//small light on roof
+
+        world.add(make_shared<xz_rect>(0, 555, 0, 555, 0  , white));	//floor
+        world.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));	//roof
+
+        world.add(make_shared<xy_rect>(0, 555, 0, 555, 555, white));	//back wall
+        //world.add(make_shared<xy_rect>(0, 555, 0, 555, 0  , white));	//front wall
+
+        //big box
+        shared_ptr<hittable> box1 = make_shared<box>(point3(0,0,0), point3(165,330,165), white);
+        box1 = make_shared<rotate_y>(box1, 15);
+        box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+        world.add(box1);
+
+
+        //small box
+        const auto glass = make_shared<dielectric>(1.5);
+        world.add(make_shared<sphere>(point3(190,90,190), 90, glass));
+
+        //auto lights = make_shared<hittable_list>();
+        light->add(make_shared<sphere>(point3(190,90,190), 90, shared_ptr<material>()));
+        light->add(make_shared<xz_rect>(213, 343, 227, 332, 554, shared_ptr<material>()));
+
+        set_camera(vec3(278, 278, -800), vec3(278, 278, 0), 40.0, 0.0);
+    }
 };
 
 

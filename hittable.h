@@ -27,7 +27,6 @@ struct hittable {
 	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const = 0;	//function that creates a bounding box around the object
 
 	virtual double pdf_value(const point3& o, const vec3 &v) const {
-	    //std::cout << "bad" << std::endl;
 	    return 0.0;
 	}
 

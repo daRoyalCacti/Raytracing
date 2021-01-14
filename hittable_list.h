@@ -21,6 +21,9 @@ struct hittable_list : public hittable {
 
 	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override;
 	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override;
+
+    virtual double pdf_value(const point3& o, const vec3& v) const override;
+    virtual vec3 random(const point3& o) const override;
 };
 
 bool hittable_list::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {
@@ -57,4 +60,19 @@ bool hittable_list::bounding_box(const double time0, const double time1, aabb& o
 	}
 	
 	return true;
+}
+
+double hittable_list::pdf_value(const point3& o, const vec3& v) const {
+    const double weight = 1.0/objects.size();
+    double sum = 0.0;
+
+    for (const auto& object : objects)
+        sum += weight * object->pdf_value(o, v);
+
+    return sum;
+}
+
+vec3 hittable_list::random(const point3& o) const {
+    const auto int_size = static_cast<int>(objects.size());
+    return objects[random_int(0, int_size-1)]->random(o);
 }

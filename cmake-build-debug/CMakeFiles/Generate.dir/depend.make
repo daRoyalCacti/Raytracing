@@ -21,6 +21,7 @@ CMakeFiles/Generate.dir/main.cpp.o: ../pdf.h
 CMakeFiles/Generate.dir/main.cpp.o: ../perlin.h
 CMakeFiles/Generate.dir/main.cpp.o: ../probability.h
 CMakeFiles/Generate.dir/main.cpp.o: ../ray.h
+CMakeFiles/Generate.dir/main.cpp.o: ../ray_colors.h
 CMakeFiles/Generate.dir/main.cpp.o: ../render.h
 CMakeFiles/Generate.dir/main.cpp.o: ../scenes.h
 CMakeFiles/Generate.dir/main.cpp.o: ../sphere.h

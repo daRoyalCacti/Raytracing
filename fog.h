@@ -2,6 +2,10 @@
 #ifndef RAYTRACER_FOG_H
 #define RAYTRACER_FOG_H
 
+#include <functional>
+
+typedef std::function<bool (const ray, const vec3, ray&)> fog_func;
+
 //https://www.astro.umd.edu/~jph/HG_note.pdf
 //https://blog.demofox.org/2014/06/22/analytic-fog-density/
 //https://computergraphics.stackexchange.com/questions/227/how-are-volumetric-effects-handled-in-raytracing

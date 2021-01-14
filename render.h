@@ -7,6 +7,7 @@
 #include "color.h"
 #include "hittable_list.h"
 #include "scenes.h"
+#include "ray_colors.h"
 
 #include <fstream>
 
@@ -28,9 +29,8 @@ struct render_settings {
         image_height = static_cast<int>(image_width / aspect_ratio);
 	}
 
-typedef std::function<bool (const ray, const vec3, ray&)> fog_func;
-	void draw(const scene &scn, std::function<color (const ray&, const hittable&, const int, const color&, fog_func, shared_ptr<hittable>)> ray_color,
-                   fog_func hit_fog) {
+
+	void draw(const scene &scn, ray_func ray_color, fog_func hit_fog) {
 		//creating a temp directory
 		std::string rand_str("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 		std::random_device rd;	

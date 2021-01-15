@@ -21,9 +21,9 @@ int main() {
 
 	
 	//the main drawing
-	render_settings ren(120, 100, 1, /*1*/16.0f/9.0f);			//change this to change the quality of the render
+	render_settings ren(1200, 1000, 5, /*1*/16.0f/9.0f);			//change this to change the quality of the render
     big_scene1 curr_scene(ren.aspect_ratio);	//change this to change the scene
-	ren.draw(curr_scene, ray_color_no_importance, no_fog);
+	ren.draw(curr_scene, ray_color_no_importance, basic_fog);
 
 
 	//end timing

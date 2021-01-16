@@ -9,7 +9,7 @@
 
 typedef std::function<color (const ray&, const hittable&, const int, const color&, fog_func, shared_ptr<hittable>)> ray_func;
 
-color ray_color_no_importance(const ray& r, const hittable& world, const int depth, const color& background, std::function<bool (const ray, const vec3, ray&)> hit_fog, shared_ptr<hittable> lights) {
+color ray_color_no_importance(const ray& r, const hittable& world, const int depth, const color& background, std::function<bool (const ray, const vec3, scatter_record&)> hit_fog, shared_ptr<hittable> lights) {
     //collision with any object
     hit_record rec;
 
@@ -24,13 +24,13 @@ color ray_color_no_importance(const ray& r, const hittable& world, const int dep
         return background;
 
     ray scattered;
-    if (hit_fog(r, rec.p, scattered)) {
-        return fog_color * ray_color_no_importance(scattered, world, depth-1, background, hit_fog, lights);
+    scatter_record srec;
+    if (hit_fog(r, rec.p, srec)) {
+        return fog_color * ray_color_no_importance(srec.specular_ray, world, depth-1, background, hit_fog, lights);
     }
 
 
     //else keep bouncing light
-    scatter_record srec;
     const color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);	//is black if the material doesn't emit
 
 
@@ -53,7 +53,7 @@ color ray_color_no_importance(const ray& r, const hittable& world, const int dep
 }
 
 
-color ray_color1(const ray& r, const hittable& world, const int depth, const color& background, std::function<bool (const ray, const vec3, ray&)> hit_fog, shared_ptr<hittable> lights) {
+color ray_color1(const ray& r, const hittable& world, const int depth, const color& background, std::function<bool (const ray, const vec3, scatter_record&)> hit_fog, shared_ptr<hittable> lights) {
     //collision with any object
     hit_record rec;
 
@@ -68,13 +68,13 @@ color ray_color1(const ray& r, const hittable& world, const int depth, const col
         return background;
 
     ray scattered;
-    if (hit_fog(r, rec.p, scattered)) {
-        return fog_color * ray_color1(scattered, world, depth-1, background, hit_fog, lights);
+    scatter_record srec;
+    if (hit_fog(r, rec.p, srec)) {
+        return fog_color * ray_color1(srec.specular_ray, world, depth-1, background, hit_fog, lights);
     }
 
 
     //else keep bouncing light
-    scatter_record srec;
     const color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);	//is black if the material doesn't emit
 
 
@@ -84,6 +84,7 @@ color ray_color1(const ray& r, const hittable& world, const int depth, const col
     if (srec.is_specular)
         return srec.attenuation * ray_color1(srec.specular_ray, world, depth-1, background, hit_fog, lights);
 
+    //https://en.wikipedia.org/wiki/Monte_Carlo_integration#Importance_sampling
     const auto light_ptr = make_shared<hittable_pdf>(lights, rec.p);
     mixture_pdf mixed_pdf(light_ptr, srec.pdf_ptr);
 

@@ -69,4 +69,29 @@ struct mixture_pdf : public pdf {
 };
 
 
+struct Henyey_Greensteing_pdf : public pdf {
+    double g[2];
+
+    Henyey_Greensteing_pdf(double g1 , double g2) {
+        g[0] = g1;
+        g[1] = g2;
+    }
+
+    virtual double value(const vec3& direction) const override {
+        //turning direction into spherical coordinates
+        //https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi0.wp.com%2Fwww.therightgate.com%2Fwp-content%2Fuploads%2F2018%2F05%2Fspherical-cartesian-conversion.jpg%3Fresize%3D640%252C159%26ssl%3D1&f=1&nofb=1
+        const double theta = acos(direction.z());   //assume r = 1
+        const double phi   = atan2(direction.y(), direction.x());
+
+        //returning the values from Henyey_Greensteing_pdf_func (product of the 2)
+        return Henyey_Greensteing_pdf_func(g[0], theta) * Henyey_Greensteing_pdf_func(g[1], phi);
+    }
+
+    virtual vec3 generate() const override {
+        const auto theta = rand_Henyey_Greensteing(g[0]);
+        const auto phi = rand_Henyey_Greensteing(g[1]);
+        return vec3(sin(theta)*cos(phi), sin(theta)*sin(phi), cos(phi));
+    }
+};
+
 #endif //RAYTRACER_PDF_H

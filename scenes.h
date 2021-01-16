@@ -10,27 +10,42 @@
 
 #include "common.h"
 #include "bvh.h"
+#include "fog.h"
 
 #include "triangle.h"
 #include "triangle_mesh.h"
 
 enum class background_color {sky, black};
 
+struct scene_settings {
+    scene_settings() {
+        important = make_shared<hittable_list>();
+    }
+
+    color background;
+    shared_ptr<hittable_list> important;
+    shared_ptr<participating_medium> fog;
+
+    bool has_fog = false;
+    bool importance = false;
+};
+
 
 
 struct scene {
-	color background_;
+    scene_settings settings;
+
 	hittable_list world;
 	camera cam_;
 	double aspect_ratio;
-	shared_ptr<hittable_list> light;
 
-	inline shared_ptr<hittable> lights() const {
-	    return light;
+
+	inline shared_ptr<hittable> important_hittables() const {
+	    return settings.important;
 	}
 
 	inline color background() const {
-		return background_;
+		return settings.background;
 	}
 
 	inline hittable_list objects() const {
@@ -41,15 +56,21 @@ struct scene {
 		return cam_;
 	}
 
-	scene(const double aspec) : aspect_ratio(aspec) {light = make_shared<hittable_list>();}
+	scene() {}
+
+	scene(const double aspec) : aspect_ratio(aspec) {}
+
+    inline void add_important(shared_ptr<hittable> obj) {
+	    settings.important->add(obj);
+	}
 
 	inline void set_background(const background_color& col) {
 		if (col == background_color::sky) {
-			background_ = color(0.70, 0.80, 1.00);
+			settings.background = color(0.70, 0.80, 1.00);
 		} else if (col == background_color::black) {
-			background_ = color(0.0, 0.0, 0.0);
+			settings.background = color(0.0, 0.0, 0.0);
 		} else {
-			background_ = color(1.0, 0.0, 1.0);	//terrible color for debugging
+			settings.background = color(1.0, 0.0, 1.0);	//terrible color for debugging
 		}
 	}
 
@@ -302,7 +323,7 @@ struct cornell_box_scene : public scene {
 		world.add(make_shared<yz_rect>(0, 555, 0, 555, 0  , red  ));	//right wall
 
 		world.add(make_shared<flip_face>(make_shared<xz_rect>(213, 343, 227, 332, 554, light_col)));	//small light on roof
-		light->add(make_shared<xz_rect>(213, 343, 227, 332, 554, shared_ptr<material>()));
+		add_important(make_shared<xz_rect>(213, 343, 227, 332, 554, shared_ptr<material>()));
 
 		world.add(make_shared<xz_rect>(0, 555, 0, 555, 0  , white));	//floor
 		world.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));	//roof
@@ -356,13 +377,13 @@ struct cornell_box_scene2 : public scene {
         world.add(box1);
 
 
-        //small box
+        //small ball
         const auto glass = make_shared<dielectric>(1.5);
         world.add(make_shared<sphere>(point3(190,90,190), 90, glass));
 
         //auto lights = make_shared<hittable_list>();
-        light->add(make_shared<sphere>(point3(190,90,190), 90, shared_ptr<material>()));
-        light->add(make_shared<xz_rect>(213, 343, 227, 332, 554, shared_ptr<material>()));
+        add_important(make_shared<sphere>(point3(190,90,190), 90, shared_ptr<material>()));
+        add_important(make_shared<xz_rect>(213, 343, 227, 332, 554, shared_ptr<material>()));
 
         set_camera(vec3(278, 278, -800), vec3(278, 278, 0), 40.0, 0.0);
     }

@@ -1,7 +1,7 @@
 
 #ifndef RAYTRACER_RAY_COLORS_H
 #define RAYTRACER_RAY_COLORS_H
-
+/*
 #include <functional>
 #include "hittable.h"
 #include "vec3.h"
@@ -96,5 +96,6 @@ color ray_color1(const ray& r, const hittable& world, const int depth, const col
     return emitted + srec.attenuation * ray_color1(scattered, world, depth-1, background, hit_fog, lights) * rec.mat_ptr->scattering_pdf(r, rec, scattered) / pdf_val;	//return the color of the object darkened by the number of times the ray bounced
 
 }
+*/
 
 #endif //RAYTRACER_RAY_COLORS_H

@@ -22,9 +22,7 @@ struct scene_settings {
         important = make_shared<hittable_list>();
     }
 
-    color background;
     shared_ptr<hittable_list> important;
-    shared_ptr<participating_medium> fog;
 
     bool has_fog = false;
     bool importance = false;
@@ -36,24 +34,15 @@ struct scene {
     scene_settings settings;
 
 	hittable_list world;
-	camera cam_;
+	camera cam;
 	double aspect_ratio;
+
+    color background;
+    shared_ptr<participating_medium> fog;
 
 
 	inline shared_ptr<hittable> important_hittables() const {
 	    return settings.important;
-	}
-
-	inline color background() const {
-		return settings.background;
-	}
-
-	inline hittable_list objects() const {
-		return world;
-	}
-
-	inline camera cam() const {
-		return cam_;
 	}
 
 	scene() {}
@@ -61,22 +50,29 @@ struct scene {
 	scene(const double aspec) : aspect_ratio(aspec) {}
 
     inline void add_important(shared_ptr<hittable> obj) {
+	    settings.importance = true;
 	    settings.important->add(obj);
 	}
 
+	inline void set_fog(shared_ptr<participating_medium> f) {
+	    settings.has_fog = true;
+	    fog = f;
+	}
+
+
 	inline void set_background(const background_color& col) {
 		if (col == background_color::sky) {
-			settings.background = color(0.70, 0.80, 1.00);
+			background = color(0.70, 0.80, 1.00);
 		} else if (col == background_color::black) {
-			settings.background = color(0.0, 0.0, 0.0);
+			background = color(0.0, 0.0, 0.0);
 		} else {
-			settings.background = color(1.0, 0.0, 1.0);	//terrible color for debugging
+			background = color(1.0, 0.0, 1.0);	//terrible color for debugging
 		}
 	}
 
 	inline void set_camera(const point3 lookfrom, const point3 lookat, const double fov = 20.0, const double aperture = 0.1, const double dist_to_focus = 10.0, 
 			const double time0 = 0.0, const double time1 = 0.35, const vec3 vup = vec3(0,1,0)) {
-		cam_ = camera(lookfrom, lookat, vup, fov, aspect_ratio, aperture, dist_to_focus, time0, time1);
+		cam = camera(lookfrom, lookat, vup, fov, aspect_ratio, aperture, dist_to_focus, time0, time1);
 	}	
 
 
@@ -388,6 +384,47 @@ struct cornell_box_scene2 : public scene {
         set_camera(vec3(278, 278, -800), vec3(278, 278, 0), 40.0, 0.0);
     }
 };
+
+struct cornell_box_scene2_fog : public scene {
+    cornell_box_scene2_fog() : scene(1.0) {
+        set_background(background_color::black);	//shouldn't matter -- can't see sky
+
+        const auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
+        const auto white = make_shared<lambertian>(color(0.73, 0.73, 0.73));
+        const auto green = make_shared<lambertian>(color(0.12, 0.45, 0.15));
+        const auto light_col = make_shared<diffuse_light>(color(15, 15, 15));	//very bright light
+
+        world.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));	//left wall
+        world.add(make_shared<yz_rect>(0, 555, 0, 555, 0  , red  ));	//right wall
+
+        world.add(make_shared<flip_face>(make_shared<xz_rect>(213, 343, 227, 332, 554, light_col)));	//small light on roof
+
+        world.add(make_shared<xz_rect>(0, 555, 0, 555, 0  , white));	//floor
+        world.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));	//roof
+
+        world.add(make_shared<xy_rect>(0, 555, 0, 555, 555, white));	//back wall
+        //world.add(make_shared<xy_rect>(0, 555, 0, 555, 0  , white));	//front wall
+
+        //big box
+        shared_ptr<hittable> box1 = make_shared<box>(point3(0,0,0), point3(165,330,165), white);
+        box1 = make_shared<rotate_y>(box1, 15);
+        box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+        world.add(box1);
+
+        set_fog(make_shared<basic_constant_fog>(color(0.8, 0.8, 0.8), 0.001, 0.3, 0.4) );
+
+        //small ball
+        const auto glass = make_shared<dielectric>(1.5);
+        world.add(make_shared<sphere>(point3(190,90,190), 90, glass));
+
+        //auto lights = make_shared<hittable_list>();
+        add_important(make_shared<sphere>(point3(190,90,190), 90, shared_ptr<material>()));
+        add_important(make_shared<xz_rect>(213, 343, 227, 332, 554, shared_ptr<material>()));
+
+        set_camera(vec3(278, 278, -800), vec3(278, 278, 0), 40.0, 0.0);
+    }
+};
+
 
 
 struct cornell_smoke_box_scene : public scene {

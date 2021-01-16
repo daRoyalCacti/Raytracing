@@ -16,23 +16,6 @@
 #include <sys/stat.h> 
 #include <sys/types.h>
 
-//is temp remove
-bool hit_fog(const ray start, const vec3 end, scatter_record &srec) {
-    const double lambda = 0.0015;//0.05;  //determines how often particles scatter - 'density of the fog'
-    const double g1 = 0.3, g2 = 0.4;   //determines how particles scatter
-    const auto length = (start.orig-end).length();
-
-    const auto pos = rand_exp(lambda);
-
-    if (pos > length)   //the ray should scatter after the ray has collided
-        return false;
-
-    const auto theta = rand_Henyey_Greensteing(g1);
-    const auto phi = rand_Henyey_Greensteing(g2);
-    srec.is_specular = true;
-    srec.specular_ray = ray(start.at(pos), vec3(sin(theta)*cos(phi), sin(theta)*sin(phi), cos(phi)), start.tm + pos);
-    return true;
-}
 
 
 struct render {
@@ -75,7 +58,7 @@ struct render {
 					for (int s = 0; s < samples_per_pixel; ++s) {
 						const auto u = double(i + random_double()) / (image_width-1);
 						const auto v = double(j + random_double()) / (image_height-1);
-						const ray r = curr_scene.cam().get_ray(u, v);
+						const ray r = curr_scene.cam.get_ray(u, v);
 						pixel_color += ray_color(r, max_depth);
 					}
 					write_color(out, pixel_color, samples_per_pixel);
@@ -104,14 +87,40 @@ struct render {
 
         //If the ray hits nothing, return the background color
         if (!curr_scene.world.hit(r, 0.001, infinity, rec))
-            return curr_scene.settings.background;
+            return curr_scene.background;
 
 
         ray scattered;
         scatter_record srec;
+
+
+
+        if (curr_scene.settings.has_fog) {
+            const auto fog_hit_time = curr_scene.fog->generate_hit_time();
+            if (fog_hit_time < r.tm - rec.t) {    //ray hit fog
+                const auto scatter_time = r.tm + fog_hit_time;
+                const auto scatter_pos = r.orig + (r.orig - rec.p) * fog_hit_time;
+
+                if (curr_scene.settings.importance) {
+                    const auto light_ptr = make_shared<hittable_pdf>(curr_scene.settings.important, rec.p);
+                    mixture_pdf mixed_pdf(light_ptr, curr_scene.fog->prob_density);
+
+                    scattered = ray(scatter_pos, mixed_pdf.generate(), scatter_time);
+                    const auto pdf_val = mixed_pdf.value(scattered.direction());
+
+                    return curr_scene.fog->color_at(scatter_pos) * ray_color(scattered, depth-1) * curr_scene.fog->prob_density->value(scattered.direction()) / pdf_val;
+                } else {
+                    return curr_scene.fog->color_at(scatter_pos) * ray_color(ray(scatter_pos, curr_scene.fog->prob_density->generate(), scatter_time), depth-1);
+                }
+
+
+            }
+        }
+        /*
         if (hit_fog(r, rec.p, srec)) {
             return fog_color * ray_color(srec.specular_ray, depth-1);
         }
+         */
 
 
 
@@ -125,17 +134,25 @@ struct render {
         if (srec.is_specular)
             return srec.attenuation * ray_color(srec.specular_ray, depth-1);
 
-        //https://en.wikipedia.org/wiki/Monte_Carlo_integration#Importance_sampling
-        const auto light_ptr = make_shared<hittable_pdf>(curr_scene.settings.important, rec.p);
-        mixture_pdf mixed_pdf(light_ptr, srec.pdf_ptr);
+        if (curr_scene.settings.importance) {
+            //https://en.wikipedia.org/wiki/Monte_Carlo_integration#Importance_sampling
+            const auto light_ptr = make_shared<hittable_pdf>(curr_scene.settings.important, rec.p);
+            mixture_pdf mixed_pdf(light_ptr, srec.pdf_ptr);
 
-        scattered = ray(rec.p, mixed_pdf.generate(), r.time());
-        const auto pdf_val = mixed_pdf.value(scattered.direction());
+            scattered = ray(rec.p, mixed_pdf.generate(), r.time());
+            const auto pdf_val = mixed_pdf.value(scattered.direction());
 
 
+            return emitted +
+                   srec.attenuation * ray_color(scattered, depth - 1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) /
+                   pdf_val;    //return the color of the object darkened by the number of times the ray bounced
+        } else {
+            scattered = ray(rec.p, srec.pdf_ptr->generate(), r.time());
+            const auto pdf_val = srec.pdf_ptr->value(scattered.direction());
 
-        return emitted + srec.attenuation * ray_color(scattered, depth-1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) / pdf_val;	//return the color of the object darkened by the number of times the ray bounced
+            return emitted + srec.attenuation * ray_color(scattered, depth-1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) / pdf_val;	//return the color of the object darkened by the number of times the ray bounced
 
+        }
     }
 };
 

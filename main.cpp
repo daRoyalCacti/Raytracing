@@ -18,7 +18,7 @@ int main() {
 
 	
 	//the main drawing
-	render ren(cornell_box_scene2(1),600, 1000, 10);			//change this to change the quality of the render
+	render ren(cornell_box_scene2_fog(),1200, 1000, 10);			//change this to change the quality of the render
     //cornell_box_scene2 curr_scene(ren.aspect_ratio);	//change this to change the scene
 	ren.draw();
 

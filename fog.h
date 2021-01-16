@@ -4,11 +4,32 @@
 
 #include <functional>
 #include "material.h"
+#include "pdf.h"
 
 struct participating_medium {
+    shared_ptr<pdf> prob_density;
+    virtual double generate_hit_time() const {return 0;}
+     virtual color color_at(const vec3 &hit_pos) const {return vec3(0,0,0);}
+};
+
+struct basic_constant_fog : public participating_medium {
+    const double lambda;
+    const color col;
+    basic_constant_fog(const color c, const double l, const double g1, const double g2) : lambda(l), col(c) {
+        prob_density = make_shared<Henyey_Greensteing_pdf>(g1, g2);
+    }
+
+    virtual double generate_hit_time() const override {
+        return rand_exp(lambda);
+    }
+
+    virtual color color_at(const vec3 &hit_pos) {
+        return col;
+    }
 
 };
 
+    /*
 typedef std::function<bool (const ray, const vec3, scatter_record&)> fog_func;
 
 //https://www.astro.umd.edu/~jph/HG_note.pdf
@@ -34,5 +55,5 @@ bool basic_fog(const ray start, const vec3 end, scatter_record &srec) {
 bool no_fog(const ray start, const vec3 end, scatter_record &srec) {
     return false;
 }
-
+*/
 #endif //RAYTRACER_FOG_H

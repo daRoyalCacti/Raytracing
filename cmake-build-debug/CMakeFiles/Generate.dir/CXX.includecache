@@ -119,6 +119,8 @@ functional
 -
 material.h
 /home/jacob/Documents/Projects/Raytracer/material.h
+pdf.h
+/home/jacob/Documents/Projects/Raytracer/pdf.h
 
 /home/jacob/Documents/Projects/Raytracer/hittable.h
 common.h

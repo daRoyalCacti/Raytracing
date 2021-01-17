@@ -5,6 +5,7 @@
 #include "probability.h"
 #include "hittable.h"
 
+
 struct pdf {
     virtual ~pdf() {}
 
@@ -35,13 +36,14 @@ struct hittable_pdf : public pdf {
     point3 o;
     shared_ptr<hittable> ptr;
 
-    hittable_pdf(shared_ptr<hittable> p, const point3& origin) : ptr(p), o(origin) {}
+    hittable_pdf(const shared_ptr<hittable> &p, const point3& origin) : ptr(p), o(origin) {}
 
     virtual double value(const vec3& direction) const override {
         return ptr->pdf_value(o, direction);
     }
 
     virtual vec3 generate() const override {
+        //return vec3(1,1,1);
         return ptr->random(o);
     }
 };
@@ -51,7 +53,7 @@ struct hittable_pdf : public pdf {
 struct mixture_pdf : public pdf {
     shared_ptr<pdf> p[2];
 
-    mixture_pdf(shared_ptr<pdf> p0, shared_ptr<pdf> p1) {
+    mixture_pdf(const shared_ptr<pdf> &p0, const shared_ptr<pdf> &p1) {
         p[0] = p0;
         p[1]= p1;
     }
@@ -71,26 +73,32 @@ struct mixture_pdf : public pdf {
 
 struct Henyey_Greensteing_pdf : public pdf {
     double g[2];
+    const vec3 incoming_dir;
 
-    Henyey_Greensteing_pdf(double g1 , double g2) {
+    Henyey_Greensteing_pdf(const double g1 , const double g2, const vec3 &inc_dir) : incoming_dir(inc_dir) {
         g[0] = g1;
         g[1] = g2;
     }
 
     virtual double value(const vec3& direction) const override {
         //turning direction into spherical coordinates
-        //https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi0.wp.com%2Fwww.therightgate.com%2Fwp-content%2Fuploads%2F2018%2F05%2Fspherical-cartesian-conversion.jpg%3Fresize%3D640%252C159%26ssl%3D1&f=1&nofb=1
-        const double theta = acos(direction.z());   //assume r = 1
-        const double phi   = atan2(direction.y(), direction.x());
+        const auto spherical = cartesian_to_spherical(direction);
 
         //returning the values from Henyey_Greensteing_pdf_func (product of the 2)
-        return Henyey_Greensteing_pdf_func(g[0], theta) * Henyey_Greensteing_pdf_func(g[1], phi);
+        return Henyey_Greensteing_pdf_func(g[0], spherical[1]) * Henyey_Greensteing_pdf_func(g[1], spherical[2]);
     }
 
+    //returns value in spherical coordinates
     virtual vec3 generate() const override {
         const auto theta = rand_Henyey_Greensteing(g[0]);
         const auto phi = rand_Henyey_Greensteing(g[1]);
-        return vec3(sin(theta)*cos(phi), sin(theta)*sin(phi), cos(phi));
+
+        auto spherical = cartesian_to_spherical(incoming_dir);
+
+        spherical[1] += theta;
+        spherical[2] += phi;
+
+        return spherical_to_cartesian(spherical);
     }
 };
 

@@ -387,7 +387,7 @@ struct cornell_box_scene2 : public scene {
 
 struct cornell_box_scene2_fog : public scene {
     cornell_box_scene2_fog() : scene(1.0) {
-        set_background(background_color::black);	//shouldn't matter -- can't see sky
+        set_background(background_color::black);
 
         const auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
         const auto white = make_shared<lambertian>(color(0.73, 0.73, 0.73));
@@ -411,9 +411,9 @@ struct cornell_box_scene2_fog : public scene {
         box1 = make_shared<translate>(box1, vec3(265, 0, 295));
         world.add(box1);
 
-        set_fog(make_shared<basic_constant_fog>(color(0.8, 0.8, 0.8), 0.001, 0.3, 0.4) );
+        set_fog(make_shared<basic_constant_fog>(color(0.8, 0.8, 0.8), 0.01, 0.3, 0.4) );    //0.007 also possible
 
-        //small ball
+        //sphere
         const auto glass = make_shared<dielectric>(1.5);
         world.add(make_shared<sphere>(point3(190,90,190), 90, glass));
 

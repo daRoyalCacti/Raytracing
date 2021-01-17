@@ -51,10 +51,10 @@ struct render {
 			out << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 			for (int j = (int)image_height-1; j>=0; --j) {
-				std::cerr << "\rScanlines remaining: " << j+1 << " / " << image_height << " of image " << n+1 << " / " << number_of_temp << std::flush;
+				std::cout << "\rScanlines remaining: " << j+1 << " / " << image_height << " of image " << n+1 << " / " << number_of_temp << std::flush;
 				for (unsigned i = 0; i < image_width; ++i) {
 					color pixel_color(0,0,0);
-					#pragma omp parallel for default(none) shared(i, j, pixel_color)
+					//#pragma omp parallel for default(none) shared(i, j, pixel_color)
 					for (int s = 0; s < samples_per_pixel; ++s) {
 						const auto u = double(i + random_double()) / (image_width-1);
 						const auto v = double(j + random_double()) / (image_height-1);
@@ -79,8 +79,6 @@ struct render {
         //collision with any object
         hit_record rec;
 
-        const color fog_color = color(0.8, 0.8, 0.8);
-
         //If we've reach the bounce limit, no more light is gathered
         if (depth <= 0)
             return color(0,0,0);
@@ -90,44 +88,70 @@ struct render {
             return curr_scene.background;
 
 
-        ray scattered;
-        scatter_record srec;
+
 
 
 
         if (curr_scene.settings.has_fog) {
             const auto fog_hit_time = curr_scene.fog->generate_hit_time();
-            if (fog_hit_time < r.tm - rec.t) {    //ray hit fog
-                const auto scatter_time = r.tm + fog_hit_time;
-                const auto scatter_pos = r.orig + (r.orig - rec.p) * fog_hit_time;
+            //if (fog_hit_time > rec.t - r.tm) {    //ray hit fog
+            if (fog_hit_time < rec.t) {     //ray hit fog
+                const auto scatter_pos = r.at(fog_hit_time);
+
+                curr_scene.fog->create_pdf(r.dir);
+
 
                 if (curr_scene.settings.importance) {
-                    const auto light_ptr = make_shared<hittable_pdf>(curr_scene.settings.important, rec.p);
+                    const auto light_ptr = make_shared<hittable_pdf>(curr_scene.settings.important, scatter_pos);
                     mixture_pdf mixed_pdf(light_ptr, curr_scene.fog->prob_density);
 
-                    scattered = ray(scatter_pos, mixed_pdf.generate(), scatter_time);
+                    const auto scattered = ray(scatter_pos, mixed_pdf.generate(), r.time());
                     const auto pdf_val = mixed_pdf.value(scattered.direction());
 
-                    return curr_scene.fog->color_at(scatter_pos) * ray_color(scattered, depth-1) * curr_scene.fog->prob_density->value(scattered.direction()) / pdf_val;
-                } else {
-                    return curr_scene.fog->color_at(scatter_pos) * ray_color(ray(scatter_pos, curr_scene.fog->prob_density->generate(), scatter_time), depth-1);
-                }
+                    bool nothing_broke = true;
+                    if(!std::isfinite(pdf_val)) {
+                        nothing_broke = false;  //is not always cause for erroring out
+                                                // - when importance sampling a dielectric sphere,
+                                                //   the generated ray is moving through the sphere.
+                                                //   Because the ray is inside the sphere, the
+                                                //   importance sampling fails.
+                                                //   However, it should fail because there is
+                                                //   no fog inside the sphere
+                    }
 
+                    /*
+                    if (!std::isfinite(pdf_val) ) {
+                        std::cerr << pdf_val << " " << curr_scene.fog->prob_density->value(scattered.direction()) << " "
+                                  << curr_scene.fog->prob_density->value(scattered.direction()) / pdf_val <<
+                                  " (" << scattered.direction() << ") " << " (" << scatter_pos << ") "  << std::endl;
+
+                        std::cerr << "\t(" << r.orig << ") (" << rec.p << ") " << fog_hit_time << " " << rec.t << " (" << r.dir << ")" << std::endl;
+                    }*/
+                    if (nothing_broke) {
+                        return curr_scene.fog->color_at(scatter_pos) * ray_color(scattered, depth - 1) *
+                               curr_scene.fog->prob_density->value(scattered.direction()) / pdf_val;
+                    }
+
+                }
+                //else
+                return curr_scene.fog->color_at(scatter_pos) *
+                           ray_color(ray(scatter_pos, curr_scene.fog->prob_density->generate(), fog_hit_time),
+                                     depth - 1);
 
             }
+
+
         }
-        /*
-        if (hit_fog(r, rec.p, srec)) {
-            return fog_color * ray_color(srec.specular_ray, depth-1);
-        }
-         */
+
+
+
 
 
 
         //else keep bouncing light
         const color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);	//is black if the material doesn't emit
 
-
+        scatter_record srec;
         if (!rec.mat_ptr->scatter(r, rec, srec))	//if the light shouldn't scatter
             return emitted;
 
@@ -139,7 +163,7 @@ struct render {
             const auto light_ptr = make_shared<hittable_pdf>(curr_scene.settings.important, rec.p);
             mixture_pdf mixed_pdf(light_ptr, srec.pdf_ptr);
 
-            scattered = ray(rec.p, mixed_pdf.generate(), r.time());
+            const auto scattered = ray(rec.p, mixed_pdf.generate(), r.time());
             const auto pdf_val = mixed_pdf.value(scattered.direction());
 
 
@@ -147,7 +171,7 @@ struct render {
                    srec.attenuation * ray_color(scattered, depth - 1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) /
                    pdf_val;    //return the color of the object darkened by the number of times the ray bounced
         } else {
-            scattered = ray(rec.p, srec.pdf_ptr->generate(), r.time());
+            const auto scattered = ray(rec.p, srec.pdf_ptr->generate(), r.time());
             const auto pdf_val = srec.pdf_ptr->value(scattered.direction());
 
             return emitted + srec.attenuation * ray_color(scattered, depth-1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) / pdf_val;	//return the color of the object darkened by the number of times the ray bounced

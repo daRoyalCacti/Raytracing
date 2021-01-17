@@ -131,6 +131,7 @@ bool xy_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 	rec.v = (y-y0)/(y1-y0);
 
 	rec.t = t;
+	//if (!std::isfinite(rec.t)) std::cout << "xy_rec collision gave infinite time" << std::endl;
 
 	const auto outward_normal = vec3(0, 0, 1);	//the trival normal vector
 	rec.set_face_normal(r, outward_normal);
@@ -161,6 +162,7 @@ bool xz_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 	rec.v = (z-z0)/(z1-z0);
 
 	rec.t = t;
+	//if (!std::isfinite(rec.t)) std::cout << "xz_rec collision gave infinite time" << std::endl;
 
 	const auto outward_normal = vec3(0, 1, 0);	//the trival normal vector
 	rec.set_face_normal(r, outward_normal);
@@ -191,6 +193,7 @@ bool yz_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 	rec.u = (y-y0)/(y1-y0);
 
 	rec.t = t;
+	//if (!std::isfinite(rec.t)) std::cout << "yz_rec collision gave infinite time" << std::endl;
 
 	const auto outward_normal = vec3(1, 0, 0);	//the trival normal vector
 	rec.set_face_normal(r, outward_normal);

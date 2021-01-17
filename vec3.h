@@ -140,4 +140,6 @@ inline vec3 refract(const vec3& uv, const vec3& n, const double etai_over_etat) 
 	return r_out_perp + r_out_parallel;
 }
 
-
+inline vec3 abs(const vec3& in) {
+    return vec3(fabs(in.x()), fabs(in.y()), fabs(in.z()));
+}

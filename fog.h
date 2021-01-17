@@ -9,21 +9,29 @@
 struct participating_medium {
     shared_ptr<pdf> prob_density;
     virtual double generate_hit_time() const {return 0;}
-     virtual color color_at(const vec3 &hit_pos) const {return vec3(0,0,0);}
+    virtual color color_at(const vec3 &hit_pos) const {
+        return vec3(1,0,0);
+    }
+
+    virtual void create_pdf(const vec3 &inc_dir) {}
 };
 
 struct basic_constant_fog : public participating_medium {
     const double lambda;
     const color col;
-    basic_constant_fog(const color c, const double l, const double g1, const double g2) : lambda(l), col(c) {
-        prob_density = make_shared<Henyey_Greensteing_pdf>(g1, g2);
+    const double g1, g2;
+    basic_constant_fog(const color c, const double l, const double g1_, const double g2_) : lambda(l), col(c), g1(g1_), g2(g2_) {}
+
+
+    virtual void create_pdf(const vec3 &inc_dir) {
+        prob_density = make_shared<Henyey_Greensteing_pdf>(g1, g2, inc_dir);
     }
 
     virtual double generate_hit_time() const override {
         return rand_exp(lambda);
     }
 
-    virtual color color_at(const vec3 &hit_pos) {
+    virtual color color_at(const vec3 &hit_pos) const override {
         return col;
     }
 

@@ -168,8 +168,72 @@ struct [[maybe_unused]] big_scene1 : public scene {
 };
 
 
-struct [[maybe_unused]] big_scene2 : public scene{
-	explicit big_scene2() : scene(aspec1) {
+
+
+struct [[maybe_unused]] big_scene1_fog : public scene {
+    explicit big_scene1_fog() : scene(aspec1) {
+        set_background(background_color::sky);
+
+
+        hittable_list obj;
+
+        const auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+        const auto ground_material = make_shared<lambertian>(checker);
+        obj.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
+
+        for (int a = -11; a<11; a++) {	//centers of spheres x
+            for (int b = -11; b<11; b++) {	//centers of spheres y
+                const auto choose_mat = random_double();	//random number to decide what material to use
+                const point3 center(a + 0.9*random_double(), 0.2, b + 0.9*random_double());
+
+                if ((center - point3(4, 0.2, 0)).length_squared() > 0.9*0.9) {	//not points where main balls go
+                    shared_ptr<material> sphere_material;
+
+                    if (choose_mat < 0.8) {
+                        //diffuse (has moving spheres)
+                        const auto albedo = color::random() * color::random();
+                        sphere_material = make_shared<lambertian>(albedo);
+                        const auto center2 = center + vec3(0, random_double(0, 0.5), 0);	//spheres moving downwards at random speeds
+                        obj.add(make_shared<moving_sphere>(center, center2, 0.0, 1.0, 0.2, sphere_material));
+                    } else if (choose_mat < 0.95) {
+                        //metal
+                        const auto albedo = color::random(0.5, 1);
+                        const auto fuzz = random_double(0, 0.5);
+                        sphere_material = make_shared<metal>(albedo, fuzz);
+                        obj.add(make_shared<sphere>(center, 0.2, sphere_material));
+                    } else {
+                        //glass
+                        sphere_material = make_shared<dielectric>(1.5);
+                        obj.add(make_shared<sphere>(center, 0.2, sphere_material));
+                    }
+
+                }
+
+            }
+        }
+
+        //main balls
+        const auto material1 = make_shared<dielectric>(1.5);
+        obj.add(make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
+
+        const auto material2 = make_shared<lambertian>(color(0.4, 0.2, 0.1));
+        obj.add(make_shared<sphere>(point3(-4, 1, 0), 1.0, material2));
+
+        const auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
+        obj.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
+
+        world.add(make_shared<bvh_node>(obj, 0, 1));
+
+        set_fog(make_shared<basic_constant_fog>(color(0.8, 0.8, 0.8), 0.8, 0.3) );
+
+        set_camera(vec3(13.0, 2.0, 3.0), vec3(0.0, 0.0, 0.0));
+    }
+
+};
+
+
+struct big_scene2 : public scene{
+	explicit big_scene2() : scene(1) {
 		set_background(background_color::black);
 
 		hittable_list boxes1;
@@ -195,7 +259,9 @@ struct [[maybe_unused]] big_scene2 : public scene{
 		
 		//main light
 		const auto light = make_shared<diffuse_light>(color(7, 7, 7));
-		world.add(make_shared<xz_rect>(123, 423, 147, 412, 554, light));
+		world.add(make_shared<flip_face>(make_shared<xz_rect>(123, 423, 147, 412, 554, light)));
+
+		add_important(make_shared<xz_rect>(123, 423, 147, 412, 554, make_shared<material>()));
 
 		//moving sphere
 		const auto center1 = point3(400, 400, 200);
@@ -389,7 +455,7 @@ struct [[maybe_unused]] cornell_box_scene2 : public scene {
     }
 };
 
-struct cornell_box_scene2_fog : public scene {
+struct [[maybe_unused]] cornell_box_scene2_fog : public scene {
     cornell_box_scene2_fog() : scene(1.0) {
         set_background(background_color::black);
 
@@ -443,7 +509,7 @@ struct [[maybe_unused]] cornell_smoke_box_scene : public scene {
 		world.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));	//left wall
 		world.add(make_shared<yz_rect>(0, 555, 0, 555, 0  , red  ));	//right wall
 
-		world.add(make_shared<xz_rect>(113, 443, 127, 432, 554, light));	//small light on roof
+		world.add(make_shared<flip_face>(make_shared<xz_rect>(113, 443, 127, 432, 554, light)));	//small light on roof
 
 		world.add(make_shared<xz_rect>(0, 555, 0, 555, 0  , white));	//floor
 		world.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));	//roof

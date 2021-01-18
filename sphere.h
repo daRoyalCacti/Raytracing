@@ -61,7 +61,9 @@ bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_recor
 	//if the first root was not acceptable, root is the second root
 	
 	rec.t = root;	//root is finding time
+#ifndef NDEBUG
 	if (!std::isfinite(rec.t)) std::cout << "sphere collision gave infinite time" << std::endl;
+#endif
 	rec.p = r.at(rec.t);
 	const vec3 outward_normal = (rec.p - center) / radius;	//a normal vector is just a point on the sphere less the center
 								//dividing by radius to make it normalised
@@ -89,8 +91,8 @@ double sphere::pdf_value(const point3& o, const vec3& v) const {
     const auto cos_theta_max = sqrt(1 - radius*radius/(center-o).length_squared());
     const auto solid_angle = 2*pi*(1 - cos_theta_max);
 
-
-    if (!std::isfinite(1/solid_angle) ) {
+    #ifndef NDEBUG
+    [[unlikely]] if (!std::isfinite(1/solid_angle) ) {
 	    std::cerr << "sphere pdf_value failed\nsolid_angle=" << solid_angle << std::endl;
 
 	    if (!std::isfinite(solid_angle) ) {
@@ -110,6 +112,7 @@ double sphere::pdf_value(const point3& o, const vec3& v) const {
 
 	    std::cerr << "sphere is centered at (" << center << ") ray origin is at (" << o << ") with the sphere radius being " << radius << std::endl;
     }
+    #endif
 
     return 1 / solid_angle;
 }

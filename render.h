@@ -1,7 +1,5 @@
 #pragma once
 
-#include <functional>
-
 #include "common.h"
 #include "camera.h"
 #include "color.h"
@@ -31,7 +29,7 @@ struct render {
 	}
 
 
-	void draw() const {
+	void draw(const std::string &output_name = "image.png") const {
 		//creating a temp directory
 		std::string rand_str("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 		std::random_device rd;	
@@ -68,7 +66,7 @@ struct render {
 			std::cerr << "\r" << std::flush;
 		}
 
-		average_images(temp_file_dir, "image.png");
+		average_images(temp_file_dir, output_name);
 
 		//deleting the temp images
 		std::filesystem::path pathToDelete(temp_file_dir);

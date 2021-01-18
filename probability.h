@@ -14,17 +14,18 @@ inline double rand_exp(double lambda) {
 
 //https://www.astro.umd.edu/~jph/HG_note.pdf
 //https://www.desmos.com/calculator/84ypsmsy95
-inline double Henyey_Greensteing_pdf_func(double g, double theta) {
-    return 1/(4*M_PI) * (1-g*g)/( pow(1+g*g - 2*g*cos(theta), 3/2.0f));
+inline double Henyey_Greensteing_pdf_func(double g, double cos_theta) {
+    return 1/(4*M_PI) * (1-g*g)/( pow(1+g*g - 2*g*cos_theta, 3/2.0f));
 }
 
+//returns a random angle
 inline double rand_Henyey_Greensteing(double g) {
     const double max_y = 1/(4*M_PI) * (1-g*g)/( pow(1+g*g - 2*fabs(g), 3/2.0f));
     while (true) {
-        const auto x = random_double(0, 2 * M_PI);
+        const auto x = random_double(-1, 1);
         const auto y = random_double(0, max_y);
         if (y < Henyey_Greensteing_pdf_func(g, x)) {
-            return x;
+            return acos(x);
         }
     }
 }

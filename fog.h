@@ -13,19 +13,22 @@ struct participating_medium {
         return vec3(1,0,0);
     }
 
-    virtual void create_pdf(const vec3 &inc_dir) {}
+    //virtual void create_pdf(const vec3 &inc_dir) {}
 };
 
 struct basic_constant_fog : public participating_medium {
     const double lambda;
     const color col;
-    const double g1, g2;
-    basic_constant_fog(const color c, const double l, const double g1_, const double g2_) : lambda(l), col(c), g1(g1_), g2(g2_) {}
-
-
-    virtual void create_pdf(const vec3 &inc_dir) {
-        prob_density = make_shared<Henyey_Greensteing_pdf>(g1, g2, inc_dir);
+    const double g;//, g2;
+    //basic_constant_fog(const color c, const double l, const double g1_, const double g2_) : lambda(l), col(c), g1(g1_), g2(g2_) {}
+    basic_constant_fog(const color c, const double l, const double g_) : lambda(l), col(c), g(g_) {
+        prob_density = make_shared<Henyey_Greensteing_pdf>(g);
     }
+
+
+    /*virtual void create_pdf(const vec3 &inc_dir) {
+        prob_density = make_shared<Henyey_Greensteing_pdf>(g1, g2, inc_dir);
+    }*/
 
     virtual double generate_hit_time() const override {
         return rand_exp(lambda);

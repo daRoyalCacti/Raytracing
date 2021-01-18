@@ -25,7 +25,7 @@ class perlin {
 		return p;
 	}
 
-	static void permute(int* p, const int n) {	//creates a permutatoin of an integer array of length n 
+	static void permute(int* p, const int n) {	//creates a permutation of an integer array of length n
 		for (int i = n-1; i>0; i--) {	//switches p[i] with some p[n] for n<i
 			const int target = random_int(0,i);
 			std::swap(p[i], p[target]);
@@ -45,7 +45,7 @@ class perlin {
 			for (int j=0; j<2; j++)
 				for (int k=0; k<2; k++) {
 					const vec3 weight_v(u-i, v-j, w-k);
-					accum +=(i*uu + (1-i)*(1-uu)) *	//regual trilinar interpolation
+					accum +=(i*uu + (1-i)*(1-uu)) *	//regal trilinear interpolation
 						(j*vv + (1-j)*(1-vv)) *
 						(k*ww + (1-k)*(1-ww)) *
 						dot(c[i][j][k], weight_v);	//with a slight modification
@@ -75,20 +75,20 @@ class perlin {
 		delete [] perm_z;
 	}
 
-	double noise(const point3& p) const {
+	[[nodiscard]] double noise(const point3& p) const {
 		//scrambling (using a hash) the random numbers (all point_count of them) to remove tiling
 		auto u = p.x() - floor(p.x());	//the decimal part of p.x
 		auto v = p.y() - floor(p.y());
 		auto w = p.z() - floor(p.z());
 
-		const auto i = static_cast<int>(floor(p.x()));	//used in the scambling
+		const auto i = static_cast<int>(floor(p.x()));	//used in the scrambling
 		const auto j = static_cast<int>(floor(p.y()));
 		const auto k = static_cast<int>(floor(p.z()));
 		
 		vec3 c[2][2][2];
 
 
-		//smothing out the result using linear interplation
+		//smoothing out the result using linear interpolation
 		for (int di=0; di<2; di++) {
 			for (int dj=0; dj<2; dj++) {
 				for (int dk=0; dk<2; dk++) {
@@ -104,7 +104,7 @@ class perlin {
 		return perlin_interp(c, u, v, w);	//the actual linear interpolation
 	}
 
-	double turb(const point3& p, const int depth=7) const {
+	[[nodiscard]] double turb(const point3& p, const int depth=7) const {
 		auto accum = 0.0;
 		auto temp_p = p;
 		auto weight = 1.0;

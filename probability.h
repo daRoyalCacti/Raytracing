@@ -1,10 +1,10 @@
 #ifndef RAYTRACER_PROBABILITY_H
 #define RAYTRACER_PROBABILITY_H
 
-#include <math.h>
+#include <cmath>
 #include "vec3.h"
 
-inline double exp_cdf(double x, double lambda) {
+[[maybe_unused]] inline double exp_cdf(double x, double lambda) {
     return 1 - exp(-lambda*x);
 }
 
@@ -20,6 +20,7 @@ inline double Henyey_Greensteing_pdf_func(double g, double cos_theta) {
 
 //returns a random angle
 inline double rand_Henyey_Greensteing(double g) {
+    //https://www.oceanopticsbook.info/view/scattering/level-2/the-henyey-greenstein-phase-function
     const double max_y = 1/(4*M_PI) * (1-g*g)/( pow(1+g*g - 2*fabs(g), 3/2.0f));
     while (true) {
         const auto x = random_double(-1, 1);

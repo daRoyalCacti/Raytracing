@@ -12,15 +12,15 @@ struct constant_medium : public hittable {
 	double neg_inv_density;		//required to move info from constructor to hit
 	
 	//d for density
-	constant_medium(const shared_ptr<hittable> b, const double d, const shared_ptr<texture> a) 
+	constant_medium(const shared_ptr<hittable> &b, const double d, const shared_ptr<texture> &a)
 		: boundary(b), neg_inv_density(-1/d), phase_function(make_shared<isotropic>(a)) {};
 
-	constant_medium(const shared_ptr<hittable> b, const double d, const color c)
+	constant_medium(const shared_ptr<hittable> &b, const double d, const color c)
 		: boundary(b), neg_inv_density(-1/d), phase_function(make_shared<isotropic>(c)) {};
 
-	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override;
+	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
 
-	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		return boundary->bounding_box(time0, time1, output_box);
 	}
 };
@@ -52,7 +52,7 @@ bool constant_medium::hit(const ray& r, const double t_min, const double t_max, 
 	const auto distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
 	const auto hit_distance = neg_inv_density * log(random_double());	//randomly deciding if the ray should leave the medium
 
-	if (hit_distance > distance_inside_boundary)	//if the randomly chosen distance is greater than the distance from the boudnary to the ray origin
+	if (hit_distance > distance_inside_boundary)	//if the randomly chosen distance is greater than the distance from the boundary to the ray origin
 		return false;
 
 	rec.t = rec1.t + hit_distance / ray_length;	//t_f = t_i + d/s

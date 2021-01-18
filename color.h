@@ -41,7 +41,7 @@ void write_color(std::ostream &out, const color pixel_color, const unsigned samp
 
 namespace fs = std::filesystem;
 //could be updated using std::string.find(std::string)
-void average_images(std::string file_dir, std::string output_loc) {
+void average_images(const std::string &file_dir, const std::string &output_loc) {
 	int num_files = 0;
 	bool first_file = true;
 	int img_w;
@@ -60,8 +60,8 @@ void average_images(std::string file_dir, std::string output_loc) {
 
 				if (first_file && line_counter == 2) {	//this line holds the image dimensions
 					//setting img_w and img_h
-					std::string width = "";
-					std::string height = "";
+					std::string width;
+					std::string height;
 
 					int size_of_width = 0;	//need to know how many digits in width. e.g. 1200 vs 120
 					for (const auto& chara : line) {
@@ -81,9 +81,9 @@ void average_images(std::string file_dir, std::string output_loc) {
 				}
 
 				if (line_counter > 3) {	//the ppm files have 3 lines of data that is not the image itself
-					std::string col1 = "";
-					std::string col2 = "";
-					std::string col3 = "";
+					std::string col1;
+					std::string col2;
+					std::string col3;
 
 					//finding space 1
 					int space1 = 0;
@@ -109,7 +109,8 @@ void average_images(std::string file_dir, std::string output_loc) {
 					col2.append(line, space1+1, space2-space1);
 					col3.append(line, space2+1, 3);
 
-					color col(std::stoi(col1)*std::stoi(col1)/(255.0f*255.0f), std::stoi(col2)*std::stoi(col2)/(255.0f*255.0f), std::stoi(col3)*std::stoi(col3)/(255.0f*255.0f) );
+					color col((float)std::stoi(col1)*(float)std::stoi(col1)/(255.0f*255.0f), (float)std::stoi(col2)*(float)std::stoi(col2)/(255.0f*255.0f),
+                              (float)std::stoi(col3)*(float)std::stoi(col3)/(255.0f*255.0f) );
 
 					fb[fb_counter++] += col;
 
@@ -130,9 +131,9 @@ void average_images(std::string file_dir, std::string output_loc) {
 		for (int i = 0; i <img_w; i++) {
 			const size_t pixel_index = j*img_w + i;
 
-			float r = fb[pixel_index].x();
-			float g = fb[pixel_index].y();
-			float b = fb[pixel_index].z();
+			double r = fb[pixel_index].x();
+			double g = fb[pixel_index].y();
+			double b = fb[pixel_index].z();
 
 			r /= num_files;
 			g /= num_files;

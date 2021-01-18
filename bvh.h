@@ -13,12 +13,12 @@ struct bvh_node : public hittable {
 	shared_ptr<hittable> right;
 	aabb box;			//the box for the current node
 
-	bvh_node();
+	bvh_node() = default;
 	bvh_node(const hittable_list& list, const double time0, const double time1) : bvh_node(list.objects, 0, list.objects.size(), time0, time1) {}
-	bvh_node(const std::vector<shared_ptr<hittable>>& src_objects, const size_t start, const size_t end, const double time0, const double time1);
+	bvh_node(const std::vector<shared_ptr<hittable>>& src_objects, size_t start, size_t end, double time0, double time1);
 
-	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override;
-	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override;
+	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
+	bool bounding_box(double time0, double time1, aabb& output_box) const override;
 };
 
 bool bvh_node::bounding_box(const double time0, const double time1, aabb& output_box) const {
@@ -36,32 +36,32 @@ bool bvh_node::hit(const ray& r, const double t_min, const double t_max, hit_rec
 	return hit_left || hit_right;
 }
 
-inline bool box_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b, const int axis) {
+inline bool box_compare(const shared_ptr<hittable>& a, const shared_ptr<hittable>& b, const int axis) {
 	aabb box_a;
 	aabb box_b;
 
 	if (!a->bounding_box(0,0,box_a) || !b->bounding_box(0,0,box_b))
-		std::cerr << "No bouning box in bvh_node constructor.\n";
+		std::cerr << "No bounding box in bvh_node constructor.\n";
 
 	return box_a.min().e[axis] < box_b.min().e[axis];
 }
 
-bool box_x_compare (const shared_ptr<hittable> a, const shared_ptr<hittable> b) {
+bool box_x_compare (const shared_ptr<hittable> &a, const shared_ptr<hittable> &b) {
 	return box_compare(a, b, 0);
 }
 
 
-inline bool box_y_compare (const shared_ptr<hittable> a, const shared_ptr<hittable> b) {
+inline bool box_y_compare (const shared_ptr<hittable> &a, const shared_ptr<hittable> &b) {
 	return box_compare(a, b, 1);
 }
 
 
-inline bool box_z_compare (const shared_ptr<hittable> a, const shared_ptr<hittable> b) {
+inline bool box_z_compare (const shared_ptr<hittable> &a, const shared_ptr<hittable> &b) {
 	return box_compare(a, b, 2);
 }
 
 bvh_node::bvh_node(const std::vector<shared_ptr<hittable>>& src_objects, const size_t start, const size_t end, const double time0, const double time1) {
-	auto objects = src_objects;	//Create a modifiable array for the sorce scene objects
+	auto objects = src_objects;	//Create a modifiable array for the source scene objects
 
 	const auto axis = random_int(0,2);
 	const auto comparator =   (axis==0) ? box_x_compare	//used to sort boxes into close and far to a given axis

@@ -11,9 +11,9 @@ struct vec3 {
 	vec3() : e{0,0,0} {}
 	vec3(double e0, double e1, double e2) : e{e0, e1, e2} {}
 
-	double x() const {return e[0];}
-	double y() const {return e[1];}
-	double z() const {return e[2];}
+	[[nodiscard]] double x() const {return e[0];}
+	[[nodiscard]] double y() const {return e[1];}
+	[[nodiscard]] double z() const {return e[2];}
 
 	vec3 operator -() const {return vec3(-e[0], -e[1], -e[2]); }
 	double operator [](int i) const {return e[i];}
@@ -37,11 +37,11 @@ struct vec3 {
 		return *this *= 1/t;
 	}
 
-	inline double length() const {
+	[[nodiscard]] inline double length() const {
 		return sqrt(length_squared());
 	}
 
-	inline double length_squared() const {
+	[[nodiscard]] inline double length_squared() const {
 		return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
 	}
 
@@ -53,11 +53,6 @@ struct vec3 {
 		return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
 	}
 
-	inline bool near_zero() const {
-		//Returns true if the vector is near 0 in all constituent dimensions
-		const auto s = 1e-8;	//what is considered 'near 0'
-		return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
-	}
 };
 
 
@@ -97,11 +92,11 @@ inline vec3 operator / (const vec3 &v, const double t) {
 	return (1/t) * v;
 }
 
-inline const double dot(const vec3 &u, const vec3 &v) {
+inline double dot(const vec3 &u, const vec3 &v) {
 	return u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2];
 }
 
-inline const vec3 cross(const vec3 &u, const vec3 &v) {
+inline vec3 cross(const vec3 &u, const vec3 &v) {
 	return vec3( u.e[1] * v.e[2] - u.e[2] * v.e[1],  u.e[2] * v.e[0] - u.e[0] * v.e[2],  u.e[0] * v.e[1] - u.e[1] * v.e[0]);
 }
 
@@ -140,6 +135,9 @@ inline vec3 refract(const vec3& uv, const vec3& n, const double etai_over_etat) 
 	return r_out_perp + r_out_parallel;
 }
 
-inline vec3 abs(const vec3& in) {
-    return vec3(fabs(in.x()), fabs(in.y()), fabs(in.z()));
+
+//https://ksuweb.kennesaw.edu/~plaval//math4490/rotgen.pdf
+inline vec3 rotate(const vec3& vec, const vec3 &axis, const double angle) {
+    const auto r = unit_vector(axis);
+    return (1-cos(angle))*dot(vec,r)*r   +  cos(angle)*vec   +  sin(angle)*cross(r, vec);
 }

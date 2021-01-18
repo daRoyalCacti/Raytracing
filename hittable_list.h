@@ -13,17 +13,17 @@ using std::make_shared;
 struct hittable_list : public hittable {
 	std::vector<shared_ptr<hittable>> objects;
 
-	hittable_list() {}
-	hittable_list(shared_ptr<hittable> object) {add(object);}
+	hittable_list() = default;
+	explicit hittable_list(const shared_ptr<hittable> &object) {add(object);}
 
-	void clear() {objects.clear();}
-	void add(shared_ptr<hittable> object) {objects.push_back(object);}
+    [[maybe_unused]] void clear() {objects.clear();}
+	void add(const shared_ptr<hittable>& object) {objects.push_back(object);}
 
-	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override;
-	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override;
+	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
+	bool bounding_box(double time0, double time1, aabb& output_box) const override;
 
-    virtual double pdf_value(const point3& o, const vec3& v) const override;
-    virtual vec3 random(const point3& o) const override;
+    [[nodiscard]] double pdf_value(const point3& o, const vec3& v) const override;
+    [[nodiscard]] vec3 random(const point3& o) const override;
 };
 
 bool hittable_list::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {

@@ -5,18 +5,18 @@
 #include "material.h"
 
 struct sphere : public hittable {
-	point3 center;
-	double radius;
+	point3 center = vec3(0,0,0);
+	double radius = 0;
 	shared_ptr<material> mat_ptr;
 
-	sphere() {}
-	sphere(const point3 cen, const double r, const shared_ptr<material> m): center(cen), radius(r), mat_ptr(m) {}
+	sphere() = default;
+	sphere(const point3 cen, const double r, const shared_ptr<material>& m): center(cen), radius(r), mat_ptr(m) {}
 
-	virtual bool hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const override;
-	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override;
+	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
+	bool bounding_box(double time0, double time1, aabb& output_box) const override;
 
-    virtual double pdf_value(const point3& o, const vec3& v) const override;
-    virtual vec3 random(const point3& o) const override;
+    [[nodiscard]] double pdf_value(const point3& o, const vec3& v) const override;
+    [[nodiscard]] vec3 random(const point3& o) const override;
 
 	private:
 	static void get_sphere_uv(const point3& p, double& u, double& v) {
@@ -61,7 +61,7 @@ bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_recor
 	//if the first root was not acceptable, root is the second root
 	
 	rec.t = root;	//root is finding time
-	//if (!std::isfinite(rec.t)) std::cout << "sphere collision gave infinite time" << std::endl;
+	if (!std::isfinite(rec.t)) std::cout << "sphere collision gave infinite time" << std::endl;
 	rec.p = r.at(rec.t);
 	const vec3 outward_normal = (rec.p - center) / radius;	//a normal vector is just a point on the sphere less the center
 								//dividing by radius to make it normalised
@@ -89,7 +89,7 @@ double sphere::pdf_value(const point3& o, const vec3& v) const {
     const auto cos_theta_max = sqrt(1 - radius*radius/(center-o).length_squared());
     const auto solid_angle = 2*pi*(1 - cos_theta_max);
 
-    /*
+
     if (!std::isfinite(1/solid_angle) ) {
 	    std::cerr << "sphere pdf_value failed\nsolid_angle=" << solid_angle << std::endl;
 
@@ -109,7 +109,7 @@ double sphere::pdf_value(const point3& o, const vec3& v) const {
 	    }
 
 	    std::cerr << "sphere is centered at (" << center << ") ray origin is at (" << o << ") with the sphere radius being " << radius << std::endl;
-    }*/
+    }
 
     return 1 / solid_angle;
 }

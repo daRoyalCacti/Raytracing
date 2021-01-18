@@ -1,26 +1,27 @@
 #pragma once
 
+#include <utility>
+
 #include "hittable.h"
 #include "common.h"
 
 struct triangle : public hittable {
 	std::shared_ptr<material> mp;
 	vec3 vertex0, vertex1, vertex2;	//position of vertex
-	double u_0, v_0, u_1, v_1, u_2, v_2;	//texture coords for each vertex
-	vec3 S, T;	//orthonormal vectors on the plane of the triangle
+	double u_0{}, v_0{}, u_1{}, v_1{}, u_2{}, v_2{};	//texture coords for each vertex
 	vec3 v0, v1;	//edges of the triangle
-	double d00, d01, d11, invDenom;	//helpful quantities for finding texture coords
+	double d00{}, d01{}, d11{}, invDenom{};	//helpful quantities for finding texture coords
 
-	bool vertex_normals;	//whether to use face normals or vertex normals
+	bool vertex_normals{};	//whether to use face normals or vertex normals
 
 	vec3 normal0, normal1, normal2;	//vertex normals (do not have to be set) 
 	
-	 triangle() {}
+	 triangle() = default;
 	 triangle(const vec3 vec0, const vec3 vec1, const vec3 vec2, const double u0_, const double v0_, const double u1_, const double v1_, const double u2_, const double v2_,  std::shared_ptr<material> mat)
-		: vertex0(vec0), vertex1(vec1), vertex2(vec2), u_0(u0_), v_0(v0_), u_1(u1_), v_1(v1_), u_2(u2_), v_2(v2_),  mp(mat) {
+		: vertex0(vec0), vertex1(vec1), vertex2(vec2), u_0(u0_), v_0(v0_), u_1(u1_), v_1(v1_), u_2(u2_), v_2(v2_),  mp(std::move(mat)) {
 
 		vertex_normals = false;
-		//precomuting some quantities to find the uv coordinates
+		//precomputing some quantities to find the uv coordinates
 		//https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates	
 		v0 = vertex1 - vertex0;
 		v1 = vertex2 - vertex0;
@@ -32,7 +33,7 @@ struct triangle : public hittable {
 		};
 
 	 triangle(const vec3 vec0, const vec3 vec1, const vec3 vec2, const vec3 n0, const vec3 n1, const vec3 n2, const double u0_, const double v0_, const double u1_, const double v1_, const double u2_, const double v2_,  std::shared_ptr<material> mat)
-		: triangle(vec0, vec1, vec2, u0_, v0_, u1_, v1_, u2_, v2_, mat) {
+		: triangle(vec0, vec1, vec2, u0_, v0_, u1_, v1_, u2_, v2_, std::move(mat)) {
 		normal0 = n0;
 		normal1 = n1;
 		normal2 = n2;
@@ -41,9 +42,9 @@ struct triangle : public hittable {
 		};
 
 	
-	 virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override;
+	 bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
 
-	 virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	 bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		//finding the min and max of each coordinate
 		double min_x = vertex0.x(), min_y = vertex0.y(), min_z = vertex0.z();
 		double max_x = vertex0.x(), max_y = vertex0.y(), max_z = vertex0.z();
@@ -79,15 +80,15 @@ struct triangle : public hittable {
 
 		const double small = 0.0001;
 		const double epsilon = 0.000001;
-		if (fabsf(min_x - max_x) < epsilon) {
+		if (std::abs(min_x - max_x) < epsilon) {
 			max_x += small;
 			min_x -= small;
 		}
-		if (fabsf(min_y - max_y) < epsilon) {
+		if (std::abs(min_y - max_y) < epsilon) {
 			max_y += small;
 			min_y -= small;
 		}
-		if (fabsf(min_z - max_z) < epsilon) {
+		if (std::abs(min_z - max_z) < epsilon) {
 			max_z += small;
 			min_z -= small;
 		}
@@ -110,7 +111,7 @@ struct triangle : public hittable {
 		Bary2 = 1.0f - Bary0 - Bary1;
 	}
 
-	 inline void barycentric_interp(double &out, const double interp0, const double interp1, const double interp2, const double Bary0, const double Bary1, const double Bary2) const {
+	 static inline void barycentric_interp(double &out, const double interp0, const double interp1, const double interp2, const double Bary0, const double Bary1, const double Bary2) {
 		//https://computergraphics.stackexchange.com/questions/1866/how-to-map-square-texture-to-triangle
 		out = Bary2*interp0 + Bary0*interp1 + Bary1*interp2; 
 	}

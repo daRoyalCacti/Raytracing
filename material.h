@@ -21,10 +21,10 @@ struct material {
 	    return false;
 	}
 
-	virtual color emitted(const ray& r_in, const hit_record& rec, const double u, const double v, const point3& p) const {
+	[[nodiscard]] virtual color emitted(const ray& r_in, const hit_record& rec, const double u, const double v, const point3& p) const {
 		return color(0, 0, 0);
 	}
-	virtual double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
+	[[nodiscard]] virtual double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
 	    return 0;
 	}
 };
@@ -32,17 +32,17 @@ struct material {
 struct lambertian : public material {
 	shared_ptr<texture> albedo;
 	
-	lambertian(const color& a) : albedo(make_shared<solid_color>(a)) {}
-	lambertian(const shared_ptr<texture> a) : albedo(a) {}
+	explicit lambertian(const color& a) : albedo(make_shared<solid_color>(a)) {}
+	explicit lambertian(const shared_ptr<texture>& a) : albedo(a) {}
 
-	virtual bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
+	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
 		srec.is_specular = false;
 		srec.attenuation = albedo->value(rec.u, rec.v, rec.p);
 		srec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
 		return true;
 	}
 
-	virtual double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
+	[[nodiscard]] double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const override {
         const auto cosine = dot(rec.normal, unit_vector(scattered.direction()) );
         return cosine < 0 ? 0 : cosine/pi;
     }
@@ -51,14 +51,14 @@ struct lambertian : public material {
 
 struct metal : public material {
 	shared_ptr<texture> albedo;
-	double fuzz;	//how much light spreads out on collision
+	double fuzz = 0;	//how much light spreads out on collision
 			//fuzz = 0 for perfect reflections
 			//fuzz = 1 for very fuzzy reflections
 
-	metal(const color& a, const double f = 0) : albedo(make_shared<solid_color>(a)), fuzz(f) {}
-	metal(const shared_ptr<texture> a) : albedo(a) {}
+	explicit metal(const color& a, const double f = 0) : albedo(make_shared<solid_color>(a)), fuzz(f) {}
+	explicit metal(const shared_ptr<texture>& a) : albedo(a) {}
 
-	virtual bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
+	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
 		const vec3 reflected = reflect(unit_vector(ray_in.direction()), rec.normal);	//the incoming ray reflected about the normal
 		srec.is_specular = true;
 		srec.specular_ray = ray(rec.p, reflected + fuzz * random_in_unit_sphere(), ray_in.time());	//the scattered ray
@@ -66,7 +66,7 @@ struct metal : public material {
 		const auto unit_direction = unit_vector(ray_in.direction());
 		const auto cosine = fmin(dot(-unit_direction, rec.normal), 1.0);
         srec.attenuation = albedo->value(rec.u, rec.v, rec.p) + (color(1, 1, 1) - albedo->value(rec.u, rec.v, rec.p)) * pow(1-cosine, 5);
-        srec.pdf_ptr = 0;
+        srec.pdf_ptr = nullptr;
 		return (dot(srec.specular_ray.direction(), rec.normal) > 0);	//making sure scattering not opposing the normal
 	}
 };
@@ -75,10 +75,10 @@ struct metal : public material {
 struct dielectric : public material {
 	double ir;	//index of refraction of the material
 
-	dielectric(const double index_of_refraction) : ir(index_of_refraction) {}
+	explicit dielectric(const double index_of_refraction) : ir(index_of_refraction) {}
 
-	virtual bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
-		const double refraction_ratio = rec.front_face ? (1.0/ir) : ir;	//refraction ratio = (refractive index of incident material) / (refrative index of transmitted material)
+	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
+		const double refraction_ratio = rec.front_face ? (1.0/ir) : ir;	//refraction ratio = (refractive index of incident material) / (refractive index of transmitted material)
 										//assuming that the incident material is air, and the refractive index of air is 1
 										//this means 'refractive index of incident material' = 1
 										// - that is assuming the ray was initially in air and then collides with the object
@@ -89,7 +89,7 @@ struct dielectric : public material {
 										// - i.e. the light is moving towards the material
 		const vec3 unit_direction = unit_vector(ray_in.direction());
 		
-		//implementing total internal reflectiion
+		//implementing total internal reflection
 		const double cos_theta = fmin(dot(-unit_direction, rec.normal), 1.0);
 		const double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
 		
@@ -106,7 +106,7 @@ struct dielectric : public material {
 		}
 
 		srec.is_specular = true;
-		srec.pdf_ptr = 0;
+		srec.pdf_ptr = nullptr;
 		srec.attenuation = color(1.0, 1.0, 1.0); //material should be clear so white is a good choice for the color (absorbs nothing)
 		srec.specular_ray = ray(rec.p, direction, ray_in.time());
 		return true;
@@ -125,14 +125,14 @@ struct dielectric : public material {
 struct diffuse_light : public material {
 	shared_ptr<texture> emit;
 
-	diffuse_light(const shared_ptr<texture> a) : emit(a) {}
-	diffuse_light(const color c) : emit(make_shared<solid_color>(c)) {}
+	explicit diffuse_light(const shared_ptr<texture>& a) : emit(a) {}
+	explicit diffuse_light(const color c) : emit(make_shared<solid_color>(c)) {}
 
-	virtual bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
+	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
 		return false;
 	}
 
-	virtual color emitted(const ray& r_in, const hit_record& rec, const double u, const double v, const point3& p) const {
+	[[nodiscard]] color emitted(const ray& r_in, const hit_record& rec, const double u, const double v, const point3& p) const override {
 	    if (rec.front_face)
 		    return emit->value(u, v, p);
 	    else
@@ -144,14 +144,14 @@ struct diffuse_light : public material {
 struct isotropic : public material {
 	shared_ptr<texture> albedo;
 
-	isotropic(const color c) : albedo(make_shared<solid_color>(c)) {}
-	isotropic(shared_ptr<texture> a) : albedo(a) {}
+	explicit isotropic(const color c) : albedo(make_shared<solid_color>(c)) {}
+	explicit isotropic(const shared_ptr<texture> &a) : albedo(a) {}
 
-	virtual bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
+	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
 	    srec.is_specular = true;    //not sure
 		srec.specular_ray = ray(rec.p, random_in_unit_sphere(), ray_in.time());	//pick a random direction for the ray to scatter
 		srec.attenuation = albedo->value(rec.u, rec.v, rec.p);
-		srec.pdf_ptr = 0;
+		srec.pdf_ptr = nullptr;
 		return true;
 	}
 };

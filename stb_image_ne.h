@@ -1,4 +1,4 @@
-//header for including stb_image without the complier displaying warnings while doing so
+//header for including stb_image without the compiler displaying warnings while doing so
 #pragma once
 
 // Disable warnings

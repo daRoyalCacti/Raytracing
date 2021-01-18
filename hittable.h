@@ -16,21 +16,21 @@ struct hit_record {
 
 	inline void set_face_normal(const ray& r, const vec3& outward_normal) { //function to set normal and front_face
 		front_face = dot(r.direction(), outward_normal) < 0;	//if the ray direction points against the normal, the ray collided with the front
-		normal = front_face ? outward_normal :-outward_normal;	//forcing the normal to point agains the ray direction
+		normal = front_face ? outward_normal :-outward_normal;	//forcing the normal to point against the ray direction
 									//if the ray collides with the front, the normal is fine
 									//if the ray collides with the back, the normal needs to be flipped
 	}
 };
 
 struct hittable {
-	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const = 0;	//function to tell when a ray hits the object
-	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const = 0;	//function that creates a bounding box around the object
+	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const = 0;	//function to tell when a ray hits the object
+	virtual bool bounding_box(double time0, double time1, aabb& output_box) const = 0;	//function that creates a bounding box around the object
 
-	virtual double pdf_value(const point3& o, const vec3 &v) const {
+	[[nodiscard]] virtual double pdf_value(const point3& o, const vec3 &v) const {
 	    return 0.0;
 	}
 
-	virtual vec3 random(const vec3 &o) const {
+	[[nodiscard]] virtual vec3 random(const vec3 &o) const {
 	    return vec3(1, 0, 0);
 	}
 };
@@ -40,9 +40,9 @@ struct translate : public hittable {
 	shared_ptr<hittable> ptr;
 	vec3 offset;
 
-	translate(const shared_ptr<hittable> p, const vec3& displacement) : ptr(p), offset(displacement) {}
+	translate(const shared_ptr<hittable>& p, const vec3& displacement) : ptr(p), offset(displacement) {}
 
-	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
+	bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
 		const ray moved_r(r.origin() - offset, r.direction(), r.time());	//moving object by offset is same as translating axes by -offset
 		
 		if(!ptr->hit(moved_r, t_min, t_max, rec))	//if ray doesn't hits object in new axes
@@ -54,9 +54,9 @@ struct translate : public hittable {
 		return true;
 	}
 
-	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		if (!ptr->bounding_box(time0, time1, output_box))	//if there is no bounding box
-			return false;					//alse sets output_box
+			return false;					//also sets output_box
 
 		output_box = aabb(output_box.min() + offset, output_box.max() + offset);
 
@@ -71,27 +71,27 @@ struct rotate_y : public hittable {
 	bool hasbox;			//required to carry info from constructor to bounding_box
 	aabb bbox;
 
-	rotate_y(const shared_ptr<hittable> p, const double angle);
+	rotate_y(const shared_ptr<hittable> &p, double angle);
 
-	virtual bool hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const override;
+	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
 
-	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		output_box = bbox;
 		return hasbox;
 	}
 };
 
-rotate_y::rotate_y(const shared_ptr<hittable> p, const double angle) : ptr(p) {
+rotate_y::rotate_y(const shared_ptr<hittable> &p, const double angle) : ptr(p) {
 	const auto radians = degrees_to_radians(angle);
 	sin_theta = sin(radians);
 	cos_theta = cos(radians);
 	hasbox = ptr->bounding_box(0, 1, bbox);		//sets bbox
 
 	//setting the bounding box
-	point3 min( infinity,  infinity,  infinity);	//intilised to rediculous values because used for comparisons
+	point3 min( infinity,  infinity,  infinity);	//initialised to ridiculous values because used for comparisons
 	point3 max(-infinity, -infinity, -infinity);
 
-	//running throung all corners of the box and rotating them
+	//running through all corners of the box and rotating them
 	//required to know which corner is min and which is max
 	for (int i = 0; i < 2; i++) 
 		for (int j = 0; j < 2; j++)
@@ -103,7 +103,7 @@ rotate_y::rotate_y(const shared_ptr<hittable> p, const double angle) : ptr(p) {
 				const auto newx =  cos_theta*x + sin_theta*z;	//rotating using Euler angles
 				const auto newz = -sin_theta*x + cos_theta*z;
 
-				const vec3 tester(newx, y, newz);	//only used in folling loop
+				const vec3 tester(newx, y, newz);	//only used in following loop
 
 				//checking every component of the rotated vector to see find what is min and max
 				for (int c = 0; c < 3; c++) {
@@ -152,9 +152,9 @@ bool rotate_y::hit(const ray& r, const double t_min, const double t_max, hit_rec
 struct flip_face : public hittable {
     shared_ptr<hittable> ptr;
 
-    flip_face(shared_ptr<hittable> p) : ptr(p) {}
+    explicit flip_face(const shared_ptr<hittable> &p) : ptr(p) {}
 
-    virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record &rec) const override {
+    bool hit(const ray& r, const double t_min, const double t_max, hit_record &rec) const override {
         if (!ptr->hit(r, t_min, t_max, rec))
             return false;
 
@@ -162,7 +162,7 @@ struct flip_face : public hittable {
         return true;
     }
 
-    virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+    bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
         return ptr->bounding_box(time0, time1, output_box);
     }
 };

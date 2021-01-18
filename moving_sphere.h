@@ -5,19 +5,19 @@
 
 struct moving_sphere : public hittable {
 	point3 center0, center1;	//centres of spheres at time0 and time1
-	double time0, time1;
-	double radius;
+	double time0 = 0, time1 = 0;
+	double radius = 0;
 	shared_ptr<material> mat_ptr;
 
-	moving_sphere();
-	moving_sphere(const point3 cen0, const point3 cen1, const double _time0, const double _time1, const double r, const shared_ptr<material> m) :
+	moving_sphere() = default;
+	moving_sphere(const point3 cen0, const point3 cen1, const double _time0, const double _time1, const double r, const shared_ptr<material>& m) :
 		center0(cen0), center1(cen1), time0(_time0), time1(_time1), radius(r), mat_ptr(m) {};
 
-	virtual bool hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const override;
+	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
 
-	virtual bool bounding_box(const double _time0, const double _time1, aabb& output_box) const override;
+	bool bounding_box(double _time0, double _time1, aabb& output_box) const override;
 
-	inline point3 center(const double time) const {
+	[[nodiscard]] inline point3 center(const double time) const {
 		return center0 + (time - time0) / (time1 - time0) * (center1 - center0);
 	}
 };
@@ -36,15 +36,15 @@ bool moving_sphere::hit(const ray& r, const double t_min, const double t_max, hi
 
 	//Find the nearest root that lies in the acceptable range.
 	auto root = (-half_b - sqrtd) / a;	//first root
-	if (root < t_min || t_max < root) {	//if the first root is ouside of the accepctable range
+	if (root < t_min || t_max < root) {	//if the first root is outside of the acceptable range
 		//if true, check the second root
 		root = (-half_b - sqrtd) / a;
 		if (root < t_min || t_max < root)
-			//if the second root is ouside of the range, there is no hit
+			//if the second root is outside of the range, there is no hit
 			return false;
 	}
 
-	//if the first root was accpetable, root is the first root
+	//if the first root was acceptable, root is the first root
 	//if the first root was not acceptable, root is the second root
 	
 	rec.t = root;	//root is finding time

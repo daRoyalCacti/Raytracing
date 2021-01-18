@@ -13,23 +13,21 @@
 
 
 struct triangle_mesh : public hittable {
-	std::shared_ptr<material> mp;
-	bvh_node* tris;
-	int n;		//number of triangles
+	shared_ptr<bvh_node> tris;
 
-	triangle_mesh() {}
+	triangle_mesh() = default;
 	triangle_mesh(hittable_list &triangles, const double time0, const double time1) {
-		tris = new bvh_node(triangles,time0, time1);
+		tris = make_shared<bvh_node>(triangles,time0, time1);
 	}
 
 
 
 
-	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
+	bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
 		return tris->hit(r, t_min, t_max, rec);
 	}
 
-	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		return tris->bounding_box(time0, time1, output_box);	
 	}
 };
@@ -50,7 +48,7 @@ void processMesh(aiMesh *mesh, const aiScene *scene, std::vector<double> &vertic
 		norms.push_back(mesh->mNormals[i].y);
 		norms.push_back(mesh->mNormals[i].z);
 
-		if (mesh->mTextureCoords[0]) {	//does the mesh contiain texture coords
+		if (mesh->mTextureCoords[0]) {	//does the mesh contain texture coords
 			uvs.push_back(mesh->mTextureCoords[0][i].x);
 			uvs.push_back(mesh->mTextureCoords[0][i].y);
 		} else {
@@ -73,7 +71,7 @@ void processMesh(aiMesh *mesh, const aiScene *scene, std::vector<double> &vertic
 	if (mesh->mMaterialIndex >= 0) {
 		//currently only processes diffuse textures
 
-		//retribve the aiMaterial object from the scene
+		//retrieve the aiMaterial object from the scene
 		aiMaterial *mat = scene->mMaterials[mesh->mMaterialIndex];
 		//saying that want all diffuse textures
 		const aiTextureType type = aiTextureType_DIFFUSE;
@@ -85,8 +83,8 @@ void processMesh(aiMesh *mesh, const aiScene *scene, std::vector<double> &vertic
 			std::string path = str.C_Str();
 
 			bool already_loaded = false;
-			for (int i = 0; i < tex_paths.size(); i++) {
-				if (path == tex_paths[i]) {
+			for (auto & tex_path : tex_paths) {
+				if (path == tex_path) {
 					already_loaded = true;
 					break;
 				}
@@ -116,7 +114,7 @@ void processNode(aiNode *node, const aiScene *scene, std::vector<double> &vertic
 
 
 
-std::shared_ptr<triangle_mesh> generate_model(const std::string file_name, const bool flip_uvs = false, const bool load_normals = true)  {
+std::shared_ptr<triangle_mesh> generate_model(const std::string& file_name, const bool flip_uvs = false)  {
 	//https://learnopengl.com/Model-Loading/Model	
 
 	std::vector<double> vertices;

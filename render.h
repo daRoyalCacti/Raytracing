@@ -7,9 +7,9 @@
 #include "color.h"
 #include "hittable_list.h"
 #include "scenes.h"
-#include "ray_colors.h"
 
 #include <fstream>
+#include <utility>
 
 //for creating a directory
 #include <bits/stdc++.h> 
@@ -25,8 +25,8 @@ struct render {
 	unsigned number_of_temp;
 	const scene curr_scene;
 
-	explicit render(const scene &scn, const unsigned img_w, const unsigned samples = 1000, const unsigned temp = 10) :
-			image_width(img_w), samples_per_pixel(samples), number_of_temp(temp), curr_scene(scn) {
+	explicit render(scene scn, const unsigned img_w, const unsigned samples = 1000, const unsigned temp = 10) :
+			image_width(img_w), samples_per_pixel(samples), number_of_temp(temp), curr_scene(std::move(scn)) {
         image_height = static_cast<int>(image_width / curr_scene.aspect_ratio);
 	}
 
@@ -59,7 +59,7 @@ struct render {
 						const auto u = double(i + random_double()) / (image_width-1);
 						const auto v = double(j + random_double()) / (image_height-1);
 						const ray r = curr_scene.cam.get_ray(u, v);
-						pixel_color += ray_color(r, max_depth);
+						pixel_color += ray_color(r, (int)max_depth);
 					}
 					write_color(out, pixel_color, samples_per_pixel);
 				}
@@ -75,7 +75,7 @@ struct render {
 		remove_all(pathToDelete);
 	}
 
-    color ray_color(const ray& r, const int depth) const {
+    [[nodiscard]] color ray_color(const ray& r, const int depth) const {
         //collision with any object
         hit_record rec;
 
@@ -91,22 +91,21 @@ struct render {
 
 
 
-
         if (curr_scene.settings.has_fog) {
             const auto fog_hit_time = curr_scene.fog->generate_hit_time();
             //if (fog_hit_time > rec.t - r.tm) {    //ray hit fog
             if (fog_hit_time < rec.t) {     //ray hit fog
                 const auto scatter_pos = r.at(fog_hit_time);
 
-                curr_scene.fog->create_pdf(r.dir);
+                //curr_scene.fog->create_pdf(r.dir);
 
 
                 if (curr_scene.settings.importance) {
                     const auto light_ptr = make_shared<hittable_pdf>(curr_scene.settings.important, scatter_pos);
                     mixture_pdf mixed_pdf(light_ptr, curr_scene.fog->prob_density);
 
-                    const auto scattered = ray(scatter_pos, mixed_pdf.generate(), r.time());
-                    const auto pdf_val = mixed_pdf.value(scattered.direction());
+                    const auto scattered = ray(scatter_pos, mixed_pdf.generate(r.dir), r.time());
+                    const auto pdf_val = mixed_pdf.value(r.dir, scattered.direction());
 
                     bool nothing_broke = true;
                     if(!std::isfinite(pdf_val)) {
@@ -119,23 +118,16 @@ struct render {
                                                 //   no fog inside the sphere
                     }
 
-                    /*
-                    if (!std::isfinite(pdf_val) ) {
-                        std::cerr << pdf_val << " " << curr_scene.fog->prob_density->value(scattered.direction()) << " "
-                                  << curr_scene.fog->prob_density->value(scattered.direction()) / pdf_val <<
-                                  " (" << scattered.direction() << ") " << " (" << scatter_pos << ") "  << std::endl;
 
-                        std::cerr << "\t(" << r.orig << ") (" << rec.p << ") " << fog_hit_time << " " << rec.t << " (" << r.dir << ")" << std::endl;
-                    }*/
                     if (nothing_broke) {
                         return curr_scene.fog->color_at(scatter_pos) * ray_color(scattered, depth - 1) *
-                               curr_scene.fog->prob_density->value(scattered.direction()) / pdf_val;
+                               curr_scene.fog->prob_density->value(r.dir, scattered.direction()) / pdf_val;
                     }
 
                 }
                 //else
                 return curr_scene.fog->color_at(scatter_pos) *
-                           ray_color(ray(scatter_pos, curr_scene.fog->prob_density->generate(), fog_hit_time),
+                           ray_color(ray(scatter_pos, curr_scene.fog->prob_density->generate(r.dir), r.time()),
                                      depth - 1);
 
             }
@@ -163,16 +155,16 @@ struct render {
             const auto light_ptr = make_shared<hittable_pdf>(curr_scene.settings.important, rec.p);
             mixture_pdf mixed_pdf(light_ptr, srec.pdf_ptr);
 
-            const auto scattered = ray(rec.p, mixed_pdf.generate(), r.time());
-            const auto pdf_val = mixed_pdf.value(scattered.direction());
+            const auto scattered = ray(rec.p, mixed_pdf.generate(r.dir), r.time());
+            const auto pdf_val = mixed_pdf.value(r.dir, scattered.direction());
 
 
             return emitted +
                    srec.attenuation * ray_color(scattered, depth - 1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) /
                    pdf_val;    //return the color of the object darkened by the number of times the ray bounced
         } else {
-            const auto scattered = ray(rec.p, srec.pdf_ptr->generate(), r.time());
-            const auto pdf_val = srec.pdf_ptr->value(scattered.direction());
+            const auto scattered = ray(rec.p, srec.pdf_ptr->generate(r.dir), r.time());
+            const auto pdf_val = srec.pdf_ptr->value(r.dir, scattered.direction());
 
             return emitted + srec.attenuation * ray_color(scattered, depth-1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) / pdf_val;	//return the color of the object darkened by the number of times the ray bounced
 

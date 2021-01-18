@@ -7,22 +7,22 @@
 
 struct xy_rect : public hittable {
 	shared_ptr<material> mp;
-	double x0, x1, y0, y1, k;	//x's and y's define a rectangle in the standard way
+	double x0 = 0, x1 = 0, y0 = 0, y1 = 0, k = 0;	//x's and y's define a rectangle in the standard way
 					//k defines z position
-	xy_rect() {}
-	xy_rect(const double _x0, const double _x1, const double _y0, const double _y1, const double _k, const shared_ptr<material> mat)
+	xy_rect() = default;
+	xy_rect(const double _x0, const double _x1, const double _y0, const double _y1, const double _k, const shared_ptr<material>& mat)
 		: x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(mat) {};
 	
-	virtual bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override;
+	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
 
-	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		//just padding the z direction by a small amount
 		const double small = 0.0001;
 		output_box = aabb(point3(x0, y0, k-small), point3(x1, y1, k+small));
 		return true;
 	}
 
-    virtual double pdf_value(const point3 &origin, const vec3 &v) const override {
+    [[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) const override {
         hit_record rec;
         if (!this->hit(ray(origin, v), 0.001, infinity, rec))
             return 0;
@@ -34,7 +34,7 @@ struct xy_rect : public hittable {
         return distance_squared / (cosine * area);
     }
 
-    virtual vec3 random(const point3 &origin) const override {
+    [[nodiscard]] vec3 random(const point3 &origin) const override {
         const auto random_point = point3(random_double(x0, x1), random_double(y0, y1), k);
         return random_point - origin;
     }
@@ -43,21 +43,21 @@ struct xy_rect : public hittable {
 //very similar to xy rect -- see for comments
 struct xz_rect : public hittable {
 	shared_ptr<material> mp;
-	double x0, x1, z0, z1, k;	//k defines y position
+	double x0 = 0, x1 = 0, z0 = 0, z1 = 0, k = 0;	//k defines y position
 
-	xz_rect() {}
-	xz_rect(const double _x0, const double _x1, const double _z0, const double _z1, const double _k, const shared_ptr<material> mat)
+	xz_rect() = default;
+	xz_rect(const double _x0, const double _x1, const double _z0, const double _z1, const double _k, const shared_ptr<material>& mat)
 		: x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat) {};
 
-	virtual bool hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const override;
+	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
 	
-	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		const double small = 0.0001;
 		output_box = aabb(point3(x0, k-small, z1), point3(x1, k+small, z1));
 		return true;
 	}
 
-	virtual double pdf_value(const point3 &origin, const vec3 &v) const override {
+	[[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) const override {
 	    hit_record rec;
 	    if (!this->hit(ray(origin, v), 0.001, infinity, rec))
 	        return 0;
@@ -69,7 +69,7 @@ struct xz_rect : public hittable {
 	    return distance_squared / (cosine * area);
 	}
 
-	virtual vec3 random(const point3 &origin) const override {
+	[[nodiscard]] vec3 random(const point3 &origin) const override {
 	    const auto random_point = point3(random_double(x0, x1), k, random_double(z0, z1));
 	    return random_point - origin;
 	}
@@ -78,21 +78,21 @@ struct xz_rect : public hittable {
 //very similar to xy rect -- see for comments
 struct yz_rect : public hittable {
 	shared_ptr<material> mp;
-	double y0, y1, z0, z1, k;	//k defines x position
+	double y0 = 0, y1 = 0, z0 = 0, z1 = 0, k = 0;	//k defines x position
 
-	yz_rect() {}
-	yz_rect(const double _y0, const double _y1, const double _z0, const double _z1, const double _k, const shared_ptr<material> mat)
+	yz_rect() = default;
+	yz_rect(const double _y0, const double _y1, const double _z0, const double _z1, const double _k, const shared_ptr<material>& mat)
 		: y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(mat) {};
 
-	virtual bool hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const override;
+	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
 
-	virtual bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		const double small = 0.0001;
 		output_box = aabb(point3(k-small, y0, z0), point3(k+small, y1, z1));
 		return true;
 	}
 
-    virtual double pdf_value(const point3 &origin, const vec3 &v) const override {
+    [[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) const override {
         hit_record rec;
         if (!this->hit(ray(origin, v), 0.001, infinity, rec))
             return 0;
@@ -104,7 +104,7 @@ struct yz_rect : public hittable {
         return distance_squared / (cosine * area);
     }
 
-    virtual vec3 random(const point3 &origin) const override {
+    [[nodiscard]] vec3 random(const point3 &origin) const override {
         const auto random_point = point3(k, random_double(y0, y1), random_double(z0, z1));
         return random_point - origin;
     }
@@ -131,7 +131,7 @@ bool xy_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 	rec.v = (y-y0)/(y1-y0);
 
 	rec.t = t;
-	//if (!std::isfinite(rec.t)) std::cout << "xy_rec collision gave infinite time" << std::endl;
+	if (!std::isfinite(rec.t)) std::cout << "xy_rec collision gave infinite time" << std::endl;
 
 	const auto outward_normal = vec3(0, 0, 1);	//the trival normal vector
 	rec.set_face_normal(r, outward_normal);
@@ -162,7 +162,7 @@ bool xz_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 	rec.v = (z-z0)/(z1-z0);
 
 	rec.t = t;
-	//if (!std::isfinite(rec.t)) std::cout << "xz_rec collision gave infinite time" << std::endl;
+	if (!std::isfinite(rec.t)) std::cout << "xz_rec collision gave infinite time" << std::endl;
 
 	const auto outward_normal = vec3(0, 1, 0);	//the trival normal vector
 	rec.set_face_normal(r, outward_normal);
@@ -193,7 +193,7 @@ bool yz_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 	rec.u = (y-y0)/(y1-y0);
 
 	rec.t = t;
-	//if (!std::isfinite(rec.t)) std::cout << "yz_rec collision gave infinite time" << std::endl;
+	if (!std::isfinite(rec.t)) std::cout << "yz_rec collision gave infinite time" << std::endl;
 
 	const auto outward_normal = vec3(1, 0, 0);	//the trival normal vector
 	rec.set_face_normal(r, outward_normal);

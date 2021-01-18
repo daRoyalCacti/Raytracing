@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "camera.h"
 #include "hittable.h"
 #include "sphere.h"
@@ -14,6 +16,8 @@
 
 #include "triangle.h"
 #include "triangle_mesh.h"
+
+constexpr double aspec1 = 16.0/9.0;
 
 enum class background_color {sky, black};
 
@@ -35,28 +39,28 @@ struct scene {
 
 	hittable_list world;
 	camera cam;
-	double aspect_ratio;
+	double aspect_ratio = 0;
 
     color background;
     shared_ptr<participating_medium> fog;
 
 
-	inline shared_ptr<hittable> important_hittables() const {
+    [[maybe_unused]] [[nodiscard]] inline shared_ptr<hittable> important_hittables() const {
 	    return settings.important;
 	}
 
-	scene() {}
+	scene() = default;
 
-	scene(const double aspec) : aspect_ratio(aspec) {}
+	explicit scene(const double aspec) : aspect_ratio(aspec) {}
 
-    inline void add_important(shared_ptr<hittable> obj) {
+    inline void add_important(const shared_ptr<hittable>& obj) {
 	    settings.importance = true;
 	    settings.important->add(obj);
 	}
 
 	inline void set_fog(shared_ptr<participating_medium> f) {
 	    settings.has_fog = true;
-	    fog = f;
+	    fog =  std::move(f);
 	}
 
 
@@ -81,8 +85,8 @@ struct scene {
 
 
 
-struct first_scene : public scene {
-	first_scene(const double aspect) : scene(aspect) {
+struct [[maybe_unused]] first_scene : public scene {
+	explicit first_scene() : scene(aspec1) {
 		set_background(background_color::sky);
 
 		const auto material_ground = make_shared<lambertian>(color(0.8, 0.8, 0));
@@ -103,8 +107,8 @@ struct first_scene : public scene {
 	}
 };
 
-struct big_scene1 : public scene {
-	big_scene1(const double aspect) : scene(aspect) {
+struct [[maybe_unused]] big_scene1 : public scene {
+    explicit big_scene1() : scene(aspec1) {
 		set_background(background_color::sky);
 
 
@@ -164,8 +168,8 @@ struct big_scene1 : public scene {
 };
 
 
-struct big_scene2 : public scene{
-	big_scene2(const double aspec) : scene(aspec) {
+struct [[maybe_unused]] big_scene2 : public scene{
+	explicit big_scene2() : scene(aspec1) {
 		set_background(background_color::black);
 
 		hittable_list boxes1;
@@ -233,8 +237,8 @@ struct big_scene2 : public scene{
 };
 
 
-struct two_spheres_scene : public scene {
-	two_spheres_scene(const double aspect) : scene(aspect) {
+struct [[maybe_unused]] two_spheres_scene : public scene {
+	two_spheres_scene() : scene(aspec1) {
 		set_background(background_color::sky);
 		
 		const auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
@@ -251,8 +255,8 @@ struct two_spheres_scene : public scene {
 
 
 
-struct two_perlin_spheres_scene : public scene {
-	two_perlin_spheres_scene(const double aspec) : scene(aspec) {
+struct [[maybe_unused]] two_perlin_spheres_scene : public scene {
+	two_perlin_spheres_scene() : scene(aspec1) {
 		set_background(background_color::sky);
 		
 		const auto pertex1 = make_shared<marble_texture>(4);
@@ -268,8 +272,8 @@ struct two_perlin_spheres_scene : public scene {
 
 
 
-struct earth_scene : public scene {
-	earth_scene(const double aspec) : scene(aspec) {
+struct [[maybe_unused]] earth_scene : public scene {
+	earth_scene() : scene(aspec1) {
 		set_background(background_color::black);
 
 		const auto earth_texture = make_shared<image_texture>("../textures/earthmap.jpg");
@@ -284,8 +288,8 @@ struct earth_scene : public scene {
 	}
 };
 
-struct earth_atm_scene : public scene {
-	earth_atm_scene(const double aspec) : scene(aspec) {
+struct [[maybe_unused]] earth_atm_scene : public scene {
+	earth_atm_scene() : scene(aspec1) {
 		set_background(background_color::black);
 
 		const auto earth_texture = make_shared<image_texture>("../textures/earthmap.jpg");
@@ -306,8 +310,8 @@ struct earth_atm_scene : public scene {
 };
 
 
-struct cornell_box_scene : public scene {
-	cornell_box_scene(const double aspec) : scene(aspec) {
+struct [[maybe_unused]] cornell_box_scene : public scene {
+	cornell_box_scene() : scene(1.0) {
 		set_background(background_color::black);	//shouldn't matter -- can't see sky
 
 		const auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
@@ -346,8 +350,8 @@ struct cornell_box_scene : public scene {
 };
 
 
-struct cornell_box_scene2 : public scene {
-    cornell_box_scene2(const double aspec) : scene(aspec) {
+struct [[maybe_unused]] cornell_box_scene2 : public scene {
+    cornell_box_scene2() : scene(1.0) {
         set_background(background_color::black);	//shouldn't matter -- can't see sky
 
         const auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
@@ -411,7 +415,7 @@ struct cornell_box_scene2_fog : public scene {
         box1 = make_shared<translate>(box1, vec3(265, 0, 295));
         world.add(box1);
 
-        set_fog(make_shared<basic_constant_fog>(color(0.8, 0.8, 0.8), 0.01, 0.3, 0.4) );    //0.007 also possible
+        set_fog(make_shared<basic_constant_fog>(color(0.8, 0.8, 0.8), 0.01, 0.3) );    //0.007 also possible
 
         //sphere
         const auto glass = make_shared<dielectric>(1.5);
@@ -427,8 +431,8 @@ struct cornell_box_scene2_fog : public scene {
 
 
 
-struct cornell_smoke_box_scene : public scene {
-	cornell_smoke_box_scene(const double aspec) : scene(aspec) {
+struct [[maybe_unused]] cornell_smoke_box_scene : public scene {
+	cornell_smoke_box_scene() : scene(1.0) {
 		set_background(background_color::black);	//shouldn't matter -- can't see sky
 
 		const auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
@@ -469,8 +473,8 @@ struct cornell_smoke_box_scene : public scene {
 
 
 
-struct triangle_scene : public scene {
-	triangle_scene(const double aspec) : scene(aspec) {
+struct [[maybe_unused]] triangle_scene : public scene {
+	triangle_scene() : scene(aspec1) {
 		set_background(background_color::sky);	//shouldn't matter -- can't see sky
 
 		world.add(make_shared<triangle>(vec3(-0.5, 0, 0), vec3(0, 1, 10), vec3(0,0,0), 0, 0, 0, 1, 1, 0, make_shared<lambertian>(vec3(0, 1, 0)) ));
@@ -483,8 +487,8 @@ struct triangle_scene : public scene {
 
 
 
-struct door_scene : public scene {
-	door_scene(const double aspec) : scene(aspec) {
+struct [[maybe_unused]] door_scene : public scene {
+	door_scene() : scene(aspec1) {
 		set_background(background_color::sky);	//shouldn't matter -- can't see sky
 
 		world.add(generate_model("../models/door/door.obj"));
@@ -496,8 +500,8 @@ struct door_scene : public scene {
 };
 
 
-struct cup_scene : public scene {
-	cup_scene(const double aspec) : scene(aspec) {
+struct [[maybe_unused]] cup_scene : public scene {
+	cup_scene() : scene(aspec1) {
 		set_background(background_color::sky);	//shouldn't matter -- can't see sky
 
 		world.add(generate_model("../models/cup/cup.obj"));

@@ -7,16 +7,16 @@
 struct aabb {
 	point3 minimum, maximum;	//the points that define the bounding box
 					// in 1D    ->         |        |
-					//        orign       min      max
+					//        origin       min      max
 					//       of ray     
 
-	aabb() {}
+	aabb() = default;
 	aabb(const point3& a, const point3& b) : minimum(a), maximum(b) {}
 
-	inline point3 min() const {return minimum;}
-	inline point3 max() const {return maximum;}
+	[[nodiscard]] inline point3 min() const {return minimum;}
+	[[nodiscard]] inline point3 max() const {return maximum;}
 
-	inline bool hit(const ray& r, double t_min, double t_max) const {
+	[[nodiscard]] inline bool hit(const ray& r, double t_min, double t_max) const {
 		//Andrew Kensler (from Pixar) intersection method
 		for (int i = 0; i < 3; i++) {
 			const auto invD = 1.0 / r.direction()[i];	// 1/x or 1/y or 1/z for the incomming ray

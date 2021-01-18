@@ -1,7 +1,6 @@
 
 #include "scenes.h"
 #include "render.h"
-#include "fog.h"
 
 
 

@@ -22,14 +22,28 @@ struct render {
 	unsigned max_depth = 50;	//max number of light bounces
 	unsigned number_of_temp;
 	const scene curr_scene;
+	std::vector<std::vector<color>> buffer;
 
 	explicit render(scene scn, const unsigned img_w, const unsigned samples = 1000, const unsigned temp = 10) :
 			image_width(img_w), samples_per_pixel(samples), number_of_temp(temp), curr_scene(std::move(scn)) {
         image_height = static_cast<int>(image_width / curr_scene.aspect_ratio);
+        buffer.resize(image_width);
+        for (auto&& buff : buffer) {
+            buff.resize(image_height);
+        }
+        buffer_reset();
+	}
+
+	inline void buffer_reset() {
+	    for (unsigned i = 0; i < image_width; i++) {
+	        for (unsigned j = 0; j < image_height; j++) {
+	            buffer[i][j] = vec3(0,0,0);
+	        }
+	    }
 	}
 
 
-	void draw(const std::string &output_name = "image.png") const {
+	void draw(const std::string &output_name = "image.png") {
 		//creating a temp directory
 		std::string rand_str("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 		std::random_device rd;	
@@ -42,28 +56,35 @@ struct render {
 		mkdir(temp_file_dir.c_str(), 0777);
 
 		for (int n = 0; n < number_of_temp; n++) {
-			std::ofstream out;
+            std::cout << "\rImage " << n+1 << " / " << number_of_temp << std::flush;
+			/*std::ofstream out;
 			out.open(temp_file_dir + "/" + std::to_string(n) + ".ppm");
 
 
-			out << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+			out << "P3\n" << image_width << ' ' << image_height << "\n255\n";*/
 
+#pragma omp parallel for default(none)
 			for (int j = (int)image_height-1; j>=0; --j) {
-				std::cout << "\rScanlines remaining: " << j+1 << " / " << image_height << " of image " << n+1 << " / " << number_of_temp << std::flush;
+				//std::cout << "\rScanlines remaining: " << j+1 << " / " << image_height << " of image " << n+1 << " / " << number_of_temp << std::flush;
 				for (unsigned i = 0; i < image_width; ++i) {
-					color pixel_color(0,0,0);
+					//color pixel_color(0,0,0);
 					//#pragma omp parallel for default(none) shared(i, j, pixel_color)
 					for (int s = 0; s < samples_per_pixel; ++s) {
 						const auto u = double(i + random_double()) / (image_width-1);
 						const auto v = double(j + random_double()) / (image_height-1);
 						const ray r = curr_scene.cam.get_ray(u, v);
-						pixel_color += ray_color(r, (int)max_depth);
+						//pixel_color += ray_color(r, (int)max_depth);
+						buffer[i][j] += ray_color(r, max_depth);
 					}
-					write_color(out, pixel_color, samples_per_pixel);
+
+					//write_color(out, pixel_color, samples_per_pixel);
 				}
 			}
-			out.close();
-			std::cerr << "\r" << std::flush;
+
+			write_buffer(temp_file_dir + "/" + std::to_string(n) + ".ppm", buffer, samples_per_pixel);
+			buffer_reset();
+			//out.close();
+			//std::cerr << "\r" << std::flush;
 		}
 
 		average_images(temp_file_dir, output_name);
@@ -73,7 +94,7 @@ struct render {
 		remove_all(pathToDelete);
 	}
 
-    [[nodiscard]] color ray_color(const ray& r, const int depth) const {
+    [[nodiscard]] color ray_color(const ray& r, const unsigned depth) const {
         //collision with any object
         hit_record rec;
 

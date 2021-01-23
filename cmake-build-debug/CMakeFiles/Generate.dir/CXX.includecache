@@ -139,15 +139,15 @@ vector
 -
 
 /home/jacob/Documents/Projects/Raytracer/main.cpp
-scenes.h
-/home/jacob/Documents/Projects/Raytracer/scenes.h
 render.h
 /home/jacob/Documents/Projects/Raytracer/render.h
-fog.h
-/home/jacob/Documents/Projects/Raytracer/fog.h
 iostream
 -
 chrono
+-
+vector
+-
+string
 -
 
 /home/jacob/Documents/Projects/Raytracer/material.h
@@ -185,7 +185,7 @@ numeric
 -
 
 /home/jacob/Documents/Projects/Raytracer/probability.h
-math.h
+cmath
 -
 vec3.h
 /home/jacob/Documents/Projects/Raytracer/vec3.h
@@ -194,19 +194,7 @@ vec3.h
 vec3.h
 /home/jacob/Documents/Projects/Raytracer/vec3.h
 
-/home/jacob/Documents/Projects/Raytracer/ray_colors.h
-functional
--
-hittable.h
-/home/jacob/Documents/Projects/Raytracer/hittable.h
-vec3.h
-/home/jacob/Documents/Projects/Raytracer/vec3.h
-fog.h
-/home/jacob/Documents/Projects/Raytracer/fog.h
-
 /home/jacob/Documents/Projects/Raytracer/render.h
-functional
--
 common.h
 /home/jacob/Documents/Projects/Raytracer/common.h
 camera.h
@@ -217,9 +205,9 @@ hittable_list.h
 /home/jacob/Documents/Projects/Raytracer/hittable_list.h
 scenes.h
 /home/jacob/Documents/Projects/Raytracer/scenes.h
-ray_colors.h
-/home/jacob/Documents/Projects/Raytracer/ray_colors.h
 fstream
+-
+utility
 -
 bits/stdc++.h
 -
@@ -229,6 +217,8 @@ sys/types.h
 -
 
 /home/jacob/Documents/Projects/Raytracer/scenes.h
+utility
+-
 camera.h
 /home/jacob/Documents/Projects/Raytracer/camera.h
 hittable.h
@@ -275,6 +265,8 @@ stb_image_ne.h
 /home/jacob/Documents/Projects/Raytracer/stb_image_ne.h
 
 /home/jacob/Documents/Projects/Raytracer/triangle.h
+utility
+-
 hittable.h
 /home/jacob/Documents/Projects/Raytracer/hittable.h
 common.h

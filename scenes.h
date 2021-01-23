@@ -277,7 +277,8 @@ struct big_scene2 : public scene{
 
 		//smoke
 		const auto boundary1 = make_shared<sphere>(point3(360, 150, 145), 70, make_shared<dielectric>(1.5));
-		world.add(make_shared<constant_medium>(boundary1, 1.0, color(0.2, 0.4, 0.9) ));
+		world.add(boundary1);
+		world.add(make_shared<constant_medium>(boundary1, 0.2, color(0.2, 0.4, 0.9) ));
 		const auto boundary2 = make_shared<sphere>(point3(0,0,0), 5000, make_shared<dielectric>(1.5) );
 		world.add(make_shared<constant_medium>(boundary2, 0.001, color(1,1,1) ));
 
@@ -456,7 +457,7 @@ struct [[maybe_unused]] cornell_box_scene2 : public scene {
 };
 
 struct [[maybe_unused]] cornell_box_scene2_fog : public scene {
-    cornell_box_scene2_fog() : scene(1.0) {
+    explicit cornell_box_scene2_fog(const double lambda = 0.01) : scene(1.0) {
         set_background(background_color::black);
 
         const auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
@@ -481,7 +482,7 @@ struct [[maybe_unused]] cornell_box_scene2_fog : public scene {
         box1 = make_shared<translate>(box1, vec3(265, 0, 295));
         world.add(box1);
 
-        set_fog(make_shared<basic_constant_fog>(color(0.8, 0.8, 0.8), 0.01, 0.3) );    //0.007 also possible
+        set_fog(make_shared<basic_constant_fog>(color(0.8, 0.8, 0.8), lambda, 0.3) );    //0.01, 0.007 possible lambda
 
         //sphere
         const auto glass = make_shared<dielectric>(1.5);

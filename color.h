@@ -36,6 +36,26 @@ void write_color(std::ostream &out, const color pixel_color, const unsigned samp
 }
 
 
+inline void write_buffer(const std::string &file_name, const std::vector<std::vector<color>> buffer, const unsigned  samples_per_pixel) {
+    std::ofstream out;
+    out.open(file_name.c_str());
+
+    const unsigned image_height = buffer[0].size();
+    const unsigned image_width = buffer.size();
+
+
+    out << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+
+    for (int j = (int)image_height-1; j>=0; --j) {
+        for (unsigned i = 0; i < image_width; ++i) {
+            write_color(out, buffer[i][j], samples_per_pixel);
+        }
+    }
+
+    out.close();
+}
+
+
 
 
 

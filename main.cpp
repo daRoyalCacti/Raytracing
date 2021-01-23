@@ -7,17 +7,20 @@
 
 
 int main() {
+
 	//start timing
 	const auto start = std::chrono::system_clock::now();
 	const std::time_t start_time = std::chrono::system_clock::to_time_t(start);
 	std::cout << "Computation started at " << std::ctime(&start_time);
 
 
-	const scene scenes_to_render[] = {big_scene2()};//.{big_scene1_fog()};
-	constexpr unsigned image_widths[] = {1000};
-	constexpr unsigned samples[] = {1000};
-	constexpr unsigned buffers[] = {10};
-	const std::string file_names[] = {"image.png"};
+	const scene scenes_to_render[] = {cornell_box_scene2_fog(0.01), cornell_box_scene2_fog(0.007), cornell_box_scene2_fog(0.015)};//.{big_scene1_fog()};
+	constexpr unsigned image_widths[] = {1000, 1000, 1000};
+	constexpr unsigned samples[] = {500, 500, 500};
+	constexpr unsigned buffers[] = {4, 4, 4};
+
+
+	const std::string file_names[] = {"fog_med.png", "fog_small.png", "fog_big.png"};
 
 
 	constexpr unsigned n = sizeof(image_widths) / sizeof(unsigned);
@@ -28,11 +31,6 @@ int main() {
 	}
 
 
-/*
-	//the main drawing
-	render ren(cornell_box_scene2_fog(),600, 5, 1);			//change this to change the quality of the render
-	ren.draw();
- */
 
 
 
@@ -44,5 +42,6 @@ int main() {
 	const std::chrono::duration<double> elapsed_seconds = end - start;
 	std::cout << "elapsed time: " << elapsed_seconds.count() << "s  or  " << elapsed_seconds.count() / 60.0 << "m  or  " << elapsed_seconds.count() / (60.0 * 60.0) << "h\n";
 	return 0;
+
 }
 

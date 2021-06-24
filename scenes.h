@@ -578,3 +578,16 @@ struct [[maybe_unused]] cup_scene : public scene {
 		set_camera(vec3(0, 0, -0.5), vec3(0, 0, 0), 20.0, 0.0); 
 	}
 };
+
+
+struct crate_scene : public scene {
+	crate_scene() : scene(aspec1) {
+		set_background(background_color::sky);	//shouldn't matter -- can't see sky
+
+		world.add(generate_model("../models/crate/Crate1.obj"));
+		world.add(make_shared<sphere>(vec3(0, -100.5, -1), 100, make_shared<lambertian>(vec3(0,1,0)) ));	
+
+
+		set_camera(vec3(-3, 4, -5), vec3(0, 1, 0), 20.0, 0.0); 
+	}
+};

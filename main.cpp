@@ -14,13 +14,21 @@ int main() {
 	std::cout << "Computation started at " << std::ctime(&start_time);
 
 
-	const scene scenes_to_render[] = {cornell_box_scene2_fog(0.01), cornell_box_scene2_fog(0.007), cornell_box_scene2_fog(0.015)};//.{big_scene1_fog()};
+	/*const scene scenes_to_render[] = {cornell_box_scene2_fog(0.01), cornell_box_scene2_fog(0.007), cornell_box_scene2_fog(0.015)};//.{big_scene1_fog()};
 	constexpr unsigned image_widths[] = {1000, 1000, 1000};
 	constexpr unsigned samples[] = {500, 500, 500};
 	constexpr unsigned buffers[] = {4, 4, 4};
 
 
-	const std::string file_names[] = {"fog_med.png", "fog_small.png", "fog_big.png"};
+	const std::string file_names[] = {"fog_med.png", "fog_small.png", "fog_big.png"};*/
+
+	const scene scenes_to_render[] = {crate_scene()};
+	constexpr unsigned image_widths[] = {200};
+	constexpr unsigned samples[] = {20};
+	constexpr unsigned buffers[] = {1};
+
+
+	const std::string file_names[] = {"test.png"};
 
 
 	constexpr unsigned n = sizeof(image_widths) / sizeof(unsigned);

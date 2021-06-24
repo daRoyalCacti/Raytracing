@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/Generate.dir/main.cpp.o"
+  "CMakeFiles/Generate.dir/main.cpp.o.d"
   "Generate"
   "Generate.pdb"
 )

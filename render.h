@@ -25,18 +25,32 @@ struct render {
     //image width and height are what they say they are
     //samplespp in the number of samples initially to generate
     void draw_on_convergence(const std::string output, const double tol = 0.001) const {
-        std::array <std::array<size_t, image_width>, image_height> samples;
-        std::array <std::array<size_t, image_width>, image_height> curr_samples;     //keeps track of how many rays have been sent for a given pixel
-        for (int j = (int) image_height - 1; j >= 0; --j) {
-            for (unsigned i = 0; i < image_width; ++i) {
+        std::vector <std::vector<size_t>> samples;
+        std::vector <std::vector<size_t>> curr_samples;     //keeps track of how many rays have been sent for a given pixel
+
+        std::vector <std::vector<color>> buffer;   //standard buffer
+        std::vector <std::vector<color>> buffer_write; //buffer that has been properly normalized for file writing
+        std::vector <std::vector<color>> buffer_prev;  //stores the previous buffer (for convergence checking)
+
+        samples.resize(image_width);
+        curr_samples.resize(image_width);
+        buffer.resize(image_width);
+        buffer_write.resize(image_width);
+        buffer_prev.resize(image_width);
+
+
+        for (unsigned i = 0; i < image_width; i++) {
+            samples[i].resize(image_height);
+            curr_samples[i].resize(image_height);
+            buffer[i].resize(image_height);
+            buffer_write[i].resize(image_height);
+            buffer_prev[i].resize(image_height);
+            for (unsigned j = 0; j < image_height; j++) {
                 samples[i][j] = samplespp;
                 curr_samples[i][j] = 0;
             }
         }
 
-        std::array <std::array<color, image_width>, image_height> buffer;
-        std::array <std::array<color, image_width>, image_height> buffer_write;
-        std::array <std::array<color, image_width>, image_height> buffer_prev;
 
         draw_to_buffer(buffer, samples);
         for (int j = (int) image_height - 1; j >= 0; --j) {
@@ -83,8 +97,10 @@ struct render {
     }
 
 
-    void draw_to_buffer(std::array <std::array<color, image_width>, image_height> &buffer,
-                        const std::array <std::array<size_t, image_width>, image_height> samples) const {
+    //void draw_to_buffer(std::array <std::array<color, image_width>, image_height> &buffer,
+    //                    const std::array <std::array<size_t, image_width>, image_height> samples) const {
+    void draw_to_buffer(std::vector <std::vector<color>> &buffer,
+                        const std::vector<std::vector<size_t>> samples) const {
         #pragma omp parallel for shared(buffer)
         for (int j = (int) image_height - 1; j >= 0; --j) {
             for (unsigned i = 0; i < image_width; ++i) {

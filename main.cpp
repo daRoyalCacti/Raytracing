@@ -14,34 +14,9 @@ int main() {
 	std::cout << "Computation started at " << std::ctime(&start_time);
 
 
-	/*const scene scenes_to_render[] = {cornell_box_scene2_fog(0.01), cornell_box_scene2_fog(0.007), cornell_box_scene2_fog(0.015)};//.{big_scene1_fog()};
-	constexpr unsigned image_widths[] = {1000, 1000, 1000};
-	constexpr unsigned samples[] = {500, 500, 500};
-	constexpr unsigned buffers[] = {4, 4, 4};
-
-
-	const std::string file_names[] = {"fog_med.png", "fog_small.png", "fog_big.png"};*/
-
-	/*const scene scenes_to_render[] = {crate_scene()};
-	constexpr unsigned samples[] = {50};
-	constexpr unsigned buffers[] = {10};
-
-
-	const std::string file_names[] = {"test.png"};
-
-
-	constexpr unsigned n = sizeof(samples) / sizeof(unsigned);
-
-	for (unsigned i = 0; i < n; i++) {
-	    render<200, 200> ren(scenes_to_render[i], samples[i], buffers[i]);
-	    ren.draw(file_names[i]);
-	}*/
-
-	scene curr_scene = 	crate_scene();
-    render<200, 200, 20> ren(curr_scene);
-    ren.draw_on_convergence("0.05.png", 0.05);
-
-
+	scene curr_scene = 	cornell_box_scene2();
+    render<600, 600, 50> ren(curr_scene);
+    ren.draw_on_convergence("cornell_box_sphere.png", 0.001);
 
 
 

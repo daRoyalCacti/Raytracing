@@ -14,109 +14,108 @@
 #include <sys/stat.h> 
 #include <sys/types.h>
 
-
-
+template<size_t image_width, size_t image_height, size_t samplespp>
 struct render {
-	unsigned image_width, image_height;
-	unsigned samples_per_pixel;	//number of light rays per pixel
-	unsigned max_depth = 50;	//max number of light bounces
-	unsigned number_of_temp;
-	const scene curr_scene;
-	std::vector<std::vector<color>> buffer;
+    const scene curr_scene;
+    static constexpr unsigned max_depth = 50;
 
-	explicit render(scene scn, const unsigned img_w, const unsigned samples = 1000, const unsigned temp = 10) :
-			image_width(img_w), samples_per_pixel(samples), number_of_temp(temp), curr_scene(std::move(scn)) {
-        image_height = static_cast<int>(image_width / curr_scene.aspect_ratio);
-        buffer.resize(image_width);
-        for (auto&& buff : buffer) {
-            buff.resize(image_height);
+    render() = delete;
+    explicit render(scene scn) : curr_scene(std::move(scn)) {}
+
+    //image width and height are what they say they are
+    //samplespp in the number of samples initially to generate
+    void draw_on_convergence(const std::string output, const double tol = 0.001) const {
+        std::array <std::array<size_t, image_width>, image_height> samples;
+        std::array <std::array<size_t, image_width>, image_height> curr_samples;     //keeps track of how many rays have been sent for a given pixel
+        for (int j = (int) image_height - 1; j >= 0; --j) {
+            for (unsigned i = 0; i < image_width; ++i) {
+                samples[i][j] = samplespp;
+                curr_samples[i][j] = 0;
+            }
         }
-        buffer_reset();
-	}
 
-	inline void buffer_reset() {
-	    for (unsigned i = 0; i < image_width; i++) {
-	        for (unsigned j = 0; j < image_height; j++) {
-	            buffer[i][j] = vec3(0,0,0);
-	        }
-	    }
-	}
+        std::array <std::array<color, image_width>, image_height> buffer;
+        std::array <std::array<color, image_width>, image_height> buffer_write;
+        std::array <std::array<color, image_width>, image_height> buffer_prev;
+
+        draw_to_buffer(buffer, samples);
+        for (int j = (int) image_height - 1; j >= 0; --j) {
+            for (unsigned i = 0; i < image_width; ++i) {
+                buffer_prev[i][j] = buffer[i][j];
+                curr_samples[i][j] += samples[i][j];
+            }
+        }
+
+        bool should_quit = false;
+        unsigned counter = 0;
+        double max_dev = 0;
+        size_t pixel_x, pixel_y;
+        while (!should_quit) {
+            max_dev = 0;
+            should_quit = true;
+            draw_to_buffer(buffer, samples);
+            for (int j = (int) image_height - 1; j >= 0; --j) {
+                for (unsigned i = 0; i < image_width; ++i) {
+                    curr_samples[i][j] += samples[i][j];
+                    buffer_write[i][j] = buffer[i][j] / (double)curr_samples[i][j];
+                    //if the colour has not changed significatly
+                    const auto dev_x = abs(buffer_write[i][j].x() - buffer_prev[i][j].x()/(double)curr_samples[i][j]);
+                    const auto dev_y = abs(buffer_write[i][j].y() - buffer_prev[i][j].y()/(double)curr_samples[i][j]);
+                    const auto dev_z = abs(buffer_write[i][j].z() - buffer_prev[i][j].z()/(double)curr_samples[i][j]);
+                    if (dev_x > max_dev) {max_dev = dev_x; pixel_x = i; pixel_y = j;};
+                    if (dev_y > max_dev) {max_dev = dev_y; pixel_x = i; pixel_y = j;};
+                    if (dev_z > max_dev) {max_dev = dev_z; pixel_x = i; pixel_y = j;};
+
+                    if ( ( dev_x > tol ) || ( dev_y > tol ) || ( dev_z > tol ) ) {
+                        should_quit = false;    //must keep computing
+                    } else {
+                        samples[i][j] = 0;  //pixel is good enough and so we can save computation power but not sending any other rays to it
+                    }
+                    buffer_prev[i][j] = buffer[i][j];
+
+                }
+            }
+
+            write_buffer_png(output, buffer_write);
+            std::cout << "loop num : " << counter++ << "\tmax deviation : " << max_dev << "/" << tol << " at (" << pixel_x << "," << pixel_y << ")\n";
+        }
+
+    }
 
 
-	void draw(const std::string &output_name = "image.png") {
-		//creating a temp directory
-		std::string rand_str("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-		std::random_device rd;	
-		std::mt19937 generator(rd());
+    void draw_to_buffer(std::array <std::array<color, image_width>, image_height> &buffer,
+                        const std::array <std::array<size_t, image_width>, image_height> samples) const {
+        #pragma omp parallel for shared(buffer)
+        for (int j = (int) image_height - 1; j >= 0; --j) {
+            for (unsigned i = 0; i < image_width; ++i) {
+                for (int s = 0; s < samples[i][j]; ++s) {
+                    const auto u = double(i + random_double()) / (image_width - 1);
+                    const auto v = double(j + random_double()) / (image_height - 1);
+                    const ray r = curr_scene.cam.get_ray(u, v);
+                    buffer[i][j] += ray_color(r, max_depth);
+                }
+            }
+        }
 
-		std::shuffle(rand_str.begin(), rand_str.end(), generator);
+    }
 
-		const std::string temp_file_dir = "./temp_image_dir_" + rand_str.substr(0, 15);
-
-		mkdir(temp_file_dir.c_str(), 0777);
-
-		for (int n = 0; n < number_of_temp; n++) {
-            std::cout << "\rImage " << n+1 << " / " << number_of_temp << std::flush;
-			/*std::ofstream out;
-			out.open(temp_file_dir + "/" + std::to_string(n) + ".ppm");
-
-
-			out << "P3\n" << image_width << ' ' << image_height << "\n255\n";*/
-
-#pragma omp parallel for default(none)
-			for (int j = (int)image_height-1; j>=0; --j) {
-				//std::cout << "\rScanlines remaining: " << j+1 << " / " << image_height << " of image " << n+1 << " / " << number_of_temp << std::flush;
-				for (unsigned i = 0; i < image_width; ++i) {
-					//color pixel_color(0,0,0);
-					//#pragma omp parallel for default(none) shared(i, j, pixel_color)
-					for (int s = 0; s < samples_per_pixel; ++s) {
-						const auto u = double(i + random_double()) / (image_width-1);
-						const auto v = double(j + random_double()) / (image_height-1);
-						const ray r = curr_scene.cam.get_ray(u, v);
-						//pixel_color += ray_color(r, (int)max_depth);
-						buffer[i][j] += ray_color(r, max_depth);
-					}
-
-					//write_color(out, pixel_color, samples_per_pixel);
-				}
-			}
-
-			write_buffer(temp_file_dir + "/" + std::to_string(n) + ".ppm", buffer, samples_per_pixel);
-			buffer_reset();
-			//out.close();
-			//std::cerr << "\r" << std::flush;
-		}
-
-		average_images(temp_file_dir, output_name);
-
-		//deleting the temp images
-		std::filesystem::path pathToDelete(temp_file_dir);
-		remove_all(pathToDelete);
-	}
-
-    [[nodiscard]] color ray_color(const ray& r, const unsigned depth) const {
+    [[nodiscard]] color ray_color(const ray &r, const unsigned depth) const {
         //collision with any object
         hit_record rec;
 
         //If we've reach the bounce limit, no more light is gathered
         if (depth <= 0)
-            return color(0,0,0);
+            return color(0, 0, 0);
 
         //If the ray hits nothing, return the background color
         if (!curr_scene.world.hit(r, 0.001, infinity, rec))
             return curr_scene.background;
 
 
-
-
-
         if (curr_scene.settings.has_fog) {
             const auto fog_hit_time = curr_scene.fog->generate_hit_time();
-            //if (fog_hit_time > rec.t - r.tm) {    //ray hit fog
             if (fog_hit_time < rec.t) {     //ray hit fog
                 const auto scatter_pos = r.at(fog_hit_time);
-
-                //curr_scene.fog->create_pdf(r.dir);
 
 
                 if (curr_scene.settings.importance) {
@@ -127,14 +126,14 @@ struct render {
                     const auto pdf_val = mixed_pdf.value(r.dir, scattered.direction());
 
                     bool nothing_broke = true;
-                    if(!std::isfinite(pdf_val)) {
+                    if (!std::isfinite(pdf_val)) {
                         nothing_broke = false;  //is not always cause for erroring out
-                                                // - when importance sampling a dielectric sphere,
-                                                //   the generated ray is moving through the sphere.
-                                                //   Because the ray is inside the sphere, the
-                                                //   importance sampling fails.
-                                                //   However, it should fail because there is
-                                                //   no fog inside the sphere
+                        // - when importance sampling a dielectric sphere,
+                        //   the generated ray is moving through the sphere.
+                        //   Because the ray is inside the sphere, the
+                        //   importance sampling fails.
+                        //   However, it should fail because there is
+                        //   no fog inside the sphere
                     }
 
 
@@ -146,8 +145,8 @@ struct render {
                 }
                 //else
                 return curr_scene.fog->color_at(scatter_pos) *
-                           ray_color(ray(scatter_pos, curr_scene.fog->prob_density->generate(r.dir), r.time()),
-                                     depth - 1);
+                       ray_color(ray(scatter_pos, curr_scene.fog->prob_density->generate(r.dir), r.time()),
+                                 depth - 1);
 
             }
 
@@ -156,18 +155,16 @@ struct render {
 
 
 
-
-
-
         //else keep bouncing light
-        const color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);	//is black if the material doesn't emit
+        const color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v,
+                                                   rec.p);    //is black if the material doesn't emit
 
         scatter_record srec;
-        if (!rec.mat_ptr->scatter(r, rec, srec))	//if the light shouldn't scatter
+        if (!rec.mat_ptr->scatter(r, rec, srec))    //if the light shouldn't scatter
             return emitted;
 
         if (srec.is_specular)
-            return srec.attenuation * ray_color(srec.specular_ray, depth-1);
+            return srec.attenuation * ray_color(srec.specular_ray, depth - 1);
 
         if (curr_scene.settings.importance) {
             //https://en.wikipedia.org/wiki/Monte_Carlo_integration#Importance_sampling
@@ -185,9 +182,12 @@ struct render {
             const auto scattered = ray(rec.p, srec.pdf_ptr->generate(r.dir), r.time());
             const auto pdf_val = srec.pdf_ptr->value(r.dir, scattered.direction());
 
-            return emitted + srec.attenuation * ray_color(scattered, depth-1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) / pdf_val;	//return the color of the object darkened by the number of times the ray bounced
+            return emitted +
+                   srec.attenuation * ray_color(scattered, depth - 1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) /
+                   pdf_val;    //return the color of the object darkened by the number of times the ray bounced
 
         }
     }
-};
 
+
+};

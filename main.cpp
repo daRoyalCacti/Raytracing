@@ -22,21 +22,24 @@ int main() {
 
 	const std::string file_names[] = {"fog_med.png", "fog_small.png", "fog_big.png"};*/
 
-	const scene scenes_to_render[] = {crate_scene()};
-	constexpr unsigned image_widths[] = {200};
-	constexpr unsigned samples[] = {20};
-	constexpr unsigned buffers[] = {1};
+	/*const scene scenes_to_render[] = {crate_scene()};
+	constexpr unsigned samples[] = {50};
+	constexpr unsigned buffers[] = {10};
 
 
 	const std::string file_names[] = {"test.png"};
 
 
-	constexpr unsigned n = sizeof(image_widths) / sizeof(unsigned);
+	constexpr unsigned n = sizeof(samples) / sizeof(unsigned);
 
 	for (unsigned i = 0; i < n; i++) {
-	    render ren(scenes_to_render[i], image_widths[i], samples[i], buffers[i]);
+	    render<200, 200> ren(scenes_to_render[i], samples[i], buffers[i]);
 	    ren.draw(file_names[i]);
-	}
+	}*/
+
+	scene curr_scene = 	crate_scene();
+    render<200, 200, 20> ren(curr_scene);
+    ren.draw_on_convergence("0.05.png", 0.05);
 
 
 

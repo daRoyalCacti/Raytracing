@@ -35,8 +35,9 @@ void write_color(std::ostream &out, const color pixel_color, const unsigned samp
 		<< static_cast<int>(256 * clamp(b, 0, 0.999)) << '\n';
 }
 
-
-inline void write_buffer(const std::string &file_name, const std::vector<std::vector<color>> buffer, const unsigned  samples_per_pixel) {
+//T was originally std::vector<std::vector<color>>
+template<typename T>
+inline void write_buffer(const std::string &file_name, const T buffer, const unsigned  samples_per_pixel) {
     std::ofstream out;
     out.open(file_name.c_str());
 
@@ -55,11 +56,41 @@ inline void write_buffer(const std::string &file_name, const std::vector<std::ve
     out.close();
 }
 
-
-
-
-
 namespace fs = std::filesystem;
+
+//T was originally std::vector<std::vector<color>>
+template<typename T>
+inline void write_buffer_png(const std::string &file_name, const T buffer) {
+    const auto img_w = buffer[0].size();
+    const auto img_h = buffer.size();
+
+    //https://www.nongnu.org/pngpp/doc/0.2.9/
+    png::image<png::rgb_pixel> image(img_w, img_h);
+    for (size_t j = 0; j<img_h; j++)
+    //for (int j = (int)img_h - 1; j>=0; j--)
+        for (size_t i = 0; i <img_w; i++) {
+
+            //gamma correcting using "gamma 2"
+            //i.e. raising the color to the power of 1/gamma = 1/2
+            const double r = sqrt(buffer[i][j].x());
+            const double g = sqrt(buffer[i][j].y());
+            const double b = sqrt(buffer[i][j].z());
+
+            //color scaled to be in [0, 255]
+            const int r_w = static_cast<int>(256 * clamp(r, 0, 0.999));
+            const int g_w = static_cast<int>(256 * clamp(g, 0, 0.999));
+            const int b_w = static_cast<int>(256 * clamp(b, 0, 0.999));
+
+            image[img_h-j-1][i] = png::rgb_pixel(r_w,g_w,b_w);
+        }
+
+    image.write(file_name);
+}
+
+
+
+
+
 //could be updated using std::string.find(std::string)
 void average_images(const std::string &file_dir, const std::string &output_loc) {
 	int num_files = 0;

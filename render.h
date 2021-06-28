@@ -90,7 +90,7 @@ struct render {
                 for (unsigned i = 0; i < image_width; ++i) {
                     curr_samples[i][j] += samples[i][j];
                     buffer_write[i][j] = buffer[i][j] / (double)curr_samples[i][j];
-                    //determining how much each the colour of each pixel has changed by a repreated iteration (for a single photon)
+                    //determining how much each the colour of each pixel has changed by a repeated iteration (for a single photon)
                     const auto dev_x = abs(buffer_write[i][j].x() - buffer_prev[i][j].x()/(double)curr_samples[i][j]) / samples[i][j];
                     const auto dev_y = abs(buffer_write[i][j].y() - buffer_prev[i][j].y()/(double)curr_samples[i][j]) / samples[i][j];
                     const auto dev_z = abs(buffer_write[i][j].z() - buffer_prev[i][j].z()/(double)curr_samples[i][j]) / samples[i][j];
@@ -105,9 +105,7 @@ struct render {
                     //if the current pixel is converging too fast, then we must keep iterating
                     if ( max_dev_l > tol ) {
                         should_quit = false;
-                    } //else {
-                        //samples[i][j] = 10;  //pixel is good enough and so we can save computation power but not sending any other rays to it
-                    //}
+                    }
 
                     buffer_prev[i][j] = buffer[i][j];
                 }
@@ -136,10 +134,10 @@ struct render {
     void draw_to_buffer(std::vector <std::vector<color>> &buffer,
                         const std::vector<std::vector<size_t>> samples) const {
         unsigned counter = 0;
-        std::cout << "\n";
         #pragma omp parallel for shared(buffer, counter)
         for (int j = (int) image_height - 1; j >= 0; --j) {
-            std::cout << "\rScanline: " << ++counter << " / " << image_height << std::flush;
+            if constexpr (log_scanlines)
+                std::cout << "\rScanline: " << ++counter << " / " << image_height << std::flush;
             for (unsigned i = 0; i < image_width; ++i) {
                 for (int s = 0; s < samples[i][j]; ++s) {
                     const auto u = double(i + random_double()) / (image_width - 1);
@@ -149,7 +147,8 @@ struct render {
                 }
             }
         }
-        std::cout << "\r                                  " << std::flush;
+        if constexpr (log_scanlines)
+            std::cout << "\r                                  \n" << std::flush;
     }
 
     [[nodiscard]] color ray_color(const ray &r, const unsigned depth) const {

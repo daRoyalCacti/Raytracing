@@ -5,9 +5,9 @@
 #include "material.h"
 
 struct sphere : public hittable {
-	point3 center = vec3(0,0,0);
+	const point3 center = vec3(0,0,0);
 	double radius = 0;
-	shared_ptr<material> mat_ptr;
+	const shared_ptr<material> mat_ptr;
 
 	sphere() = default;
 	sphere(const point3 cen, const double r, const shared_ptr<material>& m): center(cen), radius(r), mat_ptr(m) {}
@@ -48,19 +48,21 @@ bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_recor
 	const auto sqrtd = sqrt(discriminant);
 
 	//Find the nearest root that lies in the acceptable range.
-	auto root = (-half_b - sqrtd) / a;	//first root
-	if (root < t_min || t_max < root) {	//if the first root is ouside of the accepctable range
+	const auto root1 = (-half_b - sqrtd) / a;	//first root
+	if (root1 < t_min || t_max < root1) {	//if the first root is ouside of the accepctable range
 		//if true, check the second root
-		root = (-half_b - sqrtd) / a;
-		if (root < t_min || t_max < root)
-			//if the second root is ouside of the range, there is no hit
-			return false;
+		const auto root2 = (-half_b + sqrtd) / a;
+		if (root2 < t_min || t_max < root2) {
+            //if the second root is ouside of the range, there is no hit
+            return false;
+        } else {
+		    rec.t = root2;
+		}
+	} else {
+        rec.t = root1;	//root is finding time
 	}
 
-	//if the first root was accpetable, root is the first root
-	//if the first root was not acceptable, root is the second root
-	
-	rec.t = root;	//root is finding time
+
 #ifndef NDEBUG
 	if (!std::isfinite(rec.t)) std::cout << "sphere collision gave infinite time" << std::endl;
 #endif
@@ -78,7 +80,7 @@ bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_recor
 }
 
 bool sphere::bounding_box(const double time0, const double time1, aabb& output_box) const {
-	output_box = aabb(center - vec3(radius, radius, radius), center + vec3(radius, radius, radius));
+	output_box = aabb(center - vec3(radius), center + vec3(radius));
 	return true;
 }
 

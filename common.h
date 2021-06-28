@@ -6,6 +6,8 @@
 #include <random>
 
 
+constexpr bool log_scanlines = false;  //prints the number of scalines remaining when rendering an image
+
 
 
 //common usings

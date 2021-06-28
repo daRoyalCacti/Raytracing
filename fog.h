@@ -27,6 +27,7 @@ struct basic_constant_fog : public participating_medium {
         return rand_exp(lambda);
     }
 
+
     [[nodiscard]] color color_at(const vec3 &hit_pos) const override {
         return col;
     }

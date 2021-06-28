@@ -14,7 +14,8 @@
 #include <sys/stat.h> 
 #include <sys/types.h>
 
-template<size_t image_width, size_t image_height, size_t samplespp>
+//image width and height are what they say they are
+template<size_t image_width, size_t image_height>
 struct render {
     const scene curr_scene;
     static constexpr unsigned max_depth = 50;
@@ -22,9 +23,19 @@ struct render {
     render() = delete;
     explicit render(scene scn) : curr_scene(std::move(scn)) {}
 
-    //image width and height are what they say they are
+
     //samplespp in the number of samples initially to generate
-    void draw_on_convergence(const std::string output, const double tol = 0.001) const {
+    template <size_t samplespp>
+    void draw_on_convergence(const std::string output, const double tol = 0.1) const {
+        //======================================
+        //The general idea:
+        // - consider the plot of the number of rays per pixel against the color of the pixel (or some component of color, say red)
+        // - then consider the plot of the derivative of this
+        // - when the plot of the derivative reaches tol, we quit
+        // Basically, we keep on adding more rays into the convergence gets signficantly slow
+        //======================================
+        constexpr long unsigned total_rays = samplespp*image_width*image_height;
+
         std::vector <std::vector<size_t>> samples;
         std::vector <std::vector<size_t>> curr_samples;     //keeps track of how many rays have been sent for a given pixel
 
@@ -32,11 +43,14 @@ struct render {
         std::vector <std::vector<color>> buffer_write; //buffer that has been properly normalized for file writing
         std::vector <std::vector<color>> buffer_prev;  //stores the previous buffer (for convergence checking)
 
+        std::vector <std::vector<double>> conv;  //stores how fast each pixel is converging to the solution
+
         samples.resize(image_width);
         curr_samples.resize(image_width);
         buffer.resize(image_width);
         buffer_write.resize(image_width);
         buffer_prev.resize(image_width);
+        conv.resize(image_width);
 
 
         for (unsigned i = 0; i < image_width; i++) {
@@ -45,6 +59,7 @@ struct render {
             buffer[i].resize(image_height);
             buffer_write[i].resize(image_height);
             buffer_prev[i].resize(image_height);
+            conv[i].resize(image_height);
             for (unsigned j = 0; j < image_height; j++) {
                 samples[i][j] = samplespp;
                 curr_samples[i][j] = 0;
@@ -57,52 +72,74 @@ struct render {
             for (unsigned i = 0; i < image_width; ++i) {
                 buffer_prev[i][j] = buffer[i][j];
                 curr_samples[i][j] += samples[i][j];
+                buffer_write[i][j] = buffer[i][j] / (double)curr_samples[i][j];
             }
         }
+        write_buffer_png(output, buffer_write);
 
         bool should_quit = false;
         unsigned counter = 0;
-        double max_dev = 0;
-        size_t pixel_x, pixel_y;
+        double max_dev = 0, max_dev_l = 0;  //storing the quickest convergence and the color with the quickest convergence
+        double sum = 0; //summing over all max_dev_l --- acts as a normalising factor for redistributing the rays
         while (!should_quit) {
             max_dev = 0;
+            sum = 0;
             should_quit = true;
             draw_to_buffer(buffer, samples);
             for (int j = (int) image_height - 1; j >= 0; --j) {
                 for (unsigned i = 0; i < image_width; ++i) {
                     curr_samples[i][j] += samples[i][j];
                     buffer_write[i][j] = buffer[i][j] / (double)curr_samples[i][j];
-                    //if the colour has not changed significatly
-                    const auto dev_x = abs(buffer_write[i][j].x() - buffer_prev[i][j].x()/(double)curr_samples[i][j]);
-                    const auto dev_y = abs(buffer_write[i][j].y() - buffer_prev[i][j].y()/(double)curr_samples[i][j]);
-                    const auto dev_z = abs(buffer_write[i][j].z() - buffer_prev[i][j].z()/(double)curr_samples[i][j]);
-                    if (dev_x > max_dev) {max_dev = dev_x; pixel_x = i; pixel_y = j;};
-                    if (dev_y > max_dev) {max_dev = dev_y; pixel_x = i; pixel_y = j;};
-                    if (dev_z > max_dev) {max_dev = dev_z; pixel_x = i; pixel_y = j;};
+                    //determining how much each the colour of each pixel has changed by a repreated iteration (for a single photon)
+                    const auto dev_x = abs(buffer_write[i][j].x() - buffer_prev[i][j].x()/(double)curr_samples[i][j]) / samples[i][j];
+                    const auto dev_y = abs(buffer_write[i][j].y() - buffer_prev[i][j].y()/(double)curr_samples[i][j]) / samples[i][j];
+                    const auto dev_z = abs(buffer_write[i][j].z() - buffer_prev[i][j].z()/(double)curr_samples[i][j]) / samples[i][j];
+                    max_dev_l = dev_x;
+                    if (dev_y > max_dev_l) {max_dev_l = dev_y;}
+                    if (dev_z > max_dev_l) {max_dev_l = dev_z;}
+                    conv[i][j] = max_dev_l;
+                    sum += max_dev_l;
 
-                    if ( ( dev_x > tol ) || ( dev_y > tol ) || ( dev_z > tol ) ) {
-                        should_quit = false;    //must keep computing
-                    } else {
-                        samples[i][j] = 0;  //pixel is good enough and so we can save computation power but not sending any other rays to it
-                    }
+                    if (max_dev_l > max_dev) {max_dev = max_dev_l;}   //for printing purposes
+
+                    //if the current pixel is converging too fast, then we must keep iterating
+                    if ( max_dev_l > tol ) {
+                        should_quit = false;
+                    } //else {
+                        //samples[i][j] = 10;  //pixel is good enough and so we can save computation power but not sending any other rays to it
+                    //}
+
                     buffer_prev[i][j] = buffer[i][j];
-
                 }
             }
 
+
+            //redistributing the rays based on the convergence
+            for (int j = (int) image_height - 1; j >= 0; --j) {
+                for (unsigned i = 0; i < image_width; ++i) {
+                    samples[i][j] = ceil(total_rays * conv[i][j] / sum);
+                    if (samples[i][j]==0) {
+                        samples[i][j] = 1;
+                    }
+                }
+            }
+
+
+
             write_buffer_png(output, buffer_write);
-            std::cout << "loop num : " << counter++ << "\tmax deviation : " << max_dev << "/" << tol << " at (" << pixel_x << "," << pixel_y << ")\n";
+            std::cout << "loop num : " << counter++ << "\tmax deviation : " << max_dev << "/" << tol << "\n";
         }
 
     }
 
 
-    //void draw_to_buffer(std::array <std::array<color, image_width>, image_height> &buffer,
-    //                    const std::array <std::array<size_t, image_width>, image_height> samples) const {
     void draw_to_buffer(std::vector <std::vector<color>> &buffer,
                         const std::vector<std::vector<size_t>> samples) const {
-        #pragma omp parallel for shared(buffer)
+        unsigned counter = 0;
+        std::cout << "\n";
+        #pragma omp parallel for shared(buffer, counter)
         for (int j = (int) image_height - 1; j >= 0; --j) {
+            std::cout << "\rScanline: " << ++counter << " / " << image_height << std::flush;
             for (unsigned i = 0; i < image_width; ++i) {
                 for (int s = 0; s < samples[i][j]; ++s) {
                     const auto u = double(i + random_double()) / (image_width - 1);
@@ -112,7 +149,7 @@ struct render {
                 }
             }
         }
-
+        std::cout << "\r                                  " << std::flush;
     }
 
     [[nodiscard]] color ray_color(const ray &r, const unsigned depth) const {

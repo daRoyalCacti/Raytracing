@@ -115,7 +115,8 @@ struct [[maybe_unused]] big_scene1 : public scene {
 		hittable_list obj;
 		
 		const auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
-		const auto ground_material = make_shared<lambertian>(checker);
+		//const auto ground_material = make_shared<lambertian>(checker);
+        const auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
 		obj.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
 
 		for (int a = -11; a<11; a++) {	//centers of spheres x
@@ -178,7 +179,8 @@ struct [[maybe_unused]] big_scene1_fog : public scene {
         hittable_list obj;
 
         const auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
-        const auto ground_material = make_shared<lambertian>(checker);
+        //const auto ground_material = make_shared<lambertian>(checker);
+        const auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
         obj.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
 
         for (int a = -11; a<11; a++) {	//centers of spheres x

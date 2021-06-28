@@ -1,3 +1,5 @@
 build/
 cmake-build-debug/
 .idea/
+books/
+images/raytracing_in_one_weekend_main_image_large.png

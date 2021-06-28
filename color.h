@@ -60,9 +60,9 @@ namespace fs = std::filesystem;
 
 //T was originally std::vector<std::vector<color>>
 template<typename T>
-inline void write_buffer_png(const std::string &file_name, const T buffer) {
-    const auto img_w = buffer[0].size();
-    const auto img_h = buffer.size();
+inline void write_buffer_png(const std::string &file_name, const T &buffer) {
+    const auto img_w = buffer.size();
+    const auto img_h = buffer[0].size();
 
     //https://www.nongnu.org/pngpp/doc/0.2.9/
     png::image<png::rgb_pixel> image(img_w, img_h);

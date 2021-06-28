@@ -29,8 +29,8 @@ class camera {
 		const auto viewport_height = 2.0 * h;
 		const auto viewport_width = aspect_ratio*viewport_height;
 
-		w = unit_vector(lookfrom - lookat);	//vector pointing from camera to point to look at
-		u = unit_vector(cross(vup, w));		//vector pointing to the right -- orthogonal to the up vector and w
+		w = (lookfrom - lookat).normalized();	//vector pointing from camera to point to look at
+		u = cross(vup, w).normalized();		//vector pointing to the right -- orthogonal to the up vector and w
 		v = cross(w, u);			//the projection of the up vector on to the plane described by w (i.e. perpendicular to w)
 		
 		//uses a lense

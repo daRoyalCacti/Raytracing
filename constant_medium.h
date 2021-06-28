@@ -48,7 +48,7 @@ bool constant_medium::hit(const ray& r, const double t_min, const double t_max, 
 	if (rec1.t < 0)
 		rec1.t = 0;
 
-	const auto ray_length = r.direction().length();
+	const auto ray_length = r.direction().norm();
 	const auto distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
 	const auto hit_distance = neg_inv_density * log(random_double());	//randomly deciding if the ray should leave the medium
 

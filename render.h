@@ -159,6 +159,7 @@ struct render {
         if (depth <= 0)
             return color(0, 0, 0);
 
+
         //If the ray hits nothing, return the background color
         if (!curr_scene.world.hit(r, 0.001, infinity, rec))
             return curr_scene.background;
@@ -190,15 +191,16 @@ struct render {
 
 
                     if (nothing_broke) {
-                        return curr_scene.fog->color_at(scatter_pos) * ray_color(scattered, depth - 1) *
+                        return curr_scene.fog->color_at(scatter_pos).cwiseProduct(ray_color(scattered, depth - 1)) *
                                curr_scene.fog->prob_density->value(r.dir, scattered.direction()) / pdf_val;
                     }
 
                 }
                 //else
-                return curr_scene.fog->color_at(scatter_pos) *
+                return curr_scene.fog->color_at(scatter_pos).cwiseProduct(
                        ray_color(ray(scatter_pos, curr_scene.fog->prob_density->generate(r.dir), r.time()),
-                                 depth - 1);
+                                 depth - 1)
+                                );
 
             }
 
@@ -216,7 +218,7 @@ struct render {
             return emitted;
 
         if (srec.is_specular)
-            return srec.attenuation * ray_color(srec.specular_ray, depth - 1);
+            return srec.attenuation.cwiseProduct(ray_color(srec.specular_ray, depth - 1));
 
         if (curr_scene.settings.importance) {
             //https://en.wikipedia.org/wiki/Monte_Carlo_integration#Importance_sampling
@@ -226,16 +228,15 @@ struct render {
             const auto scattered = ray(rec.p, mixed_pdf.generate(r.dir), r.time());
             const auto pdf_val = mixed_pdf.value(r.dir, scattered.direction());
 
-
             return emitted +
-                   srec.attenuation * ray_color(scattered, depth - 1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) /
+                   srec.attenuation.cwiseProduct(ray_color(scattered, depth - 1) * rec.mat_ptr->scattering_pdf(r, rec, scattered)) /
                    pdf_val;    //return the color of the object darkened by the number of times the ray bounced
         } else {
             const auto scattered = ray(rec.p, srec.pdf_ptr->generate(r.dir), r.time());
             const auto pdf_val = srec.pdf_ptr->value(r.dir, scattered.direction());
 
             return emitted +
-                   srec.attenuation * ray_color(scattered, depth - 1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) /
+                   srec.attenuation.cwiseProduct(ray_color(scattered, depth - 1) * rec.mat_ptr->scattering_pdf(r, rec, scattered) ) /
                    pdf_val;    //return the color of the object darkened by the number of times the ray bounced
 
         }

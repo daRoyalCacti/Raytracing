@@ -2,10 +2,90 @@
 
 #include <iostream>
 #include <cmath>
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
+#define EIGEN_USE_MKL_ALL   //https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html
+                            //https://eigen.tuxfamily.org/dox/TopicUsingBlasLapack.html
+#ifdef NDEBUG
+    #define EIGEN_NO_DEBUG
+#endif
+using namespace Eigen;
 
 using std::sqrt;
 
+typedef Vector3d vec3;
 
+using point3 = vec3;
+using color = vec3;
+
+template <typename T, typename U>
+vec3 cross(const T &vec1, const U &vec2) {
+    return vec1.cross(vec2);
+}
+
+template <typename T, typename U>
+double dot(const T &vec1, const U &vec2) {
+    return vec1.dot(vec2);
+}
+
+template <typename T>
+vec3 unit_vector(const T &vec1) {
+    return vec1.normalized();
+}
+
+//random vector with elements in range [0,1]
+vec3 random_vec3() {
+    return vec3(random_double(), random_double(), random_double());
+}
+
+vec3 random_vec3(const double a, const double b) {
+    //return (b-a)*random_vec3() + vec3(a, a, a);
+    return vec3(random_double(a, b), random_double(a, b), random_double(a, b));
+}
+
+
+
+vec3 random_in_unit_sphere() {
+    while (true) {
+        //const auto p = Eigen::Vector3d::Random();
+        const auto p = random_vec3(-1,1);
+        if (p.squaredNorm() < 1) return p;
+    }
+}
+
+vec3 random_in_unit_disk() {
+    while (true) {
+        const auto p = vec3(random_double(-1,1), random_double(-1,1), 0);
+        if (p.squaredNorm() < 1) return p;
+    }
+}
+
+vec3 random_unit_vector() {
+    return random_in_unit_sphere().normalized();
+}
+
+vec3 reflect(const vec3& v, const vec3& n) {
+    //reflects a vector v about another vector n
+    return v - 2 * dot(v,n)*n;
+}
+
+vec3 refract(const vec3& uv, const vec3& n, const double etai_over_etat) {
+    //Computes the refracted ray of light passing through a dielectric material using snell's law
+    const auto cos_theta = fmin(dot(-uv, n), 1.0);
+    const vec3 r_out_perp = etai_over_etat * (uv + cos_theta*n);
+    const vec3 r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.squaredNorm() )) * n;
+    return r_out_perp + r_out_parallel;
+}
+
+
+//https://ksuweb.kennesaw.edu/~plaval//math4490/rotgen.pdf
+vec3 rotate(const vec3& vec, const vec3 &axis, const double angle) {
+    const auto r = axis.normalized();
+    return (1-cos(angle))*dot(vec,r)*r   +  cos(angle)*vec   +  sin(angle)*cross(r, vec);
+}
+
+
+/*
 struct vec3 {
 	double e[3];
 	vec3() : e{0,0,0} {}
@@ -142,3 +222,4 @@ inline vec3 rotate(const vec3& vec, const vec3 &axis, const double angle) {
     const auto r = unit_vector(axis);
     return (1-cos(angle))*dot(vec,r)*r   +  cos(angle)*vec   +  sin(angle)*cross(r, vec);
 }
+ */

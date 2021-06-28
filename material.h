@@ -30,7 +30,7 @@ struct material {
 };
 
 struct lambertian : public material {
-	shared_ptr<texture> albedo;
+	const shared_ptr<texture> albedo;
 	
 	explicit lambertian(const color& a) : albedo(make_shared<solid_color>(a)) {}
 	explicit lambertian(const shared_ptr<texture>& a) : albedo(a) {}

@@ -28,8 +28,8 @@ struct xy_rect : public hittable {
             return 0;
 
         const auto area = (x1-x0)*(y1-y0);
-        const auto distance_squared = rec.t * rec.t * v.length_squared();
-        const auto cosine = fabs(dot(v, rec.normal)) / v.length();
+        const auto distance_squared = rec.t * rec.t * v.squaredNorm();
+        const auto cosine = fabs(dot(v, rec.normal)) / v.norm();
 
         return distance_squared / (cosine * area);
     }
@@ -63,8 +63,8 @@ struct xz_rect : public hittable {
 	        return 0;
 
 	    const auto area = (x1-x0)*(z1-z0);
-	    const auto distance_squared = rec.t * rec.t * v.length_squared();
-	    const auto cosine = fabs(dot(v, rec.normal)) / v.length();
+	    const auto distance_squared = rec.t * rec.t * v.squaredNorm();
+	    const auto cosine = fabs(dot(v, rec.normal)) / v.norm();
 
 	    return distance_squared / (cosine * area);
 	}
@@ -98,8 +98,8 @@ struct yz_rect : public hittable {
             return 0;
 
         const auto area = (z1-z0)*(y1-y0);
-        const auto distance_squared = rec.t * rec.t * v.length_squared();
-        const auto cosine = fabs(dot(v, rec.normal)) / v.length();
+        const auto distance_squared = rec.t * rec.t * v.squaredNorm();
+        const auto cosine = fabs(dot(v, rec.normal)) / v.norm();
 
         return distance_squared / (cosine * area);
     }

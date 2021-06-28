@@ -6,7 +6,7 @@
 #include <random>
 
 
-constexpr bool log_scanlines = false;  //prints the number of scalines remaining when rendering an image
+constexpr bool log_scanlines = false;  //prints the number of scanlines remaining when rendering an image
 
 
 
@@ -59,7 +59,7 @@ inline double clamp(const double x, const double min, const double max) {
 
 //https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi0.wp.com%2Fwww.therightgate.com%2Fwp-content%2Fuploads%2F2018%2F05%2Fspherical-cartesian-conversion.jpg%3Fresize%3D640%252C159%26ssl%3D1&f=1&nofb=1
 [[maybe_unused]] inline vec3 cartesian_to_spherical(const vec3& input) {
-    const double r = input.length();
+    const double r = input.norm();
     const double theta = acos(input.z() / r);
     const double phi   = atan2(input.y(), input.x());
 

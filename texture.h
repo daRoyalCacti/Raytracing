@@ -11,15 +11,15 @@ struct texture {
 
 struct solid_color : public texture {
 	solid_color() = default;
-	explicit solid_color(const color c) : color_value(c) {}
-	solid_color(const double red, const double green, const double blue) : solid_color(color(red, green, blue)) {}
+	explicit solid_color(const color &c) : color_value(c) {}
+	solid_color(const double red, const double green, const double blue) : color_value(red, green, blue) {}
 	
 	[[nodiscard]] color value(const double u, const double v, const vec3& p) const override {
 		return color_value;
 	}
 
 	private:
-	color color_value;
+	const color color_value;
 };
 
 

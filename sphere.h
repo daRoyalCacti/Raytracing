@@ -38,10 +38,10 @@ struct sphere : public hittable {
 bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {
 	//using the quadratic equation to find if (and when) 'ray' collides with sphere centred at 'center' with radius 'radius'
 	
-	const vec3 oc = r.origin() - center;	
-	const auto a = r.direction().length_squared();
+	const vec3 oc = r.origin() - center;
+	const auto a = r.direction().squaredNorm();
 	const auto half_b =  dot(oc, r.direction());	//uses half b to simplify the quadratic equation
-	const auto c = oc.length_squared() - radius * radius;
+	const auto c = oc.squaredNorm() - radius * radius;
 	const auto discriminant = half_b*half_b - a*c;
 
 	if (discriminant < 0) return false;	//if there is no collision
@@ -80,7 +80,7 @@ bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_recor
 }
 
 bool sphere::bounding_box(const double time0, const double time1, aabb& output_box) const {
-	output_box = aabb(center - vec3(radius), center + vec3(radius));
+	output_box = aabb(center - vec3(radius, radius, radius), center + vec3(radius, radius, radius));
 	return true;
 }
 
@@ -90,7 +90,7 @@ double sphere::pdf_value(const point3& o, const vec3& v) const {
     if (!this->hit(ray(o,v), 0.001, infinity, rec))
         return 0;
 
-    const auto cos_theta_max = sqrt(1 - radius*radius/(center-o).length_squared());
+    const auto cos_theta_max = sqrt(1 - radius*radius/(center-o).squaredNorm());
     const auto solid_angle = 2*pi*(1 - cos_theta_max);
 
     #ifndef NDEBUG
@@ -121,7 +121,7 @@ double sphere::pdf_value(const point3& o, const vec3& v) const {
 
 vec3 sphere::random(const point3& o) const {
     const vec3 direction = center - o;
-    const double distance_squared = direction.length_squared();
+    const double distance_squared = direction.squaredNorm();
 
     onb uvw;
     uvw.build_from_w(direction);

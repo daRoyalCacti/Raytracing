@@ -113,30 +113,32 @@ struct [[maybe_unused]] big_scene1 : public scene {
 
 
 		hittable_list obj;
-		
-		const auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
-		//const auto ground_material = make_shared<lambertian>(checker);
+
         const auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
 		obj.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
 
 		for (int a = -11; a<11; a++) {	//centers of spheres x
 			for (int b = -11; b<11; b++) {	//centers of spheres y
-				const auto choose_mat = random_double();	//random number to decide what material to use
+				const double choose_mat = random_double();	//random number to decide what material to use
 				const point3 center(a + 0.9*random_double(), 0.2, b + 0.9*random_double());
 
-				if ((center - point3(4, 0.2, 0)).length_squared() > 0.9*0.9) {	//not points where main balls go
+				if ((center - point3(4, 0.2, 0)).squaredNorm() > 0.9*0.9) {	//not points where main balls go
 					shared_ptr<material> sphere_material;
 
 					if (choose_mat < 0.8) {
 						//diffuse (has moving spheres)
-						const auto albedo = color::random() * color::random();
-						sphere_material = make_shared<lambertian>(albedo);	
-						const auto center2 = center + vec3(0, random_double(0, 0.5), 0);	//spheres moving downwards at random speeds				
+						//const auto albedo = random_vec3() * random_vec3();
+
+						const vec3 albedo = random_vec3().cwiseProduct(random_vec3());
+						sphere_material = make_shared<lambertian>(albedo);
+                        //sphere_material = make_shared<lambertian>(vec3(random_double()*random_double(), random_double()*random_double(), random_double() * random_double()) );
+
+                        const vec3 center2 = center + vec3(0, random_double(0, 0.5), 0);	//spheres moving downwards at random speeds
 						obj.add(make_shared<moving_sphere>(center, center2, 0.0, 1.0, 0.2, sphere_material));
 					} else if (choose_mat < 0.95) {
 						//metal
-						const auto albedo = color::random(0.5, 1);
-						const auto fuzz = random_double(0, 0.5);
+						const vec3 albedo = random_vec3(0.5, 1);
+						const double fuzz = random_double(0, 0.5);
 						sphere_material = make_shared<metal>(albedo, fuzz);
 						obj.add(make_shared<sphere>(center, 0.2, sphere_material));
 					} else {
@@ -178,29 +180,27 @@ struct [[maybe_unused]] big_scene1_fog : public scene {
 
         hittable_list obj;
 
-        const auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
-        //const auto ground_material = make_shared<lambertian>(checker);
         const auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
         obj.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
 
         for (int a = -11; a<11; a++) {	//centers of spheres x
             for (int b = -11; b<11; b++) {	//centers of spheres y
-                const auto choose_mat = random_double();	//random number to decide what material to use
+                const double choose_mat = random_double();	//random number to decide what material to use
                 const point3 center(a + 0.9*random_double(), 0.2, b + 0.9*random_double());
 
-                if ((center - point3(4, 0.2, 0)).length_squared() > 0.9*0.9) {	//not points where main balls go
+                if ((center - point3(4, 0.2, 0)).squaredNorm() > 0.9*0.9) {	//not points where main balls go
                     shared_ptr<material> sphere_material;
 
                     if (choose_mat < 0.8) {
                         //diffuse (has moving spheres)
-                        const auto albedo = color::random() * color::random();
+                        const vec3 albedo = random_vec3().cwiseProduct(random_vec3());
                         sphere_material = make_shared<lambertian>(albedo);
-                        const auto center2 = center + vec3(0, random_double(0, 0.5), 0);	//spheres moving downwards at random speeds
+                        const vec3 center2 = center + vec3(0, random_double(0, 0.5), 0);	//spheres moving downwards at random speeds
                         obj.add(make_shared<moving_sphere>(center, center2, 0.0, 1.0, 0.2, sphere_material));
                     } else if (choose_mat < 0.95) {
                         //metal
-                        const auto albedo = color::random(0.5, 1);
-                        const auto fuzz = random_double(0, 0.5);
+                        const vec3 albedo = random_vec3(0.5, 1);
+                        const double fuzz = random_double(0, 0.5);
                         sphere_material = make_shared<metal>(albedo, fuzz);
                         obj.add(make_shared<sphere>(center, 0.2, sphere_material));
                     } else {
@@ -243,16 +243,16 @@ struct big_scene2 : public scene{
 
 		//generating the ground
 		const int boxes_per_side = 20;
-		const auto w = 100.0;	//width
+		const double w = 100.0;	//width
 		for (int i = 0; i < boxes_per_side; i++) 
 			for (int j = 0; j < boxes_per_side; j++) {
-				const auto x0 = -1000.0 + i*w;
-				const auto z0 = -1000.0 + j*w;
-				const auto y0 = 0.0;
+				const double x0 = -1000.0 + i*w;
+				const double z0 = -1000.0 + j*w;
+				const double y0 = 0.0;
 
-				const auto x1 = x0 + w;
-				const auto z1 = z0 + w;
-				const auto y1 = random_double(1, 101);
+				const double x1 = x0 + w;
+				const double z1 = z0 + w;
+				const double y1 = random_double(1, 101);
 
 				boxes1.add(make_shared<box>(point3(x0, y0, z0), point3(x1, y1, z1), ground));
 			}
@@ -266,8 +266,8 @@ struct big_scene2 : public scene{
 		add_important(make_shared<xz_rect>(123, 423, 147, 412, 554, make_shared<material>()));
 
 		//moving sphere
-		const auto center1 = point3(400, 400, 200);
-		const auto center2 = center1 + vec3(30, 30, 0);
+		const vec3 center1 = point3(400, 400, 200);
+		const vec3 center2 = center1 + vec3(30, 30, 0);
 		const auto moving_sphere_material = make_shared<lambertian>(color(0.7, 0.3, 0.1));
 		world.add(make_shared<moving_sphere>(center1, center2, 0, 1, 50, moving_sphere_material));
 
@@ -297,7 +297,7 @@ struct big_scene2 : public scene{
 		const auto white = make_shared<lambertian>(color(0.73, 0.73, 0.73));
 		const int ns = 1000;	//number of spheres
 		for (int j = 0; j < ns; j++)
-			boxes2.add(make_shared<sphere>(point3::random(0, 165), 10, white) );
+			boxes2.add(make_shared<sphere>(random_vec3(0, 165), 10, white) );
 
 		world.add(make_shared<translate>(make_shared<rotate_y>(make_shared<bvh_node>(boxes2, 0.0, 1.0), 30), vec3(-100, 270, 395) ));
 

@@ -22,7 +22,7 @@ struct cosine_pdf : public pdf {
     }
 
     [[nodiscard]] double value(const vec3& incoming_dir, const vec3& out_direction) const override {
-        const auto cosine = dot(unit_vector(out_direction), uvw.w());
+        const auto cosine = dot(out_direction.normalized(), uvw.w());
         return cosine <= 0 ? 0 : cosine/pi;
     }
 

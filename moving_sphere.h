@@ -4,13 +4,13 @@
 #include "hittable.h"
 
 struct moving_sphere : public hittable {
-	point3 center0, center1;	//centres of spheres at time0 and time1
+	const point3 center0, center1;	//centres of spheres at time0 and time1
 	double time0 = 0, time1 = 0;
-	double radius = 0;
-	shared_ptr<material> mat_ptr;
+	const double radius = 0;
+	const shared_ptr<material> mat_ptr;
 
 	moving_sphere() = default;
-	moving_sphere(const point3 cen0, const point3 cen1, const double _time0, const double _time1, const double r, const shared_ptr<material>& m) :
+	moving_sphere(const point3 &cen0, const point3 &cen1, const double _time0, const double _time1, const double r, const shared_ptr<material>& m) :
 		center0(cen0), center1(cen1), time0(_time0), time1(_time1), radius(r), mat_ptr(m) {};
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
@@ -26,28 +26,29 @@ struct moving_sphere : public hittable {
 bool moving_sphere::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {
 	//essentially the same as sphere::hit but center is now center(time)
 	const vec3 oc = r.origin() - center(r.time());
-	const auto a = r.direction().length_squared();
+	const auto a = r.direction().squaredNorm();
 	const auto half_b =  dot(oc, r.direction());	//uses half b to simplify the quadratic equation
-	const auto c = oc.length_squared() - radius * radius;
+	const auto c = oc.squaredNorm() - radius * radius;
 	const auto discriminant = half_b*half_b - a*c;
 
 	if (discriminant < 0) return false;	//if there is no collision
 	const auto sqrtd = sqrt(discriminant);
 
-	//Find the nearest root that lies in the acceptable range.
-	auto root = (-half_b - sqrtd) / a;	//first root
-	if (root < t_min || t_max < root) {	//if the first root is outside of the acceptable range
-		//if true, check the second root
-		root = (-half_b - sqrtd) / a;
-		if (root < t_min || t_max < root)
-			//if the second root is outside of the range, there is no hit
-			return false;
-	}
+    //Find the nearest root that lies in the acceptable range.
+    const auto root1 = (-half_b - sqrtd) / a;	//first root
+    if (root1 < t_min || t_max < root1) {	//if the first root is ouside of the accepctable range
+        //if true, check the second root
+        const auto root2 = (-half_b + sqrtd) / a;
+        if (root2 < t_min || t_max < root2) {
+            //if the second root is ouside of the range, there is no hit
+            return false;
+        } else {
+            rec.t = root2;
+        }
+    } else {
+        rec.t = root1;	//root is finding time
+    }
 
-	//if the first root was acceptable, root is the first root
-	//if the first root was not acceptable, root is the second root
-	
-	rec.t = root;	//root is finding time
 	rec.p = r.at(rec.t);
 	const vec3 outward_normal = (rec.p - center(r.time())) / radius;	//a normal vector is just a point on the sphere less the center
 								//dividing by radius to make it normalised

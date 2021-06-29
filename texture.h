@@ -10,7 +10,7 @@ struct texture {
 };
 
 struct solid_color : public texture {
-	solid_color() = default;
+	solid_color() = delete;
 	explicit solid_color(const color c) : color_value(c) {}
 	solid_color(const double red, const double green, const double blue) : solid_color(color(red, green, blue)) {}
 	
@@ -19,15 +19,15 @@ struct solid_color : public texture {
 	}
 
 	private:
-	color color_value;
+	const color color_value;
 };
 
 
 struct checker_texture : public texture {
-	shared_ptr<texture> odd;
-	shared_ptr<texture> even;
+	const shared_ptr<texture> odd;
+	const shared_ptr<texture> even;
 
-	checker_texture() = default;
+	checker_texture() = delete;
 	checker_texture(const shared_ptr<texture>& _even, const shared_ptr<texture>& _odd) : even(_even), odd(_odd) {}
 	checker_texture(const color c1, const color c2) : even(make_shared<solid_color>(c1)), odd(make_shared<solid_color>(c2)) {}
 
@@ -44,9 +44,10 @@ struct checker_texture : public texture {
 
 
 struct [[maybe_unused]] noise_texture : public texture {
-	perlin noise;
-	double scale;	//how detailed the noise is, bigger number := more noise
+	const perlin noise;
+	const double scale;	//how detailed the noise is, bigger number := more noise
 
+	noise_texture() = delete;
 	explicit noise_texture(const double sc = 1.0) : scale(sc) {}
 
 	[[nodiscard]] color value(const double u, const double v, const point3& p) const override {
@@ -58,10 +59,11 @@ struct [[maybe_unused]] noise_texture : public texture {
 
 
 struct turbulent_texture : public texture {
-	perlin noise;
-	double scale;	//how detailed the noise is, bigger number := more noise
+	const perlin noise;
+	const double scale;	//how detailed the noise is, bigger number := more noise
 	int depth;	//number of layers of noise
 
+	turbulent_texture() = delete;
 	explicit turbulent_texture(const double sc = 1.0, const int dpt = 7) : scale(sc), depth(dpt) {}
 	
 	[[nodiscard]] color value(const double u, const double v, const point3& p) const override {
@@ -71,9 +73,10 @@ struct turbulent_texture : public texture {
 
 
 struct marble_texture : public texture {
-	perlin noise;
-	double scale;	//how detailed the noise is, bigger number := more noise
+	const perlin noise;
+	const double scale;	//how detailed the noise is, bigger number := more noise
 
+	marble_texture() = delete;
 	explicit marble_texture(const double sc = 1.0) : scale(sc) {}
 	
 	[[nodiscard]] color value(const double u, const double v, const point3& p) const override {
@@ -93,7 +96,8 @@ class image_texture : public texture {
 	public:
 	const static int bytes_per_pixel = 3;
 
-	image_texture() : data(nullptr), width(0), height(0), bytes_per_scanline(0) {}
+	image_texture() = delete;
+	//image_texture() : data(nullptr), width(0), height(0), bytes_per_scanline(0) {}
 
 	explicit image_texture(const char* filename) {
 		auto components_per_pixel = bytes_per_pixel;

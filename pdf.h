@@ -15,27 +15,28 @@ struct pdf {
 
 
 struct cosine_pdf : public pdf {
-    onb uvw;
+    const onb uvw;
 
-    explicit cosine_pdf(const vec3& w) {
-        uvw.build_from_w(w);
+    explicit cosine_pdf(const vec3& w) : uvw(w){
+        //uvw.build_from_w(w);
     }
 
-    [[nodiscard]] double value(const vec3& incoming_dir, const vec3& out_direction) const override {
+    [[nodiscard]] inline double value(const vec3& incoming_dir, const vec3& out_direction) const override {
         const auto cosine = dot(unit_vector(out_direction), uvw.w());
         return cosine <= 0 ? 0 : cosine/pi;
     }
 
-    [[nodiscard]] vec3 generate(const vec3& incoming_dir) const override {
+    [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) const override {
         return uvw.local(random_cosine_direction());
     }
 };
 
 
 struct hittable_pdf : public pdf {
-    point3 o;
-    shared_ptr<hittable> ptr;
+    const point3 o;
+    const shared_ptr<hittable> ptr;
 
+    hittable_pdf() = delete;
     hittable_pdf(const shared_ptr<hittable> &p, const point3& origin) : ptr(p), o(origin) {}
 
     [[nodiscard]] double value(const vec3& incoming_dir, const vec3& out_direction) const override {
@@ -50,18 +51,19 @@ struct hittable_pdf : public pdf {
 
 
 struct mixture_pdf : public pdf {
-    shared_ptr<pdf> p[2];
+    const shared_ptr<pdf> p[2];
 
-    mixture_pdf(const shared_ptr<pdf> &p0, const shared_ptr<pdf> &p1) {
-        p[0] = p0;
-        p[1]= p1;
+    mixture_pdf() = delete;
+    mixture_pdf(const shared_ptr<pdf> &p0, const shared_ptr<pdf> &p1) : p{p0, p1} {
+        //p[0] = p0;
+        //p[1]= p1;
     }
 
-    [[nodiscard]] double value(const vec3& incoming_dir, const vec3& out_direction) const override {
+    [[nodiscard]] inline double value(const vec3& incoming_dir, const vec3& out_direction) const override {
         return 0.5 * p[0]->value(incoming_dir, out_direction) + 0.5 * p[1]->value(incoming_dir, out_direction);
     }
 
-    [[nodiscard]] vec3 generate(const vec3& incoming_dir) const override {
+    [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) const override {
         if (random_double() < 0.5)
             return p[0]->generate(incoming_dir);
         else
@@ -74,13 +76,13 @@ struct Henyey_Greensteing_pdf : public pdf {
 
     explicit Henyey_Greensteing_pdf(const double g1) : g(g1) {}
 
-    [[nodiscard]] double value(const vec3& incoming_dir, const vec3& out_direction) const override {
+    [[nodiscard]] inline double value(const vec3& incoming_dir, const vec3& out_direction) const override {
         //http://www.pbr-book.org/3ed-2018/Volume_Scattering/Phase_Functions.html#PhaseHG
         return Henyey_Greensteing_pdf_func(g, dot(incoming_dir, out_direction));
     }
 
     //returns value in spherical coordinates
-    [[nodiscard]] vec3 generate(const vec3& incoming_dir) const override {
+    [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) const override {
         //https://math.stackexchange.com/questions/1418262/given-a-vector-and-angle-find-new-vector
         const auto angle = rand_Henyey_Greensteing(g);
 

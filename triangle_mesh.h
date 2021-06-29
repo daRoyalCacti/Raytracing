@@ -13,21 +13,17 @@
 
 
 struct triangle_mesh : public hittable {
-	shared_ptr<bvh_node> tris;
+	const shared_ptr<bvh_node> tris;
 
-	triangle_mesh() = default;
-	triangle_mesh(hittable_list &triangles, const double time0, const double time1) {
-		tris = make_shared<bvh_node>(triangles,time0, time1);
-	}
+	triangle_mesh() = delete;
+	triangle_mesh(hittable_list &triangles, const double time0, const double time1) : tris(make_shared<bvh_node>(triangles,time0, time1)) {}
 
 
-
-
-	bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
+	inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
 		return tris->hit(r, t_min, t_max, rec);
 	}
 
-	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		return tris->bounding_box(time0, time1, output_box);	
 	}
 };

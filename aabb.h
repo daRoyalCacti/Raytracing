@@ -8,18 +8,19 @@ struct aabb {
 	point3 minimum, maximum;	//the points that define the bounding box
 					// in 1D    ->         |        |
 					//        origin       min      max
-					//       of ray     
+					//       of ray
+					//can't be const
 
 	aabb() = default;
 	aabb(const point3& a, const point3& b) : minimum(a), maximum(b) {}
 
-	[[nodiscard]] inline point3 min() const {return minimum;}
-	[[nodiscard]] inline point3 max() const {return maximum;}
+	[[nodiscard]] point3 min() const {return minimum;}
+	[[nodiscard]] point3 max() const {return maximum;}
 
 	[[nodiscard]] inline bool hit(const ray& r, double t_min, double t_max) const {
 		//Andrew Kensler (from Pixar) intersection method
 		for (int i = 0; i < 3; i++) {
-			const auto invD = 1.0 / r.direction()[i];	// 1/x or 1/y or 1/z for the incomming ray
+			const double invD = 1.0 / r.direction()[i];	// 1/x or 1/y or 1/z for the incomming ray
 			auto t0 = (min()[i] - r.origin()[i]) * invD;	//the time it takes the ray to hit the 'min' side of bounding box
 									// s=d/t => t = d/s
 									// d is the distance from origin to bounding box in a single direction
@@ -102,7 +103,7 @@ struct aabb {
 
 };
 
-inline aabb surrounding_box(const aabb box0, const aabb box1) {		//creates a larger bounding box around 2 smaller bounding boxes
+aabb surrounding_box(const aabb &box0, const aabb &box1) {		//creates a larger bounding box around 2 smaller bounding boxes
 	const point3 small(	fmin(box0.min().x(),  box1.min().x()),
 				fmin(box0.min().y(),  box1.min().y()),
 				fmin(box0.min().z(),  box1.min().z()) );

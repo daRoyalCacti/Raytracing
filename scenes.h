@@ -38,7 +38,7 @@ struct scene {
     scene_settings settings;
 
 	hittable_list world;
-	camera cam;
+	shared_ptr<camera> cam;
 	double aspect_ratio = 0;
 
     color background;
@@ -76,7 +76,7 @@ struct scene {
 
 	inline void set_camera(const point3 lookfrom, const point3 lookat, const double fov = 20.0, const double aperture = 0.1, const double dist_to_focus = 10.0, 
 			const double time0 = 0.0, const double time1 = 0.35, const vec3 vup = vec3(0,1,0)) {
-		cam = camera(lookfrom, lookat, vup, fov, aspect_ratio, aperture, dist_to_focus, time0, time1);
+		cam = make_shared<camera>(lookfrom, lookat, vup, fov, aspect_ratio, aperture, dist_to_focus, time0, time1);
 	}	
 
 
@@ -234,7 +234,7 @@ struct [[maybe_unused]] big_scene1_fog : public scene {
 };
 
 
-struct big_scene2 : public scene{
+struct [[maybe_unused]] big_scene2 : public scene{
 	explicit big_scene2() : scene(1) {
 		set_background(background_color::black);
 
@@ -582,7 +582,7 @@ struct [[maybe_unused]] cup_scene : public scene {
 };
 
 
-struct crate_scene : public scene {
+struct [[maybe_unused]] crate_scene : public scene {
 	crate_scene() : scene(aspec1) {
 		set_background(background_color::sky);	//shouldn't matter -- can't see sky
 

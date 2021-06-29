@@ -37,12 +37,13 @@ struct hittable {
 
 
 struct translate : public hittable {
-	shared_ptr<hittable> ptr;
-	vec3 offset;
+	const shared_ptr<hittable> ptr;
+	const vec3 offset;
 
+	translate() = delete;
 	translate(const shared_ptr<hittable>& p, const vec3& displacement) : ptr(p), offset(displacement) {}
 
-	bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
+	inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
 		const ray moved_r(r.origin() - offset, r.direction(), r.time());	//moving object by offset is same as translating axes by -offset
 		
 		if(!ptr->hit(moved_r, t_min, t_max, rec))	//if ray doesn't hits object in new axes
@@ -54,7 +55,7 @@ struct translate : public hittable {
 		return true;
 	}
 
-	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		if (!ptr->bounding_box(time0, time1, output_box))	//if there is no bounding box
 			return false;					//also sets output_box
 
@@ -66,25 +67,23 @@ struct translate : public hittable {
 
 
 struct rotate_y : public hittable {
-	shared_ptr<hittable> ptr;
-	double sin_theta, cos_theta;	//required to carry info from constructor to hit
+	const shared_ptr<hittable> ptr;
+	const double sin_theta, cos_theta;	//required to carry info from constructor to hit
 	bool hasbox;			//required to carry info from constructor to bounding_box
 	aabb bbox;
 
+	rotate_y() = delete;
 	rotate_y(const shared_ptr<hittable> &p, double angle);
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
 
-	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		output_box = bbox;
 		return hasbox;
 	}
 };
 
-rotate_y::rotate_y(const shared_ptr<hittable> &p, const double angle) : ptr(p) {
-	const auto radians = degrees_to_radians(angle);
-	sin_theta = sin(radians);
-	cos_theta = cos(radians);
+rotate_y::rotate_y(const shared_ptr<hittable> &p, const double angle) : ptr(p), sin_theta(sin(degrees_to_radians(angle))), cos_theta(cos(degrees_to_radians(angle))) {
 	hasbox = ptr->bounding_box(0, 1, bbox);		//sets bbox
 
 	//setting the bounding box
@@ -132,7 +131,7 @@ bool rotate_y::hit(const ray& r, const double t_min, const double t_max, hit_rec
 	if (!ptr->hit(rotated_r, t_min, t_max, rec))	//if the ray doesn't hit in the new frame
 		return false;				//also sets rec
 
-	auto p = rec.p;
+	auto p = rec.p; //temporary variable
 	auto normal = rec.normal;
 
 	//rotation the position of the collision and the normal vectors using Euler angles
@@ -150,11 +149,12 @@ bool rotate_y::hit(const ray& r, const double t_min, const double t_max, hit_rec
 
 
 struct flip_face : public hittable {
-    shared_ptr<hittable> ptr;
+    const shared_ptr<hittable> ptr;
 
+    flip_face() = delete;
     explicit flip_face(const shared_ptr<hittable> &p) : ptr(p) {}
 
-    bool hit(const ray& r, const double t_min, const double t_max, hit_record &rec) const override {
+    inline bool hit(const ray& r, const double t_min, const double t_max, hit_record &rec) const override {
         if (!ptr->hit(r, t_min, t_max, rec))
             return false;
 
@@ -162,7 +162,7 @@ struct flip_face : public hittable {
         return true;
     }
 
-    bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+    inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
         return ptr->bounding_box(time0, time1, output_box);
     }
 };

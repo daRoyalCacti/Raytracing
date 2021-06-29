@@ -5,11 +5,11 @@
 #include "material.h"
 
 struct sphere : public hittable {
-	const point3 center = vec3(0,0,0);
-	double radius = 0;
+	const point3 center;
+	const double radius = 0;
 	const shared_ptr<material> mat_ptr;
 
-	sphere() = default;
+	sphere() = delete;
 	sphere(const point3 cen, const double r, const shared_ptr<material>& m): center(cen), radius(r), mat_ptr(m) {}
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
@@ -19,7 +19,7 @@ struct sphere : public hittable {
     [[nodiscard]] vec3 random(const point3& o) const override;
 
 	private:
-	static void get_sphere_uv(const point3& p, double& u, double& v) {
+	static inline void get_sphere_uv(const point3& p, double& u, double& v) {
 		//p: a given point on a unit sphere
 		//u: normalised angle around Y axis (starting from x=-1)
 		//v: normalised angle around Z axis (from Y=-1 to Y=1)
@@ -30,7 +30,7 @@ struct sphere : public hittable {
 								// - this uses atan2(a, b) = atan2(-a,-b) + pi which is continuous
 								// - atan2(a,b) = atan(a/b)
 
-		u = phi / (2 * pi);	//simple normalisation
+		u = phi / two_pi;	//simple normalisation
 		v = theta / pi;
 	}
 };
@@ -123,7 +123,8 @@ vec3 sphere::random(const point3& o) const {
     const vec3 direction = center - o;
     const double distance_squared = direction.length_squared();
 
-    onb uvw;
-    uvw.build_from_w(direction);
+    //onb uvw;
+    //uvw.build_from_w(direction);
+    onb uvw(direction);
     return uvw.local( random_to_sphere(radius, distance_squared) );
 }

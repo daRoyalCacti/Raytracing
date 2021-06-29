@@ -18,17 +18,22 @@ using std::sqrt;
 //common constants
 constexpr double infinity = std::numeric_limits<double>::infinity();
 constexpr double pi = 3.1415926535897932385;
+constexpr double two_pi = 2*pi;
 
 //utility functions
 inline double degrees_to_radians(double degrees) {
 	return degrees * pi / 180.0;
 }
 
+namespace global {
+    constexpr unsigned seed = 523523;
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    std::mt19937 generator(seed);
+}
+
 inline double random_double() {
 	//Returns number from U[0,1)
-	static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-	static std::mt19937 generator;
-	return distribution(generator);
+	return global::distribution(global::generator);
 }
 
 inline double random_double(const double min, const double max) {

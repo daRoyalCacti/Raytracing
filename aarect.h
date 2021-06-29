@@ -6,18 +6,20 @@
 #include "hittable.h"
 
 struct xy_rect : public hittable {
-	shared_ptr<material> mp;
-	double x0 = 0, x1 = 0, y0 = 0, y1 = 0, k = 0;	//x's and y's define a rectangle in the standard way
+	const shared_ptr<material> mp;
+	const double x0 = 0, x1 = 0, y0 = 0, y1 = 0, k = 0;	//x's and y's define a rectangle in the standard way
 					//k defines z position
-	xy_rect() = default;
+	const double area = 0;
+	const double lx = 0, ly = 0;
+	xy_rect() = delete;
 	xy_rect(const double _x0, const double _x1, const double _y0, const double _y1, const double _k, const shared_ptr<material>& mat)
-		: x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(mat) {};
-	
+		: x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(mat), area( (x1-x0)*(y1-y0)), lx(x1-x0), ly(y1-y0) {};
+
 	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
 
 	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		//just padding the z direction by a small amount
-		const double small = 0.0001;
+		constexpr double small = 0.0001;
 		output_box = aabb(point3(x0, y0, k-small), point3(x1, y1, k+small));
 		return true;
 	}
@@ -27,32 +29,35 @@ struct xy_rect : public hittable {
         if (!this->hit(ray(origin, v), 0.001, infinity, rec))
             return 0;
 
-        const auto area = (x1-x0)*(y1-y0);
-        const auto distance_squared = rec.t * rec.t * v.length_squared();
-        const auto cosine = fabs(dot(v, rec.normal)) / v.length();
+
+        const auto v_length2 = v.length_squared();
+        const double distance_squared = rec.t * rec.t * v_length2;
+        const double cosine = fabs(dot(v, rec.normal)) / sqrt(v_length2);
 
         return distance_squared / (cosine * area);
     }
 
     [[nodiscard]] vec3 random(const point3 &origin) const override {
-        const auto random_point = point3(random_double(x0, x1), random_double(y0, y1), k);
+        const vec3 random_point = point3(random_double(x0, x1), random_double(y0, y1), k);
         return random_point - origin;
     }
 };
 
 //very similar to xy rect -- see for comments
 struct xz_rect : public hittable {
-	shared_ptr<material> mp;
-	double x0 = 0, x1 = 0, z0 = 0, z1 = 0, k = 0;	//k defines y position
+	const shared_ptr<material> mp;
+	const double x0 = 0, x1 = 0, z0 = 0, z1 = 0, k = 0;	//k defines y position
+  const double area = 0;
+	const double lx = 0, lz = 0;
 
-	xz_rect() = default;
+	xz_rect() = delete;
 	xz_rect(const double _x0, const double _x1, const double _z0, const double _z1, const double _k, const shared_ptr<material>& mat)
-		: x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat) {};
+		: x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat), area((x1-x0)*(z1-z0) ), lx(x1-x0), lz(z1-z0) {};
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
 	
 	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
-		const double small = 0.0001;
+		constexpr double small = 0.0001;
 		output_box = aabb(point3(x0, k-small, z1), point3(x1, k+small, z1));
 		return true;
 	}
@@ -62,9 +67,9 @@ struct xz_rect : public hittable {
 	    if (!this->hit(ray(origin, v), 0.001, infinity, rec))
 	        return 0;
 
-	    const auto area = (x1-x0)*(z1-z0);
-	    const auto distance_squared = rec.t * rec.t * v.length_squared();
-	    const auto cosine = fabs(dot(v, rec.normal)) / v.length();
+        const auto v_length2 = v.length_squared();
+	    const double distance_squared = rec.t * rec.t * v_length2;
+	    const double cosine = fabs(dot(v, rec.normal)) / sqrt(v_length2);
 
 	    return distance_squared / (cosine * area);
 	}
@@ -77,17 +82,19 @@ struct xz_rect : public hittable {
 
 //very similar to xy rect -- see for comments
 struct yz_rect : public hittable {
-	shared_ptr<material> mp;
-	double y0 = 0, y1 = 0, z0 = 0, z1 = 0, k = 0;	//k defines x position
+	const shared_ptr<material> mp;
+	const double y0 = 0, y1 = 0, z0 = 0, z1 = 0, k = 0;	//k defines x position
+  const double area = 0;
+	const double lz = 0, ly = 0;
 
-	yz_rect() = default;
+	yz_rect() = delete;
 	yz_rect(const double _y0, const double _y1, const double _z0, const double _z1, const double _k, const shared_ptr<material>& mat)
-		: y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(mat) {};
+		: y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(mat), area( (z1-z0)*(y1-y0) ), lz(z1-z0), ly(y1-y0) {};
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
 
 	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
-		const double small = 0.0001;
+		constexpr double small = 0.0001;
 		output_box = aabb(point3(k-small, y0, z0), point3(k+small, y1, z1));
 		return true;
 	}
@@ -97,9 +104,9 @@ struct yz_rect : public hittable {
         if (!this->hit(ray(origin, v), 0.001, infinity, rec))
             return 0;
 
-        const auto area = (z1-z0)*(y1-y0);
-        const auto distance_squared = rec.t * rec.t * v.length_squared();
-        const auto cosine = fabs(dot(v, rec.normal)) / v.length();
+        const auto v_length2 = v.length_squared();
+        const double distance_squared = rec.t * rec.t * v_length2;
+        const double cosine = fabs(dot(v, rec.normal)) / sqrt(v_length2);
 
         return distance_squared / (cosine * area);
     }
@@ -112,14 +119,14 @@ struct yz_rect : public hittable {
 
 
 bool xy_rect::hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const {
-	const auto t = (k-r.origin().z()) / r.direction().z();	//time of collision - see aabb.h for why this is the case
+	const double t = (k-r.origin().z()) / r.direction().z();	//time of collision - see aabb.h for why this is the case
 
 	if (t < t_min || t > t_max)	//if collision is outside of specified times
 		return false;
 	
 	//the x and y components of the ray at the time of collision
-	const auto x = r.origin().x() + t*r.direction().x();
-	const auto y = r.origin().y() + t*r.direction().y();
+	const double x = r.origin().x() + t*r.direction().x();
+	const double y = r.origin().y() + t*r.direction().y();
 
 	//the collision algorithm
 	// - simply if the x and y components of the point of collision are outside the specified size of the rectangle
@@ -127,15 +134,15 @@ bool xy_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 		return false;	//there was no collision
 	
 	//normalise x and y to be used as texture coords
-	rec.u = (x-x0)/(x1-x0);
-	rec.v = (y-y0)/(y1-y0);
+	rec.u = (x-x0)/lx;
+	rec.v = (y-y0)/ly;
 
 	rec.t = t;
 #ifndef NDEBUG
 	if (!std::isfinite(rec.t)) std::cout << "xy_rec collision gave infinite time" << std::endl;
 #endif
 
-	const auto outward_normal = vec3(0, 0, 1);	//the trival normal vector
+	const auto outward_normal = vec3(0, 0, 1);	//the trivial normal vector
 	rec.set_face_normal(r, outward_normal);
 	rec.mat_ptr = mp;
 	rec.p = r.at(t);
@@ -160,8 +167,8 @@ bool xz_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 		return false;	//there was no collision
 	
 	//normalise x and z to be used as texture coords
-	rec.u = (x-x0)/(x1-x0);
-	rec.v = (z-z0)/(z1-z0);
+	rec.u = (x-x0)/lx;
+	rec.v = (z-z0)/lz;
 
 	rec.t = t;
 #ifndef NDEBUG
@@ -193,8 +200,8 @@ bool yz_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 		return false;	//there was no collision
 	
 	//normalise y and z to be used as texture coords
-	rec.v = (z-z0)/(z1-z0);
-	rec.u = (y-y0)/(y1-y0);
+	rec.v = (z-z0)/lz;
+	rec.u = (y-y0)/ly;
 
 	rec.t = t;
 #ifndef NDEBUG

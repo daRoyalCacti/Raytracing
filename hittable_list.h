@@ -14,10 +14,11 @@ struct hittable_list : public hittable {
 	std::vector<shared_ptr<hittable>> objects;
 
 	hittable_list() = default;
-	explicit hittable_list(const shared_ptr<hittable> &object) {add(object);}
+	//explicit hittable_list(const shared_ptr<hittable> &object) {add(object);}
 
     [[maybe_unused]] void clear() {objects.clear();}
 	void add(const shared_ptr<hittable>& object) {objects.push_back(object);}
+	void reserve(const size_t N) {objects.reserve(N);}
 
 	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
 	bool bounding_box(double time0, double time1, aabb& output_box) const override;
@@ -43,7 +44,7 @@ bool hittable_list::hit(const ray& r, const double t_min, const double t_max, hi
 	return hit_anything;
 }
 
-bool hittable_list::bounding_box(const double time0, const double time1, aabb& output_box) const {
+inline bool hittable_list::bounding_box(const double time0, const double time1, aabb& output_box) const {
 	if (objects.empty()) return false;	//no objects to create bounding boxes for
 
 	aabb temp_box;
@@ -62,7 +63,7 @@ bool hittable_list::bounding_box(const double time0, const double time1, aabb& o
 	return true;
 }
 
-double hittable_list::pdf_value(const point3& o, const vec3& v) const {
+inline double hittable_list::pdf_value(const point3& o, const vec3& v) const {
     const double weight = 1.0/objects.size();
     double sum = 0.0;
 
@@ -72,7 +73,7 @@ double hittable_list::pdf_value(const point3& o, const vec3& v) const {
     return sum;
 }
 
-vec3 hittable_list::random(const point3& o) const {
+inline vec3 hittable_list::random(const point3& o) const {
     const auto int_size = static_cast<int>(objects.size());
     return objects[random_int(0, int_size-1)]->random(o);
 }

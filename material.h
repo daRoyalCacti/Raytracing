@@ -30,8 +30,9 @@ struct material {
 };
 
 struct lambertian : public material {
-	shared_ptr<texture> albedo;
-	
+	const shared_ptr<texture> albedo;
+
+	lambertian() = delete;
 	explicit lambertian(const color& a) : albedo(make_shared<solid_color>(a)) {}
 	explicit lambertian(const shared_ptr<texture>& a) : albedo(a) {}
 
@@ -42,7 +43,7 @@ struct lambertian : public material {
 		return true;
 	}
 
-	[[nodiscard]] double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const override {
+	[[nodiscard]] inline double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const override {
         const auto cosine = dot(rec.normal, unit_vector(scattered.direction()) );
         return cosine < 0 ? 0 : cosine/pi;
     }
@@ -50,15 +51,16 @@ struct lambertian : public material {
 
 
 struct metal : public material {
-	shared_ptr<texture> albedo;
-	double fuzz = 0;	//how much light spreads out on collision
+	const shared_ptr<texture> albedo;
+	const double fuzz = 0;	//how much light spreads out on collision
 			//fuzz = 0 for perfect reflections
 			//fuzz = 1 for very fuzzy reflections
 
+	metal() = delete;
 	explicit metal(const color& a, const double f = 0) : albedo(make_shared<solid_color>(a)), fuzz(f) {}
-	explicit metal(const shared_ptr<texture>& a) : albedo(a) {}
+	explicit metal(const shared_ptr<texture>& a, const double f = 0) : albedo(a), fuzz(f) {}
 
-	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
+	inline bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
 		const vec3 reflected = reflect(unit_vector(ray_in.direction()), rec.normal);	//the incoming ray reflected about the normal
 		srec.is_specular = true;
 		srec.specular_ray = ray(rec.p, reflected + fuzz * random_in_unit_sphere(), ray_in.time());	//the scattered ray
@@ -73,11 +75,12 @@ struct metal : public material {
 
 
 struct dielectric : public material {
-	double ir;	//index of refraction of the material
+	const double ir;	//index of refraction of the material
 
+	dielectric() = delete;
 	explicit dielectric(const double index_of_refraction) : ir(index_of_refraction) {}
 
-	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
+	inline bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
 		const double refraction_ratio = rec.front_face ? (1.0/ir) : ir;	//refraction ratio = (refractive index of incident material) / (refractive index of transmitted material)
 										//assuming that the incident material is air, and the refractive index of air is 1
 										//this means 'refractive index of incident material' = 1
@@ -113,7 +116,7 @@ struct dielectric : public material {
 	}
 
 	private:
-	static double reflectance(const double cosine, const double ref_idx) {
+	static inline double reflectance(const double cosine, const double ref_idx) {
 		//use Schlick's approximation for reflectance
 		const auto sqrt_r0 = (1-ref_idx) / (1+ref_idx);
 		const auto r0 = sqrt_r0 * sqrt_r0;
@@ -123,8 +126,9 @@ struct dielectric : public material {
 
 
 struct diffuse_light : public material {
-	shared_ptr<texture> emit;
+	const shared_ptr<texture> emit;
 
+	diffuse_light() = delete;
 	explicit diffuse_light(const shared_ptr<texture>& a) : emit(a) {}
 	explicit diffuse_light(const color c) : emit(make_shared<solid_color>(c)) {}
 
@@ -132,7 +136,7 @@ struct diffuse_light : public material {
 		return false;
 	}
 
-	[[nodiscard]] color emitted(const ray& r_in, const hit_record& rec, const double u, const double v, const point3& p) const override {
+	[[nodiscard]] inline color emitted(const ray& r_in, const hit_record& rec, const double u, const double v, const point3& p) const override {
 	    if (rec.front_face)
 		    return emit->value(u, v, p);
 	    else
@@ -142,12 +146,13 @@ struct diffuse_light : public material {
 
 //for scattering
 struct isotropic : public material {
-	shared_ptr<texture> albedo;
+	const shared_ptr<texture> albedo;
 
+	isotropic() = delete;
 	explicit isotropic(const color c) : albedo(make_shared<solid_color>(c)) {}
 	explicit isotropic(const shared_ptr<texture> &a) : albedo(a) {}
 
-	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
+	inline bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override {
 	    srec.is_specular = true;    //not sure
 		srec.specular_ray = ray(rec.p, random_in_unit_sphere(), ray_in.time());	//pick a random direction for the ray to scatter
 		srec.attenuation = albedo->value(rec.u, rec.v, rec.p);

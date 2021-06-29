@@ -6,40 +6,50 @@
 #include "common.h"
 
 struct triangle : public hittable {
-	std::shared_ptr<material> mp;
-	vec3 vertex0, vertex1, vertex2;	//position of vertex
-	double u_0{}, v_0{}, u_1{}, v_1{}, u_2{}, v_2{};	//texture coords for each vertex
-	vec3 v0, v1;	//edges of the triangle
-	double d00{}, d01{}, d11{}, invDenom{};	//helpful quantities for finding texture coords
+	const std::shared_ptr<material> mp;
+	const vec3 vertex0, vertex1, vertex2;	//position of vertex
+	const double u_0{}, v_0{}, u_1{}, v_1{}, u_2{}, v_2{};	//texture coords for each vertex
+	const vec3 v0, v1;	//edges of the triangle
+    //precomputed quantities to find the uv coordinates
+    //https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+	const double d00{}, d01{}, d11{}, invDenom{};	//helpful quantities for finding texture coords
 
-	bool vertex_normals{};	//whether to use face normals or vertex normals
+	const bool vertex_normals{};	//whether to use face normals or vertex normals
 
-	vec3 normal0, normal1, normal2;	//vertex normals (do not have to be set) 
+	const vec3 normal0, normal1, normal2;	//vertex normals --- normal0 is also the face normal (when vertex normals are not supplied)
 	
-	 triangle() = default;
-	 triangle(const vec3 vec0, const vec3 vec1, const vec3 vec2, const double u0_, const double v0_, const double u1_, const double v1_, const double u2_, const double v2_,  std::shared_ptr<material> mat)
-		: vertex0(vec0), vertex1(vec1), vertex2(vec2), u_0(u0_), v_0(v0_), u_1(u1_), v_1(v1_), u_2(u2_), v_2(v2_),  mp(std::move(mat)) {
+	 triangle() = delete;
+	 triangle(const vec3 &vec0, const vec3 &vec1, const vec3 &vec2, double u0_, double v0_, double u1_, double v1_, double u2_, double v2_,
+           const std::shared_ptr<material> &mat)
+		: vertex0(vec0), vertex1(vec1), vertex2(vec2), u_0(u0_), v_0(v0_), u_1(u1_), v_1(v1_), u_2(u2_), v_2(v2_),  mp(mat),
+		vertex_normals(false), v0(vec1 - vec0), v1(vec2 - vec0),
+          d00(dot(v0, v0)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))), d01(dot(v0, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))),
+           d11(dot(v1, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))),
+           normal0(cross(v1, v0)){
+          //invDenom(1.0 / (d00 * d11 - d01 * d01)) {
 
-		vertex_normals = false;
-		//precomputing some quantities to find the uv coordinates
-		//https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates	
-		v0 = vertex1 - vertex0;
-		v1 = vertex2 - vertex0;
+		//v0 = vertex1 - vertex0;
+		//v1 = vertex2 - vertex0;
 
-		d00 = dot(v0, v0);
-		d01 = dot(v0, v1);
-		d11 = dot(v1, v1);
-		invDenom = 1.0f / (d00 * d11 - d01 * d01);
-		};
+		//d00 = dot(v0, v0);
+		//d01 = dot(v0, v1);
+		//d11 = dot(v1, v1);
+		//invDenom = 1.0f / (d00 * d11 - d01 * d01);
+		}
 
-	 triangle(const vec3 vec0, const vec3 vec1, const vec3 vec2, const vec3 n0, const vec3 n1, const vec3 n2, const double u0_, const double v0_, const double u1_, const double v1_, const double u2_, const double v2_,  std::shared_ptr<material> mat)
-		: triangle(vec0, vec1, vec2, u0_, v0_, u1_, v1_, u2_, v2_, std::move(mat)) {
-		normal0 = n0;
-		normal1 = n1;
-		normal2 = n2;
+	 triangle(const vec3 &vec0, const vec3 &vec1, const vec3 &vec2, const vec3 &n0, const vec3 &n1, const vec3 &n2,
+           double u0_, double v0_, double u1_, double v1_, double u2_, double v2_,  const std::shared_ptr<material> &mat)
+           : vertex0(vec0), vertex1(vec1), vertex2(vec2), u_0(u0_), v_0(v0_), u_1(u1_), v_1(v1_), u_2(u2_), v_2(v2_),  mp(mat),
+             vertex_normals(true), v0(vec1 - vec0), v1(vec2 - vec0),
+             d00(dot(v0, v0)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))), d01(dot(v0, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))),
+              d11(dot(v1, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))), normal0(n0), normal1(n1), normal2(n2) {
+		//: triangle(vec0, vec1, vec2, u0_, v0_, u1_, v1_, u2_, v2_, mat) {
+		//normal0 = n0;
+		//normal1 = n1;
+		//normal2 = n2;
 
-		vertex_normals = true;
-		};
+		//vertex_normals = true;
+		}
 
 	
 	 bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
@@ -99,16 +109,18 @@ struct triangle : public hittable {
 	}
 
 
-	 inline void barycentric_coords(const vec3 p, double& Bary0, double& Bary1, double &Bary2) const {
+	 inline void barycentric_coords(const vec3 &p, double& Bary0, double& Bary1, double &Bary2) const {
 		//find the uv coordinates by interpolating using barycentric coordinates
 		//https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates	
 		const vec3 v2 = p - vertex0;
 		const double d20 = dot(v2, v0);
 		const double d21 = dot(v2, v1);
 
-		Bary0 = (d11 * d20 - d01 * d21) * invDenom;
-		Bary1 = (d00 * d21 - d01 * d20) * invDenom;
-		Bary2 = 1.0f - Bary0 - Bary1;
+		//Bary0 = (d11 * d20 - d01 * d21) * invDenom;
+		//Bary1 = (d00 * d21 - d01 * d20) * invDenom;
+		Bary0 = (d11 * d20 - d01 * d21);    //invDenom now integrated into the definitions of d11, d01 and d00
+		Bary1 = (d00 * d21 - d01 * d20);
+		Bary2 = 1.0 - Bary0 - Bary1;
 	}
 
 	 static inline void barycentric_interp(double &out, const double interp0, const double interp1, const double interp2, const double Bary0, const double Bary1, const double Bary2) {
@@ -122,13 +134,13 @@ struct triangle : public hittable {
 	//using the Moller-Trumbore intersection algorithm
 	//https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 	
-	const double epsilon = 0.0000001;
+	constexpr double epsilon = 0.0000001;
 	vec3 h, s, q;
 	double a, f, u, v;
 	
 	
 	h = cross(r.dir, v1);
-        a = dot(v0, h);
+	a = dot(v0, h);
 
 	if (a > -epsilon && a < epsilon)	//ray is parallel to triangle
 		return false;
@@ -164,7 +176,8 @@ struct triangle : public hittable {
 	barycentric_interp(rec.v, v_0, v_1, v_2, Bary0, Bary1, Bary2);
 	
 	if (!vertex_normals) {
-		rec.set_face_normal(r, cross(v1, v0) );
+		//rec.set_face_normal(r, cross(v1, v0) );
+        rec.set_face_normal(r, normal0 );
 	} else {
 		//interpolating the normal vectors
 		vec3 temp_norm_res;

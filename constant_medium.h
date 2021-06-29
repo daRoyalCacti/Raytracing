@@ -7,9 +7,9 @@
 #include "texture.h"
 
 struct constant_medium : public hittable {
-	shared_ptr<hittable> boundary;
-	shared_ptr<material> phase_function;
-	double neg_inv_density;		//required to move info from constructor to hit
+	const shared_ptr<hittable> boundary;
+	const shared_ptr<material> phase_function;
+	const double neg_inv_density;		//required to move info from constructor to hit
 	
 	//d for density
 	constant_medium(const shared_ptr<hittable> &b, const double d, const shared_ptr<texture> &a)

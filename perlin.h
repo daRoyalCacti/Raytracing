@@ -6,15 +6,16 @@
 #include <numeric>
 
 class perlin {
-	static const int point_count = 256;
-	vec3* ranvec;		//array to hold the noise 
-				//was original a double array, now vec3 to help with smoothing the noise
-	int* perm_x;		//permutations for the x-direction
-	int* perm_y;
-	int* perm_z;
+	static constexpr unsigned point_count = 256;
+	std::array<vec3, point_count> ranvec;		//array to hold the noise
+				    //was original a double array, now vec3 to help with smoothing the noise
+	const std::array<int, point_count> perm_x;		//permutations for the x-direction
+	const std::array<int, point_count> perm_y;
+	const std::array<int, point_count> perm_z;
 
-	static int* perlin_generate_perm() {	//creates a permutation of the numbers from 0 to point_count
-		auto p = new int[point_count];
+	static std::array<int, point_count> perlin_generate_perm() {	//creates a permutation of the numbers from 0 to point_count
+		//auto p = new int[point_count];
+        std::array<int, point_count> p;
 
 		//for (int i = 0; i < point_count; i++)
 		//	p[i] = i;
@@ -25,7 +26,7 @@ class perlin {
 		return p;
 	}
 
-	static void permute(int* p, const int n) {	//creates a permutation of an integer array of length n
+	static void permute(std::array<int, point_count> p, const int n) {	//creates a permutation of an integer array of length n
 		for (int i = n-1; i>0; i--) {	//switches p[i] with some p[n] for n<i
 			const int target = random_int(0,i);
 			std::swap(p[i], p[target]);
@@ -57,23 +58,14 @@ class perlin {
 
 
 	public:
-	perlin() {
-		ranvec = new vec3[point_count];
+	perlin() : perm_x(perlin_generate_perm()), perm_y(perlin_generate_perm()), perm_z(perlin_generate_perm()){
+		//ranvec = new vec3[point_count];
 		for (int i = 0; i < point_count; i++) {
 			ranvec[i] = unit_vector(vec3::random(-1,1));
 		}
-
-		perm_x = perlin_generate_perm();
-		perm_y = perlin_generate_perm();
-		perm_z = perlin_generate_perm();
 	}
 
-	~perlin() {
-		delete [] ranvec;
-		delete [] perm_x;
-		delete [] perm_y;
-		delete [] perm_z;
-	}
+	~perlin() = default;
 
 	[[nodiscard]] double noise(const point3& p) const {
 		//scrambling (using a hash) the random numbers (all point_count of them) to remove tiling

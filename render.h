@@ -142,7 +142,7 @@ struct render {
                 for (int s = 0; s < samples[i][j]; ++s) {
                     const auto u = double(i + random_double()) / (image_width - 1);
                     const auto v = double(j + random_double()) / (image_height - 1);
-                    const ray r = curr_scene.cam.get_ray(u, v);
+                    const ray r = curr_scene.cam->get_ray(u, v);
                     buffer[i][j] += ray_color(r, max_depth);
                 }
             }

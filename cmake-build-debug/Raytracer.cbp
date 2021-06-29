@@ -5,7 +5,7 @@
 		<Option title="Raytracer"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="gcc"/>
-		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\..\;CMake Files\..\..\..\..\..\usr\;CMake Files\..\..\..\..\..\usr\lib64\;CMake Files\..\..\..\..\..\usr\lib64\cmake\;CMake Files\..\..\..\..\..\usr\lib64\cmake\assimp-5.0\;"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\..\;CMake Files\..\..\..\..\..\usr\;CMake Files\..\..\..\..\..\usr\lib64\;CMake Files\..\..\..\..\..\usr\lib64\cmake\;CMake Files\..\..\..\..\..\usr\lib64\cmake\assimp-5.0\;CMake Files\..\..\..\..\..\usr\share\;CMake Files\..\..\..\..\..\usr\share\eigen3\;CMake Files\..\..\..\..\..\usr\share\eigen3\cmake\;"/>
 		<Build>
 			<Target title="all">
 				<Option working_dir="/home/jacob/Documents/Projects/Raytracer/cmake-build-debug"/>
@@ -45,6 +45,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/home/jacob/Documents/Projects/Raytracer"/>
+					<Add directory="/usr/include/eigen3"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/x86_64-pc-linux-gnu"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/backward"/>
@@ -68,6 +69,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/home/jacob/Documents/Projects/Raytracer"/>
+					<Add directory="/usr/include/eigen3"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/x86_64-pc-linux-gnu"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/backward"/>
@@ -113,6 +115,15 @@
 		</Unit>
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/../../../../../usr/lib64/cmake/assimp-5.0/assimpTargets.cmake">
 			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib64\cmake\assimp-5.0\"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/../../../../../usr/share/eigen3/cmake/Eigen3Config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\share\eigen3\cmake\"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/../../../../../usr/share/eigen3/cmake/Eigen3ConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\share\eigen3\cmake\"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/../../../../../usr/share/eigen3/cmake/Eigen3Targets.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\share\eigen3\cmake\"/>
 		</Unit>
 	</Project>
 </CodeBlocks_project_file>

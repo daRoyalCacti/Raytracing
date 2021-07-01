@@ -282,7 +282,7 @@ struct [[maybe_unused]] big_scene2 : public scene{
 		world.add(boundary1);
 		world.add(make_shared<constant_medium>(boundary1, 0.2, color(0.2, 0.4, 0.9) ));
 		const auto boundary2 = make_shared<sphere>(point3(0,0,0), 5000, make_shared<dielectric>(1.5) );
-		world.add(make_shared<constant_medium>(boundary2, 0.001, color(1,1,1) ));
+		world.add(make_shared<constant_medium>(boundary2, 0.0001, color(1,1,1) ));
 
 		//Earth
 		const auto emat = make_shared<lambertian>(make_shared<image_texture>("../textures/earthmap.jpg"));

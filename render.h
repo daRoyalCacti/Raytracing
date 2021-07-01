@@ -197,8 +197,6 @@ struct render {
             }
             for (unsigned i = 0; i < image_width; ++i) {
                 for (int s = 0; s < samples[i][j]; ++s) {
-                    //const auto u = double(i + random_double()) / (image_width - 1);
-                    //const auto v = double(j + random_double()) / (image_height - 1);
                     const auto r_v = random_halton_2D(halton_indices[i][j]);
                     const auto u = double(i + r_v.x()) / (image_width - 1);
                     const auto v = double(j + r_v.y()) / (image_height - 1);

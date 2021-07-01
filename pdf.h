@@ -30,7 +30,6 @@ struct cosine_pdf : public pdf {
     [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) override {
         return uvw.local(random_cosine_direction());    //would likely be better the halton set was used but
                                                         // using it leads to some very strange images
-        //return uvw.local(random_cosine_direction_halton(halton_index));
     }
 };
 

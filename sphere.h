@@ -125,8 +125,6 @@ vec3 sphere::random(const point3& o) {
     const vec3 direction = center - o;
     const double distance_squared = direction.length_squared();
 
-    //onb uvw;
-    //uvw.build_from_w(direction);
     onb uvw(direction);
     return uvw.local( random_to_sphere_halton(radius, distance_squared, halton_index) );
 }

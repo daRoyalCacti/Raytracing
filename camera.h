@@ -6,7 +6,6 @@ class camera {
 	const point3 origin;    //camera is positioned
 	const vec3 horizontal;    //defines the direction of horizontal through u, and how far horizontal to draw through viewport_width
 	const vec3 vertical;      //defines the direction of vertical through v, and how far vertical to draw through viewport_height
-    //const point3 lower_left_corner;
 	const double lens_radius = 0;
 	const double time0 = 0, time1 = 0;	//shutter open/close times
 
@@ -33,36 +32,10 @@ class camera {
     //focus_dist := distance from the camera that is in focus
 	camera(const point3 &lookfrom, const vec3 &lookat, const vec3 &vup, const double vfov, const double aspect_ratio, const double aperture, const double focus_dist,
 			const double _time0, const double _time1) : time0(_time0), time1(_time1), lens_radius(aperture/2.0), origin(lookfrom), w(unit_vector(lookfrom - lookat)),
-			//u(unit_vector(cross(vup, unit_vector(lookfrom - lookat)))), v(cross(unit_vector(lookfrom - lookat), unit_vector(cross(vup, unit_vector(lookfrom - lookat))))),
 			u(unit_vector(cross(vup, w))), v(cross(w, u)),
 			horizontal(focus_dist * aspect_ratio* 2.0 * tan(degrees_to_radians(vfov)/2) * unit_vector(cross(vup, unit_vector(lookfrom - lookat))) ),
 			vertical(focus_dist * 2.0 * tan(degrees_to_radians(vfov)/2) * cross(unit_vector(lookfrom - lookat), unit_vector(cross(vup, unit_vector(lookfrom - lookat)))) ),
-			llc_m_o(- horizontal/2 - vertical/2 - focus_dist*unit_vector(lookfrom - lookat)){
-
-        /*u(unit_vector(cross(vup, w))), v(cross(w, u)),
-          horizontal(focus_dist * aspect_ratio* 2.0 * tan(degrees_to_radians(vfov)/2) * unit_vector(cross(vup, w)) ),
-                vertical(focus_dist * 2.0 * tan(degrees_to_radians(vfov)/2) * cross(w, u) ),
-                lower_left_corner(origin - horizontal/2 - vertical/2 - focus_dist*unit_vector(lookfrom - lookat) ) {*/
-
-		//const auto theta = degrees_to_radians(vfov);
-		//const auto h = tan(theta/2);
-
-		//const auto viewport_height = 2.0 * h;
-		//const auto viewport_width = aspect_ratio*viewport_height;
-
-		//w = unit_vector(lookfrom - lookat);
-		//u = unit_vector(cross(vup, w));
-		//v = cross(w, u);
-		
-		//uses a lense
-		//origin = lookfrom;
-		//horizontal = focus_dist * viewport_width * u;
-		//vertical = focus_dist * viewport_height * v;
-		//lower_left_corner = origin - horizontal/2 - vertical/2 - focus_dist*w;
-
-
-		//lens_radius = aperture/2;
-	}
+			llc_m_o(- horizontal/2 - vertical/2 - focus_dist*unit_vector(lookfrom - lookat)){}
 
 	[[nodiscard]] ray get_ray(const double s, const double t) {
 		//uses the thin lens approximation to generate depth of field

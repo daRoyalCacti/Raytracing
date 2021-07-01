@@ -88,8 +88,8 @@ struct triangle : public hittable {
 		if (vertex2.z() > max_z)
 			max_z = vertex2.z();
 
-		const double small = 0.0001;
-		const double epsilon = 0.000001;
+		constexpr double small = 0.0001;
+		constexpr double epsilon = 0.000001;
 		if (std::abs(min_x - max_x) < epsilon) {
 			max_x += small;
 			min_x -= small;

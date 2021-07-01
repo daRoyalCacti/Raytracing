@@ -6,5 +6,5 @@ CXX_FLAGS = -O3 -DNDEBUG   -fopenmp -std=gnu++2a
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/jacob/Documents/Projects/Raytracer -isystem /usr/include/eigen3 
+CXX_INCLUDES = -I/home/jacob/Documents/Projects/Raytracer 
 

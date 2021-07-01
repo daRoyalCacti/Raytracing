@@ -44,9 +44,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/lib64/cmake/assimp-5.0/assimp-config.cmake"
   "/usr/lib64/cmake/assimp-5.0/assimpTargets-release.cmake"
   "/usr/lib64/cmake/assimp-5.0/assimpTargets.cmake"
-  "/usr/share/eigen3/cmake/Eigen3Config.cmake"
-  "/usr/share/eigen3/cmake/Eigen3ConfigVersion.cmake"
-  "/usr/share/eigen3/cmake/Eigen3Targets.cmake"
   )
 
 # The corresponding makefile is:

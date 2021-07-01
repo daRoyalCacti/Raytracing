@@ -39,19 +39,24 @@ bool constant_medium::hit(const ray& r, const double t_min, const double t_max, 
 	// - so the ray is on a trajectory that will enter the medium and exit it
 	if (!boundary->hit(r, rec1.t+0.0001, infinity, rec2))
 		return false;
+	//note that finding these allows for the ray to move backwards in time
+	// - i.e. if the ray starts inside the medium, this will not trivially return false
 
 	if (rec1.t < t_min) rec1.t = t_min;	//if the entry collision happens before the min time
 	if (rec2.t > t_max) rec2.t = t_max;	//if the exit collision happens after the max time
+	//this is to only consider the ray moving between these times
 
 	if (rec1.t >= rec2.t)	//if the entry happens after or at the same time as the exit
 		return false;
 
-	if (rec1.t < 0)
-		rec1.t = 0;
+	if (rec1.t < 0) //required to find the distance inside the boundary
+		rec1.t = 0; //(if negative, this distance would measure the distance based on where the ray came from, not where it is now)
 
 	const auto ray_length = r.direction().length();
 	const auto distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
 	const auto hit_distance = neg_inv_density * log(random_halton_1D(halton_index));	//randomly deciding if the ray should leave the medium
+	                                                                                        // - is choosing from an exponential distribution
+	                                                                                        //from STAT2003, in general we take -1/lambda * ln(U) for U~U[0,1]
 
 	if (hit_distance > distance_inside_boundary)	//if the randomly chosen distance is greater than the distance from the boundary to the ray origin
 		return false;

@@ -81,37 +81,31 @@ namespace Halton {
 
 }
 
+template <size_t N>
+struct Halton_set {
+    std::array<double, N> halton_set_1D;
+    std::array<vec2, N> halton_set_2D;
+    std::array<vec3, N> halton_set_3D;
 
-namespace global {
-    std::array<double, halton_sequence_stored_size> halton_set_1D;
-    std::array<vec2, halton_sequence_stored_size> halton_set_2D;
-    std::array<vec3, halton_sequence_stored_size> halton_set_3D;
-
-    void init_halton_set() {
-        for (unsigned i = 0; i < halton_sequence_stored_size; i++) {
-            //can make more faster by using, for example, 1D[i] to init 2D[i]
+    Halton_set() {
+        for (unsigned i = 0; i < N; i++) {
             halton_set_1D[i] = Halton::get_halton<2>(i/2);
-            halton_set_2D[i] = vec2(Halton::get_halton<2>(i/2), Halton::get_halton<3>(i/2));
-            halton_set_3D[i] = vec3(Halton::get_halton<2>(i/2), Halton::get_halton<3>(i/2), Halton::get_halton<5>(i/2));
+            halton_set_2D[i] = vec2(halton_set_1D[i], Halton::get_halton<3>(i/2));
+            halton_set_3D[i] = vec3(halton_set_2D[i], Halton::get_halton<5>(i/2));
         }
     }
+};
+
+namespace global {
+    Halton_set<halton_sequence_stored_size> Halton_rng;
 }
 
 
-
-inline double random_test() {
-    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    static std::mt19937 generator;
-    //Returns number from U[0,1)
-    return distribution(generator);
-}
 
 inline double random_halton_1D(size_t &index) {
-    const double ret_val = global::halton_set_1D[index];
+    const double ret_val = global::Halton_rng.halton_set_1D[index];
     index = (index + 1) % global::halton_sequence_stored_size;
     return ret_val;
-    //index = (index + 1) % global::halton_sequence_stored_size;
-    //return random_test();
 }
 
 inline double random_halton_1D(double min, double max, size_t &index) {
@@ -120,12 +114,10 @@ inline double random_halton_1D(double min, double max, size_t &index) {
 
 
 inline vec2 random_halton_2D(size_t &index) {
-    const vec2 ret_val = global::halton_set_2D[index];
+    const vec2 ret_val = global::Halton_rng.halton_set_2D[index];
     index = (index + 1) % global::halton_sequence_stored_size;
 
     return ret_val;
-    /*index = (index + 1) % global::halton_sequence_stored_size;
-    return vec2(random_test(), random_test());*/
 }
 
 //gets a pseudo-random value from [min,max]x[min,max]
@@ -141,12 +133,10 @@ inline vec2 random_halton_2D(double min1, double max1, double min2, double max2,
 
 
 inline vec3 random_halton_3D(size_t &index) {
-    const vec3 ret_val = global::halton_set_3D[index];
+    const vec3 ret_val = global::Halton_rng.halton_set_3D[index];
     index = (index + 1) % global::halton_sequence_stored_size;
 
     return ret_val;
-    //index = (index + 1) % global::halton_sequence_stored_size;
-    //return vec3(random_test(), random_test(), random_test());
 }
 
 //gets a pseudo-random value from [min,max]
@@ -190,9 +180,17 @@ inline double Henyey_Greensteing_pdf_func(double g, double cos_theta) {
 inline double rand_Henyey_Greensteing_halton(double g, size_t &index) {
     //https://www.oceanopticsbook.info/view/scattering/level-2/the-henyey-greenstein-phase-function
     const double max_y = 1/(4*M_PI) * (1-g*g)/( pow(1+g*g - 2*fabs(g), 3/2.0f));
+    #ifndef NDEBUG
+      unsigned counter = 0;
+      constexpr auto max_loops = 100;
+    #endif
     while (true) {
-        //const auto x = random_double(-1, 1);
-        //const auto y = random_double(0, max_y);
+        #ifndef NDEBUG
+            ++counter;
+            if (counter > max_loops) {
+                throw std::runtime_error("Infinite loop in rand_Henyey_Greensteing_halton");
+            }
+        #endif
         const auto r = random_halton_2D(-1, 1, 0, max_y, index);
         if (r.y() < Henyey_Greensteing_pdf_func(g, r.x())) {
             return acos(r.x());
@@ -202,14 +200,34 @@ inline double rand_Henyey_Greensteing_halton(double g, size_t &index) {
 
 
 inline vec3 halton_random_in_unit_sphere(size_t &index) {
+    #ifndef NDEBUG
+        unsigned counter = 0;
+        constexpr auto max_loops = 100;
+    #endif
     while (true) {
+        #ifndef NDEBUG
+            ++counter;
+            if (counter > max_loops) {
+                throw std::runtime_error("Infinite loop in halton_random_in_unit_sphere");
+            }
+        #endif
         const vec3 p = random_halton_3D(-1,1, index);
         if (p.length_squared() < 1) return p;
     }
 }
 
 inline vec3 halton_random_in_unit_disk(size_t &index) {
+    #ifndef NDEBUG
+        unsigned counter = 0;
+        constexpr auto max_loops = 100;
+    #endif
     while (true) {
+        #ifndef NDEBUG
+            ++counter;
+            if (counter > max_loops) {
+                throw std::runtime_error("Infinite loop in halton_random_in_unit_disk");
+            }
+        #endif
         const auto p = vec3(random_halton_2D(-1, 1, index), 0);
         if (p.length_squared() < 1) return p;
     }
@@ -223,8 +241,6 @@ inline vec3 random_unit_vector_halton(size_t &index) {
 }
 
 inline vec3 random_to_sphere_halton(double radius, double distance_squared, size_t &index) {
-    //const auto r1 = random_double();
-    //const auto r2 = random_double();
     const auto r = random_halton_2D(index);
 
     const auto z = 1 + r.y()* ( sqrt(1 - radius*radius/distance_squared) - 1);
@@ -238,5 +254,10 @@ inline vec3 random_to_sphere_halton(double radius, double distance_squared, size
 
     return vec3(x, y, z);
 }
+
+inline double rand_exp_halton(double lambda, size_t &index) {
+    return -1/lambda*log(random_halton_1D(index));
+}
+
 
 #endif //RAYTRACER_HALTON_HPP

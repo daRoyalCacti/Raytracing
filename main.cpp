@@ -13,13 +13,6 @@ int main() {
 	const std::time_t start_time = std::chrono::system_clock::to_time_t(start);
 	std::cout << "Computation started at " << std::ctime(&start_time);
 
-	std::cout << "Generating the Halton set";
-    const auto start_halton = std::chrono::system_clock::now();
-	global::init_halton_set();
-    const auto end_halton = std::chrono::system_clock::now();
-    const std::chrono::duration<double> elapsed_seconds_halton = end_halton - start_halton;
-    std::cout << " -- took " << elapsed_seconds_halton.count() << "s\n";
-
 
 
     scene weekend = 	big_scene1();

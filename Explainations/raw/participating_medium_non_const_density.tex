@@ -1,0 +1,79 @@
+\documentclass[12pt]{article}
+\newcommand{\helperdir}{/home/jacob/Documents/Latex-Documents/Helpers}
+\newcommand{\codedir}{../Code}
+\newcommand{\figuredir}{../Figures}
+\newcommand{\datadir}{../Data}
+
+\usepackage{amsmath}  %for begin align
+\usepackage{footnote} %for \footnote{}
+
+\usepackage[hidelinks]{hyperref}	%for \url{}. hidelinks to remove green border around links
+\usepackage[shortlabels]{enumitem}	%to be  able to change the enum characters (e.g. \begin{enumerate}[i)]
+
+\input{\helperdir/all.tex}
+\pagestyle{plain} %for fancy footer to work correctly
+
+\usepackage{tipa} %for \textsci
+
+
+\begin{document}
+\settitle{Generating a pdf for participating medium of non constant density }
+
+Consider some medium where the density is give as
+\WfigureNC{density.png}{0.3} %https://www.desmos.com/calculator/ps6mexq4tb
+The horizontal is time and the vertical axis is the density of the medium at the position where the ray is at the corresponding time.\\
+If the density of the medium was just $\rho_0$, then the pdf would be 
+\[f_0(t) = \lambda_0 \e^{-\lambda_0 t} \]
+where $\lambda_0$ is a function of $\rho_0$ (as $\rho$ increases, $\lambda$ increases)
+(see readme for more explaination).\\ 
+Simililarly if the density was just $\rho_1$
+\[f_1(t) = \lambda_1 \e^{-\lambda_1 t} \] 
+%
+Denote the pdf as $f$.\\ 
+Then the pdf for $t\in[0,t_0)$ must be the same for a constant medium because the probability to scatter during this interval is uneffected by the presence of the other medium.\\ 
+From conditional probability\cite{1}, for $T$ the random variable corresponding to the time of scattering and for $t>t_0$
+\[\prob{T>t|T>t_0} = \frac{\prob{T>t, T>t_0}}{\prob{T>t_0}}\] 
+but $\set{T>t}$ is a superset of $\set{T>t_0}$ so 
+\[\prob{T>t|T>t_0} = \frac{\prob{T>t}}{\prob{T>t_0}}\] 
+$\prob{T>t|T>t_0}$ can be interpretted as given that the ray has lasted until $t_0$, what is the probability that is lasts until $t$.
+This is equivilent to the ray starting that $t_0$ and lasting a time $t - t_0$.\\ 
+As such, 
+\[\prob{T>t|T>t_0} = \intt_0^{t-t_0} \lambda_1 \e^{-\lambda_1 t} \dd t = 1 - \e^{\lambda_1 (t-t_0)}\] 
+Also, 
+\[ \prob{T>t} = 1 - \prob{T<t} = 1 - \intt_0^t f(t) \dd t\] 
+Because $T<t_0$ is determined entirely by $f_0$
+\[\prob{T>t_0} = 1 - \prob{T<t_0} = 1 - \ab*{1 - \e^{-\lambda_0 t_0}} = \e^{-\lambda_0 t_0}\]
+%
+Thus,
+\[1 - \intt_0^t f(t) \dd t = \ab*{1 - \e^{\lambda_1 (t-t_0)}}\e^{-\lambda_0 t_0} \implies f(t) = \e^{\lambda_1 (t-t_0)}\e^{-\lambda_0 t_0}\] 
+and so 
+\[ f(t) = \begin{cases}
+  \lambda_0 \e^{-\lambda_0 t} & t\in[0,t_0)\\ 
+  \e^{\lambda_1 (t-t_0)}\e^{-\lambda_0 t_0} & t\in[t_0,\infty)
+\end{cases}\]
+%
+Similarly for 3 regions of varying density 
+\[ f(t) = \begin{cases}
+  \lambda_0 \e^{-\lambda_0 t} & t\in[0,t_0)\\ 
+  \e^{\lambda_1 (t-t_0)}\e^{-\lambda_0 t_0} & t\in[t_0,t_1)\\
+  \e^{\lambda_2 (t-t_1)}\e^{-\lambda_0 t_0}\e^{-\lambda_1(t_1-t_0)} & t\in[t_1,\infty)
+\end{cases}\]
+and for 4
+\[ f(t) = \begin{cases}
+  \lambda_0 \e^{-\lambda_0 t} & t\in[0,t_0)\\ 
+  \e^{\lambda_1 (t-t_0)}\e^{-\lambda_0 t_0} & t\in[t_0,t_1)\\
+  \e^{\lambda_2 (t-t_1)}\e^{-\lambda_0 t_0}\e^{-\lambda_1(t_1-t_0)} & t\in[t_1,t2)\\
+  \e^{\lambda_3 (t-t_2)}\e^{-\lambda_0 t_0}\e^{-\lambda_1(t_1-t_0)}\e^{-\lambda_2(t_2-t_1)} & t\in[t_2,\infty)
+\end{cases}\]
+
+
+
+\newpage
+\begin{thebibliography}{9}
+
+  \bibitem{1}
+  \url{https://en.wikipedia.org/wiki/Conditional_probability}
+
+\end{thebibliography}
+
+\end{document}

@@ -3,9 +3,8 @@
 This is a CPU path tracer based on; [Raytracing in one weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html), [Raytracing the next week](https://raytracing.github.io/books/RayTracingTheNextWeek.html), 
 and [Raytracing the rest of your life](https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html)
 (a GPU implemention using CUDA was also done. See [Raytracing_GPU](https://github.com/daRoyalCacti/Raytracing_GPU)).
-##From raytracing in one weekend
+## From raytracing in one weekend
 As such it has the following features
-* outputs LDR images
 * Antialiasing (inherit to the path tracing method)  
 * custom classes
     * custom vector 3 class
@@ -31,13 +30,13 @@ As such it has the following features
 * Orthonormal basis generation
 * Probability density classes
 
-##Eigen
+## Eigen
 [Eigen 3](https://eigen.tuxfamily.org/index.php?title=Main_Page) was implemented to replace the vector 3 class as the original implementation was quite naive.
 However it was found that eigen was slower and thus it was removed. 
 This is also in a [stack overflow post](https://stackoverflow.com/questions/58071344/is-eigen-slow-at-multiplying-small-matrices) where it was found that eigen is slow for small matrices due to some additional overhead.
 The eigen implementation can be seen in the [eigen branch](https://github.com/daRoyalCacti/Raytracing/tree/eigen)
 
-##Participating medium using Henyey-Greenstein Phase function
+## Participating medium using Henyey-Greenstein Phase function
 Support was added for participating medium which scatters by the [Henyey-Greenstein Phase function](https://www.astro.umd.edu/~jph/HG_note.pdf)
 It is an 1D phase function -- the most naturally occurring type ([pbrt](https://www.pbrt.org/) [section 11.2](https://www.pbr-book.org/3ed-2018/Volume_Scattering/Phase_Functions#PhaseHG)).
 It is also isotropic (again see [pbrt](https://www.pbrt.org/) [section 11.2](https://www.pbr-book.org/3ed-2018/Volume_Scattering/Phase_Functions#PhaseHG)) which makes it particularly easy to use.
@@ -61,7 +60,7 @@ As such there are infinitely many possible rays to get from this angle.
 The method used was to generate a random vector and then to rotate about that vector by the found angle.
 The general way of doing this using [quaternions](https://www.3dgep.com/understanding-quaternions/#Rotations) was not used and instead the result from [kennesaw state univeristy](https://ksuweb.kennesaw.edu/~plaval//math4490/rotgen.pdf) was used.
 
-##Triangle meshes
+## Triangle meshes
 Triangle meshes are generally read from file.
 To do this [assimp](https://assimp.org/) was used similarly to what is found at [learnopengl.com](https://learnopengl.com/Model-Loading/Model).
 All triangle meshes are loaded into a bvh because there would rarely be a case where there would not be a performace boost from doing so due to most meshes having a high triangle count.
@@ -71,8 +70,13 @@ Texture coordinates were found using a [Barycentric coordinate system](https://e
 as by the discussion given on [computer graphics stack exchange](https://computergraphics.stackexchange.com/questions/1866/how-to-map-square-texture-to-triangle).
 These were computed efficiently using the method given in [Real-time collisoin detection](http://realtimecollisiondetection.net/), which the method being transcribed in [game dev stack exchange](https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates).
 
+## Multithreading
+Multi-threading was simply added using [open mp](https://www.openmp.org/)'s parallel for.
+This is enough to maintain constant 100% CPU usage.
 
-##Images
+It is planned to add SIMD in the future.
+
+## Images
 All images created are available in [/images](https://github.com/daRoyalCacti/Raytracing_GPU/tree/master/images). Some noteworthy images are seen below.
 
 <img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/cornell_box.png" width="400" height="400" alt="cornell box">

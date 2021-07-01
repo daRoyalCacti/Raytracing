@@ -52,7 +52,7 @@ struct triangle : public hittable {
 		}
 
 	
-	 bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
+	 bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
 
 	 bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		//finding the min and max of each coordinate
@@ -130,7 +130,7 @@ struct triangle : public hittable {
 
 };
 
- bool triangle::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {
+ bool triangle::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
 	//using the Moller-Trumbore intersection algorithm
 	//https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 	

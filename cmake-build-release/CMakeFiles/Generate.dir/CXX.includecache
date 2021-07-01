@@ -6,6 +6,20 @@
 
 #IncludeRegexTransform: 
 
+/home/jacob/Documents/Projects/Raytracer/Halton.hpp
+utility
+-
+array
+-
+cmath
+-
+algorithm
+-
+vec2.h
+/home/jacob/Documents/Projects/Raytracer/vec2.h
+vec3.h
+/home/jacob/Documents/Projects/Raytracer/vec3.h
+
 /home/jacob/Documents/Projects/Raytracer/ONB.h
 
 /home/jacob/Documents/Projects/Raytracer/aabb.h
@@ -67,10 +81,10 @@ memory
 -
 random
 -
+probability.h
+/home/jacob/Documents/Projects/Raytracer/probability.h
 ray.h
 /home/jacob/Documents/Projects/Raytracer/ray.h
-vec3.h
-/home/jacob/Documents/Projects/Raytracer/vec3.h
 
 /home/jacob/Documents/Projects/Raytracer/constant_medium.h
 common.h
@@ -189,6 +203,10 @@ cmath
 -
 vec3.h
 /home/jacob/Documents/Projects/Raytracer/vec3.h
+vec2.h
+/home/jacob/Documents/Projects/Raytracer/vec2.h
+Halton.hpp
+/home/jacob/Documents/Projects/Raytracer/Halton.hpp
 
 /home/jacob/Documents/Projects/Raytracer/ray.h
 vec3.h
@@ -286,9 +304,13 @@ assimp/scene.h
 assimp/postprocess.h
 -
 
+/home/jacob/Documents/Projects/Raytracer/vec2.h
+
 /home/jacob/Documents/Projects/Raytracer/vec3.h
 iostream
 -
 cmath
 -
+vec2.h
+/home/jacob/Documents/Projects/Raytracer/vec2.h
 

@@ -21,6 +21,8 @@ class camera {
 	const vec3 u; //vector pointing to the right -- orthogonal to the up vector and w
 	const vec3 v; //the projection of the up vector on to the plane described by w (i.e. perpendicular to w)
 
+	size_t halton_counter = 0, halton_counter2 = 0;  //used to get pseudo-random numbers from the Halton sequence
+
 	public:
 	camera() = delete;
 
@@ -62,11 +64,11 @@ class camera {
 		//lens_radius = aperture/2;
 	}
 
-	[[nodiscard]] ray get_ray(const double s, const double t) const {
+	[[nodiscard]] ray get_ray(const double s, const double t) {
 		//uses the thin lens approximation to generate depth of field
-		const vec3 rd = lens_radius * random_in_unit_disk();	//randomness is required to get the blur
+		const vec3 rd = lens_radius * halton_random_in_unit_disk(halton_counter);	//randomness is required to get blur (i.e. depth of field)
 		const vec3 offset = u * rd.x() + v*rd.y();		//offset for where the light is coming from
 
-		return ray(origin + offset, llc_m_o + s*horizontal + t*vertical - offset, random_double(time0, time1));	//random time to simulate motion blur
+		return ray(origin + offset, llc_m_o + s*horizontal + t*vertical - offset, random_halton_1D(time0, time1, halton_counter2));	//random time to simulate motion blur
 	}
 };

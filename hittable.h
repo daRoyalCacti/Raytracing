@@ -23,14 +23,14 @@ struct hit_record {
 };
 
 struct hittable {
-	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const = 0;	//function to tell when a ray hits the object
+	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) = 0;	//function to tell when a ray hits the object
 	virtual bool bounding_box(double time0, double time1, aabb& output_box) const = 0;	//function that creates a bounding box around the object
 
-	[[nodiscard]] virtual double pdf_value(const point3& o, const vec3 &v) const {
+	[[nodiscard]] virtual double pdf_value(const point3& o, const vec3 &v) {
 	    return 0.0;
 	}
 
-	[[nodiscard]] virtual vec3 random(const vec3 &o) const {
+	[[nodiscard]] virtual vec3 random(const vec3 &o) {
 	    return vec3(1, 0, 0);
 	}
 };
@@ -43,7 +43,7 @@ struct translate : public hittable {
 	translate() = delete;
 	translate(const shared_ptr<hittable>& p, const vec3& displacement) : ptr(p), offset(displacement) {}
 
-	inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
+	inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
 		const ray moved_r(r.origin() - offset, r.direction(), r.time());	//moving object by offset is same as translating axes by -offset
 		
 		if(!ptr->hit(moved_r, t_min, t_max, rec))	//if ray doesn't hits object in new axes
@@ -75,7 +75,7 @@ struct rotate_y : public hittable {
 	rotate_y() = delete;
 	rotate_y(const shared_ptr<hittable> &p, double angle);
 
-	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
+	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 
 	inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		output_box = bbox;
@@ -114,7 +114,7 @@ rotate_y::rotate_y(const shared_ptr<hittable> &p, const double angle) : ptr(p), 
 	bbox = aabb(min,max);
 }
 
-bool rotate_y::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {
+bool rotate_y::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
 	auto origin = r.origin();
 	auto direction = r.direction();
 	
@@ -154,7 +154,7 @@ struct flip_face : public hittable {
     flip_face() = delete;
     explicit flip_face(const shared_ptr<hittable> &p) : ptr(p) {}
 
-    inline bool hit(const ray& r, const double t_min, const double t_max, hit_record &rec) const override {
+    inline bool hit(const ray& r, const double t_min, const double t_max, hit_record &rec) override {
         if (!ptr->hit(r, t_min, t_max, rec))
             return false;
 

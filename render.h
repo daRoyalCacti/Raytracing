@@ -17,16 +17,26 @@
 //image width and height are what they say they are
 template<size_t image_width, size_t image_height>
 struct render {
-    const scene curr_scene;
+    scene curr_scene;
     static constexpr unsigned max_depth = 50;
 
+    std::vector<std::vector<size_t>> halton_indices;    //used to get random numbers from the halton sequence
+
     render() = delete;
-    explicit render(scene scn) : curr_scene(std::move(scn)) {}
+    explicit render(scene scn) : curr_scene(std::move(scn)) {
+        halton_indices.resize(image_width);
+        for (unsigned i = 0; i < image_width; i++) {
+            halton_indices[i].resize(image_height);
+            for (unsigned j = 0; j < image_height; j++) {
+                halton_indices[i][j] = 0;
+            }
+        }
+    }
 
 
     //samplespp in the number of samples initially to generate
     template <size_t samplespp>
-    void draw_on_convergence(const std::string output, const double tol = 0.1) const {
+    void draw_on_convergence(const std::string &output, const double tol = 0.1) {
         //======================================
         //The general idea:
         // - consider the plot of the number of rays per pixel against the color of the pixel (or some component of color, say red)
@@ -36,6 +46,8 @@ struct render {
         //======================================
         constexpr long unsigned total_rays = samplespp*image_width*image_height;
 
+        std::cout << "Initialising render";
+        const auto start_init = std::chrono::high_resolution_clock::now();
         std::vector <std::vector<size_t>> samples;
         std::vector <std::vector<size_t>> curr_samples;     //keeps track of how many rays have been sent for a given pixel
 
@@ -65,9 +77,20 @@ struct render {
                 curr_samples[i][j] = 0;
             }
         }
+        const auto end_init = std::chrono::high_resolution_clock::now();
+        const std::chrono::duration<double> elapsed_seconds_init = end_init - start_init;
+        std::cout << " -- took " << elapsed_seconds_init.count() << "s" << std::endl;
 
 
+        std::cout << "Generating initial image" << std::flush;
+        const auto start_image1 = std::chrono::high_resolution_clock::now();
         draw_to_buffer(buffer, samples);
+        const auto end_image1 = std::chrono::high_resolution_clock::now();
+        const std::chrono::duration<double> elapsed_seconds_image1 = end_image1 - start_image1;
+        std::cout << " -- took " << elapsed_seconds_image1.count() << "s" << std::endl;
+
+        std::cout << "\tupdating buffers" << std::flush;
+        const auto start_buffer1 = std::chrono::high_resolution_clock::now();
         for (int j = (int) image_height - 1; j >= 0; --j) {
             for (unsigned i = 0; i < image_width; ++i) {
                 buffer_prev[i][j] = buffer[i][j];
@@ -75,17 +98,36 @@ struct render {
                 buffer_write[i][j] = buffer[i][j] / (double)curr_samples[i][j];
             }
         }
+        const auto end_buffer1 = std::chrono::high_resolution_clock::now();
+        const std::chrono::duration<double> elapsed_seconds_buffer1 = end_buffer1 - start_buffer1;
+        std::cout << " -- took " << elapsed_seconds_buffer1.count() << "s" << std::endl;
+
+        std::cout << "\twriting to disk";
+        const auto start_disk1 = std::chrono::high_resolution_clock::now();
         write_buffer_png(output, buffer_write);
+        const auto end_disk1 = std::chrono::high_resolution_clock::now();
+        const std::chrono::duration<double> elapsed_seconds_disk1 = end_disk1 - start_disk1;
+        std::cout << " -- took " << elapsed_seconds_disk1.count() << "s" << std::endl;
 
         bool should_quit = false;
         unsigned counter = 0;
-        double max_dev = 0, max_dev_l = 0;  //storing the quickest convergence and the color with the quickest convergence
-        double sum = 0; //summing over all max_dev_l --- acts as a normalising factor for redistributing the rays
+        double max_dev, max_dev_l;  //storing the quickest convergence and the color with the quickest convergence
+        double sum; //summing over all max_dev_l --- acts as a normalising factor for redistributing the rays
         while (!should_quit) {
             max_dev = 0;
             sum = 0;
             should_quit = true;
+            counter++;
+
+            std::cout << "Generating image " << counter  << std::flush;
+            const auto start_image = std::chrono::high_resolution_clock::now();
             draw_to_buffer(buffer, samples);
+            const auto end_image = std::chrono::high_resolution_clock::now();
+            const std::chrono::duration<double> elapsed_seconds_image = end_image - start_image;
+            std::cout << " -- took " << elapsed_seconds_image.count() << "s" << std::endl;
+
+            std::cout << "\tupdating buffers"  << std::flush;
+            const auto start_buffer = std::chrono::high_resolution_clock::now();
             for (int j = (int) image_height - 1; j >= 0; --j) {
                 for (unsigned i = 0; i < image_width; ++i) {
                     curr_samples[i][j] += samples[i][j];
@@ -110,8 +152,14 @@ struct render {
                     buffer_prev[i][j] = buffer[i][j];
                 }
             }
+            const auto end_buffer = std::chrono::high_resolution_clock::now();
+            const std::chrono::duration<double> elapsed_seconds_buffer = end_buffer - start_buffer;
+            std::cout << " -- took " << elapsed_seconds_buffer.count() << "s" << std::endl;;
+            std::cout << "\tmax deviation : " << max_dev << "/" << tol << std::endl;
 
 
+            std::cout << "\tredistributing rays" << std::flush;
+            const auto start_redis = std::chrono::high_resolution_clock::now();
             //redistributing the rays based on the convergence
             for (int j = (int) image_height - 1; j >= 0; --j) {
                 for (unsigned i = 0; i < image_width; ++i) {
@@ -121,37 +169,50 @@ struct render {
                     }
                 }
             }
+            const auto end_redis = std::chrono::high_resolution_clock::now();
+            const std::chrono::duration<double> elapsed_seconds_redis = end_redis - start_redis;
+            std::cout << " -- took " << elapsed_seconds_redis.count() << "s" << std::endl;
 
 
 
+            std::cout << "\twriting to disk" << std::flush;
+            const auto start_disk = std::chrono::high_resolution_clock::now();
             write_buffer_png(output, buffer_write);
-            std::cout << "loop num : " << counter++ << "\tmax deviation : " << max_dev << "/" << tol << "\n";
+            const auto end_disk = std::chrono::high_resolution_clock::now();
+            const std::chrono::duration<double> elapsed_seconds_disk = end_disk - start_disk;
+            std::cout << " -- took " << elapsed_seconds_disk.count() << "s" << std::endl;
+
         }
 
     }
 
 
     void draw_to_buffer(std::vector <std::vector<color>> &buffer,
-                        const std::vector<std::vector<size_t>> samples) const {
+                        const std::vector<std::vector<size_t>> &samples) {
         unsigned counter = 0;
-        #pragma omp parallel for shared(buffer, counter)
+        #pragma omp parallel for shared(buffer, counter, samples), default(none)
         for (int j = (int) image_height - 1; j >= 0; --j) {
-            if constexpr (log_scanlines)
+            if constexpr (log_scanlines) {
                 std::cout << "\rScanline: " << ++counter << " / " << image_height << std::flush;
+            }
             for (unsigned i = 0; i < image_width; ++i) {
                 for (int s = 0; s < samples[i][j]; ++s) {
-                    const auto u = double(i + random_double()) / (image_width - 1);
-                    const auto v = double(j + random_double()) / (image_height - 1);
+                    //const auto u = double(i + random_double()) / (image_width - 1);
+                    //const auto v = double(j + random_double()) / (image_height - 1);
+                    const auto r_v = random_halton_2D(halton_indices[i][j]);
+                    const auto u = double(i + r_v.x()) / (image_width - 1);
+                    const auto v = double(j + r_v.y()) / (image_height - 1);
                     const ray r = curr_scene.cam->get_ray(u, v);
                     buffer[i][j] += ray_color(r, max_depth);
                 }
             }
         }
-        if constexpr (log_scanlines)
+        if constexpr (log_scanlines) {
             std::cout << "\r                                  \n" << std::flush;
+        }
     }
 
-    [[nodiscard]] color ray_color(const ray &r, const unsigned depth) const {
+    [[nodiscard]] color ray_color(const ray &r, const unsigned depth) {
         //collision with any object
         hit_record rec;
 

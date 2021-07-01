@@ -13,7 +13,7 @@ struct box : public hittable {
 	box() = delete;
 	box(const point3& p0, const point3& p1, const shared_ptr<material> &ptr);
 
-	bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
+	bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
 		return sides.hit(r, t_min, t_max, rec);
 	}
 

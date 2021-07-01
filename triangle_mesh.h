@@ -19,7 +19,7 @@ struct triangle_mesh : public hittable {
 	triangle_mesh(hittable_list &triangles, const double time0, const double time1) : tris(make_shared<bvh_node>(triangles,time0, time1)) {}
 
 
-	inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const override {
+	inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
 		return tris->hit(r, t_min, t_max, rec);
 	}
 

@@ -86,6 +86,9 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/Halton.hpp">
+			<Option target="Generate"/>
+		</Unit>
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/ONB.h">
 			<Option target="Generate"/>
 		</Unit>
@@ -99,6 +102,9 @@
 			<Option target="Generate"/>
 		</Unit>
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/probability.h">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/vec2.h">
 			<Option target="Generate"/>
 		</Unit>
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/CMakeLists.txt">

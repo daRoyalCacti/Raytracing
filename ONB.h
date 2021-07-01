@@ -12,7 +12,7 @@ struct onb {
                                     cross(unit_vector(n), unit_vector(cross(  unit_vector(n), fabs(unit_vector(n).x()) > 0.9 ? vec3(0,1,0) : vec3(1, 0, 0)  )  )) }
     {
         /*
-         //has old uvw positi0n in array
+         //has old uvw positin in array
             axis[2] = unit_vector(n);
             const vec3 a = fabs(w().x()) > 0.9 ? vec3(0,1,0) : vec3(1, 0, 0);
             axis[1] = unit_vector(cross(w(), a));

@@ -6,6 +6,9 @@
 #include <random>
 
 
+#include "probability.h"
+
+
 constexpr bool log_scanlines = false;  //prints the number of scalines remaining when rendering an image
 
 
@@ -25,26 +28,7 @@ inline double degrees_to_radians(double degrees) {
 	return degrees * pi / 180.0;
 }
 
-namespace global {
-    constexpr unsigned seed = 523523;
-    std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    std::mt19937 generator(seed);
-}
 
-inline double random_double() {
-	//Returns number from U[0,1)
-	return global::distribution(global::generator);
-}
-
-inline double random_double(const double min, const double max) {
-	//Returns number from U[min, max)
-	return min + (max-min)*random_double();
-}
-
-inline int random_int(const int min, const int max) {
-	//Returns a random integer from U[min,  max]
-	return static_cast<int>(random_double(min, max+1));
-}
 
 inline double clamp(const double x, const double min, const double max) {
     if (!std::isfinite(x)) return min;
@@ -59,7 +43,7 @@ inline double clamp(const double x, const double min, const double max) {
 
 //common headers
 #include "ray.h"
-#include "vec3.h"
+//#include "vec3.h" //vec3 now included in probability.h
 
 
 //https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi0.wp.com%2Fwww.therightgate.com%2Fwp-content%2Fuploads%2F2018%2F05%2Fspherical-cartesian-conversion.jpg%3Fresize%3D640%252C159%26ssl%3D1&f=1&nofb=1

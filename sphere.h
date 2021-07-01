@@ -9,14 +9,16 @@ struct sphere : public hittable {
 	const double radius = 0;
 	const shared_ptr<material> mat_ptr;
 
+	size_t halton_index = 0;
+
 	sphere() = delete;
 	sphere(const point3 cen, const double r, const shared_ptr<material>& m): center(cen), radius(r), mat_ptr(m) {}
 
-	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
+	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 	bool bounding_box(double time0, double time1, aabb& output_box) const override;
 
-    [[nodiscard]] double pdf_value(const point3& o, const vec3& v) const override;
-    [[nodiscard]] vec3 random(const point3& o) const override;
+    [[nodiscard]] double pdf_value(const point3& o, const vec3& v) override;
+    [[nodiscard]] vec3 random(const point3& o) override;
 
 	private:
 	static inline void get_sphere_uv(const point3& p, double& u, double& v) {
@@ -35,7 +37,7 @@ struct sphere : public hittable {
 	}
 };
 
-bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {
+bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
 	//using the quadratic equation to find if (and when) 'ray' collides with sphere centred at 'center' with radius 'radius'
 	
 	const vec3 oc = r.origin() - center;	
@@ -85,7 +87,7 @@ bool sphere::bounding_box(const double time0, const double time1, aabb& output_b
 }
 
 
-double sphere::pdf_value(const point3& o, const vec3& v) const {
+double sphere::pdf_value(const point3& o, const vec3& v) {
     hit_record rec;
     if (!this->hit(ray(o,v), 0.001, infinity, rec))
         return 0;
@@ -119,12 +121,12 @@ double sphere::pdf_value(const point3& o, const vec3& v) const {
     return 1 / solid_angle;
 }
 
-vec3 sphere::random(const point3& o) const {
+vec3 sphere::random(const point3& o) {
     const vec3 direction = center - o;
     const double distance_squared = direction.length_squared();
 
     //onb uvw;
     //uvw.build_from_w(direction);
     onb uvw(direction);
-    return uvw.local( random_to_sphere(radius, distance_squared) );
+    return uvw.local( random_to_sphere_halton(radius, distance_squared, halton_index) );
 }

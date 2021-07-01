@@ -10,6 +10,7 @@ struct constant_medium : public hittable {
 	const shared_ptr<hittable> boundary;
 	const shared_ptr<material> phase_function;
 	const double neg_inv_density;		//required to move info from constructor to hit
+	size_t halton_index = 0;
 	
 	//d for density
 	constant_medium(const shared_ptr<hittable> &b, const double d, const shared_ptr<texture> &a)
@@ -18,7 +19,7 @@ struct constant_medium : public hittable {
 	constant_medium(const shared_ptr<hittable> &b, const double d, const color c)
 		: boundary(b), neg_inv_density(-1/d), phase_function(make_shared<isotropic>(c)) {};
 
-	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
+	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
 
 	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		return boundary->bounding_box(time0, time1, output_box);
@@ -27,7 +28,7 @@ struct constant_medium : public hittable {
 
 
 //algorithm only works for convex shape
-bool constant_medium::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {
+bool constant_medium::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
 	hit_record rec1, rec2;
 	
 	//if the ray ever hits the boundary
@@ -50,7 +51,7 @@ bool constant_medium::hit(const ray& r, const double t_min, const double t_max, 
 
 	const auto ray_length = r.direction().length();
 	const auto distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
-	const auto hit_distance = neg_inv_density * log(random_double());	//randomly deciding if the ray should leave the medium
+	const auto hit_distance = neg_inv_density * log(random_halton_1D(halton_index));	//randomly deciding if the ray should leave the medium
 
 	if (hit_distance > distance_inside_boundary)	//if the randomly chosen distance is greater than the distance from the boundary to the ray origin
 		return false;

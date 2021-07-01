@@ -10,12 +10,13 @@ struct pdf {
     virtual ~pdf() = default;
 
     [[nodiscard]] virtual double value(const vec3& incoming_dir, const vec3& out_direction) const = 0;
-    [[nodiscard]] virtual vec3 generate(const vec3& incoming_dir) const = 0;
+    [[nodiscard]] virtual vec3 generate(const vec3& incoming_dir) = 0;
 };
 
 
 struct cosine_pdf : public pdf {
     const onb uvw;
+    //size_t halton_index = 0;  //cannot make work (see below)
 
     explicit cosine_pdf(const vec3& w) : uvw(w){
         //uvw.build_from_w(w);
@@ -26,8 +27,10 @@ struct cosine_pdf : public pdf {
         return cosine <= 0 ? 0 : cosine/pi;
     }
 
-    [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) const override {
-        return uvw.local(random_cosine_direction());
+    [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) override {
+        return uvw.local(random_cosine_direction());    //would likely be better the halton set was used but
+                                                        // using it leads to some very strange images
+        //return uvw.local(random_cosine_direction_halton(halton_index));
     }
 };
 
@@ -43,7 +46,7 @@ struct hittable_pdf : public pdf {
         return ptr->pdf_value(o, out_direction);
     }
 
-    [[nodiscard]] vec3 generate(const vec3& incoming_dir) const override {
+    [[nodiscard]] vec3 generate(const vec3& incoming_dir) override {
         return ptr->random(o);
     }
 };
@@ -63,7 +66,7 @@ struct mixture_pdf : public pdf {
         return 0.5 * p[0]->value(incoming_dir, out_direction) + 0.5 * p[1]->value(incoming_dir, out_direction);
     }
 
-    [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) const override {
+    [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) override {
         if (random_double() < 0.5)
             return p[0]->generate(incoming_dir);
         else
@@ -73,6 +76,7 @@ struct mixture_pdf : public pdf {
 
 struct Henyey_Greensteing_pdf : public pdf {
     const double g;
+    size_t halton_index1 = 0, hatlon_index2 = 0;
 
     explicit Henyey_Greensteing_pdf(const double g1) : g(g1) {}
 
@@ -82,12 +86,12 @@ struct Henyey_Greensteing_pdf : public pdf {
     }
 
     //returns value in spherical coordinates
-    [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) const override {
+    [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) override {
         //https://math.stackexchange.com/questions/1418262/given-a-vector-and-angle-find-new-vector
-        const auto angle = rand_Henyey_Greensteing(g);
+        const auto angle = rand_Henyey_Greensteing_halton(g, halton_index1);
 
         //select random vector to rotate around
-        const auto rot = random_unit_vector();
+        const auto rot = random_unit_vector_halton(hatlon_index2);
 
         //rotate about the random vector by the angle
         return rotate(incoming_dir, rot, angle);

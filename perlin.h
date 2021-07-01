@@ -61,7 +61,7 @@ class perlin {
 	perlin() : perm_x(perlin_generate_perm()), perm_y(perlin_generate_perm()), perm_z(perlin_generate_perm()){
 		//ranvec = new vec3[point_count];
 		for (int i = 0; i < point_count; i++) {
-			ranvec[i] = unit_vector(vec3::random(-1,1));
+			ranvec[i] = unit_vector(random_vec3(-1,1));
 		}
 	}
 

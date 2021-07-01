@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cmath>
+#include "vec2.h"
 
 using std::sqrt;
 
@@ -11,6 +12,8 @@ struct vec3 {
 	vec3() : e{0,0,0} {}
 	vec3(double e0, double e1, double e2) : e{e0, e1, e2} {}
 	explicit vec3(double E) : e{E,E,E} {}
+	vec3(const vec2 &v, double e2) : e{v.x(), v.y(), e2} {}
+    vec3(double e0, const vec2 &v) : e{e0, v.x(), v.y()} {}
 
 	[[nodiscard]] double x() const {return e[0];}
 	[[nodiscard]] double y() const {return e[1];}
@@ -45,15 +48,6 @@ struct vec3 {
 	[[nodiscard]] inline double length_squared() const {
 		return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
 	}
-
-	inline static vec3 random() {	//static because does not need a particular vec3
-		return vec3(random_double(), random_double(), random_double());
-	}
-
-	inline static vec3 random(const double min, const double max) {
-		return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
-	}
-
 };
 
 
@@ -71,6 +65,14 @@ inline std::ostream& operator << (std::ostream &out, const vec3 &v) {
 
 inline vec3 operator + (const vec3 &u, const vec3 &v) {
 	return vec3(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]);
+}
+
+inline vec3 operator + (const double t, const vec3 &v) {
+    return vec3(t+v.e[0], t+v.e[1], t+v.e[2]);
+}
+
+inline vec3 operator + (const vec3 &v, const double t) {
+    return t + v;
 }
 
 inline vec3 operator - (const vec3 &u, const vec3 &v) {
@@ -105,23 +107,6 @@ inline vec3 unit_vector(const vec3 v) {
 	return v / v.length();
 }
 
-inline vec3 random_in_unit_sphere() {
-	while (true) {
-		const auto p = vec3::random(-1,1);
-		if (p.length_squared() < 1) return p;
-	}
-}
-
-inline vec3 random_in_unit_disk() {
-	while (true) {
-		const auto p = vec3(random_double(-1,1), random_double(-1,1), 0);
-		if (p.length_squared() < 1) return p;
-	}
-}
-
-inline vec3 random_unit_vector() {
-	return unit_vector(random_in_unit_sphere());
-}
 
 inline vec3 reflect(const vec3& v, const vec3& n) {
 	//reflects a vector v about another vector n

@@ -11,11 +11,14 @@ struct xy_rect : public hittable {
 					//k defines z position
 	const double area = 0;
 	const double lx = 0, ly = 0;
+
+	size_t halton_index = 0;
+
 	xy_rect() = delete;
 	xy_rect(const double _x0, const double _x1, const double _y0, const double _y1, const double _k, const shared_ptr<material>& mat)
 		: x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(mat), area( (x1-x0)*(y1-y0)), lx(x1-x0), ly(y1-y0) {};
 
-	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
+	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
 
 	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		//just padding the z direction by a small amount
@@ -24,7 +27,7 @@ struct xy_rect : public hittable {
 		return true;
 	}
 
-    [[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) const override {
+    [[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) override {
         hit_record rec;
         if (!this->hit(ray(origin, v), 0.001, infinity, rec))
             return 0;
@@ -37,8 +40,9 @@ struct xy_rect : public hittable {
         return distance_squared / (cosine * area);
     }
 
-    [[nodiscard]] vec3 random(const point3 &origin) const override {
-        const vec3 random_point = point3(random_double(x0, x1), random_double(y0, y1), k);
+    [[nodiscard]] vec3 random(const point3 &origin) override {
+        //const vec3 random_point = point3(random_double(x0, x1), random_double(y0, y1), k);
+        const vec3 random_point = point3(random_halton_2D(x0, x1, y0, y1, halton_index), k);
         return random_point - origin;
     }
 };
@@ -47,14 +51,15 @@ struct xy_rect : public hittable {
 struct xz_rect : public hittable {
 	const shared_ptr<material> mp;
 	const double x0 = 0, x1 = 0, z0 = 0, z1 = 0, k = 0;	//k defines y position
-  const double area = 0;
+    const double area = 0;
 	const double lx = 0, lz = 0;
+	size_t halton_index = 0;
 
 	xz_rect() = delete;
 	xz_rect(const double _x0, const double _x1, const double _z0, const double _z1, const double _k, const shared_ptr<material>& mat)
 		: x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat), area((x1-x0)*(z1-z0) ), lx(x1-x0), lz(z1-z0) {};
 
-	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
+	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 	
 	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		constexpr double small = 0.0001;
@@ -62,7 +67,7 @@ struct xz_rect : public hittable {
 		return true;
 	}
 
-	[[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) const override {
+	[[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) override {
 	    hit_record rec;
 	    if (!this->hit(ray(origin, v), 0.001, infinity, rec))
 	        return 0;
@@ -74,8 +79,10 @@ struct xz_rect : public hittable {
 	    return distance_squared / (cosine * area);
 	}
 
-	[[nodiscard]] vec3 random(const point3 &origin) const override {
-	    const auto random_point = point3(random_double(x0, x1), k, random_double(z0, z1));
+	[[nodiscard]] vec3 random(const point3 &origin) override {
+	    //const auto random_point = point3(random_double(x0, x1), k, random_double(z0, z1));
+	    const auto r = random_halton_2D(x0, x1, z0, z1, halton_index);
+        const auto random_point = point3(r.x(), k, r.y());
 	    return random_point - origin;
 	}
 };
@@ -84,14 +91,15 @@ struct xz_rect : public hittable {
 struct yz_rect : public hittable {
 	const shared_ptr<material> mp;
 	const double y0 = 0, y1 = 0, z0 = 0, z1 = 0, k = 0;	//k defines x position
-  const double area = 0;
+    const double area = 0;
 	const double lz = 0, ly = 0;
+	size_t halton_index = 0;
 
 	yz_rect() = delete;
 	yz_rect(const double _y0, const double _y1, const double _z0, const double _z1, const double _k, const shared_ptr<material>& mat)
 		: y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(mat), area( (z1-z0)*(y1-y0) ), lz(z1-z0), ly(y1-y0) {};
 
-	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
+	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 
 	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		constexpr double small = 0.0001;
@@ -99,7 +107,7 @@ struct yz_rect : public hittable {
 		return true;
 	}
 
-    [[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) const override {
+    [[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) override {
         hit_record rec;
         if (!this->hit(ray(origin, v), 0.001, infinity, rec))
             return 0;
@@ -111,14 +119,15 @@ struct yz_rect : public hittable {
         return distance_squared / (cosine * area);
     }
 
-    [[nodiscard]] vec3 random(const point3 &origin) const override {
-        const auto random_point = point3(k, random_double(y0, y1), random_double(z0, z1));
+    [[nodiscard]] vec3 random(const point3 &origin) override {
+        //const auto random_point = point3(k, random_double(y0, y1), random_double(z0, z1));
+        const auto random_point = point3(k, random_halton_2D(y0, y1, z0, z1, halton_index));
         return random_point - origin;
     }
 };
 
 
-bool xy_rect::hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const {
+bool xy_rect::hit(const ray&r, const double t_min, const double t_max, hit_record& rec)  {
 	const double t = (k-r.origin().z()) / r.direction().z();	//time of collision - see aabb.h for why this is the case
 
 	if (t < t_min || t > t_max)	//if collision is outside of specified times
@@ -152,7 +161,7 @@ bool xy_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 
 
 
-bool xz_rect::hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const {
+bool xz_rect::hit(const ray&r, const double t_min, const double t_max, hit_record& rec) {
 	const auto t = (k-r.origin().y()) / r.direction().y();	//time of collision - see aabb.h for why this is the case
 
 	if (t < t_min || t > t_max)	//if collision is outside of specified times
@@ -185,7 +194,7 @@ bool xz_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 
 
 
-bool yz_rect::hit(const ray&r, const double t_min, const double t_max, hit_record& rec) const {
+bool yz_rect::hit(const ray&r, const double t_min, const double t_max, hit_record& rec) {
 	const auto t = (k-r.origin().x()) / r.direction().x();	//time of collision - see aabb.h for why this is the case
 
 	if (t < t_min || t > t_max)	//if collision is outside of specified times

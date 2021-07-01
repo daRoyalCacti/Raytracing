@@ -3,37 +3,19 @@
 #include "common.h"
 #include "hittable.h"
 
-/*struct moving_sphere : public hittable {
-	const point3 center0, center1;	//centres of spheres at time0 and time1
-	const double time0 = 0, time1 = 0;
-	const double radius = 0;
-	const shared_ptr<material> mat_ptr;
-
-	moving_sphere() = delete;
-	moving_sphere(const point3 cen0, const point3 cen1, const double _time0, const double _time1, const double r, const shared_ptr<material>& m) :
-		center0(cen0), center1(cen1), time0(_time0), time1(_time1), radius(r), mat_ptr(m) {};
-
-	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
-
-	bool bounding_box(double _time0, double _time1, aabb& output_box) const override;
-
-	[[nodiscard]] inline point3 center(const double time) const {
-		return center0 + (time - time0) / (time1 - time0) * (center1 - center0);
-	}
-};*/
 
 struct moving_sphere : public hittable {
 	const point3 center0;	//centres of spheres at time0 (at time1 not needed)
 	const double time0 = 0, time1 = 0;
 	const double radius = 0;
 	const shared_ptr<material> mat_ptr;
-	const vec3 dc_d_dt = 0;    //(centre1 - centre0)/(time1 - time0)
+	const vec3 dc_d_dt;    //(centre1 - centre0)/(time1 - time0)
 
 	moving_sphere() = delete;
 	moving_sphere(const point3 cen0, const point3 cen1, const double _time0, const double _time1, const double r, const shared_ptr<material>& m) :
 		center0(cen0), time0(_time0), time1(_time1), radius(r), mat_ptr(m), dc_d_dt( (cen1-cen0) / (_time1-_time0)) {};
 
-	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) const override;
+	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 
 	bool bounding_box(double _time0, double _time1, aabb& output_box) const override;
 
@@ -43,7 +25,7 @@ struct moving_sphere : public hittable {
 };
 
 
-bool moving_sphere::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) const {
+bool moving_sphere::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
 	//essentially the same as sphere::hit but center is now center(time)
 	const vec3 oc = r.origin() - center(r.time());
 	const auto a = r.direction().length_squared();

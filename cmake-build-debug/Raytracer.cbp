@@ -87,22 +87,85 @@
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/Halton.hpp">
 			<Option target="Generate"/>
 		</Unit>
-		<Unit filename="/home/jacob/Documents/Projects/Raytracer/ONB.h">
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/ONB.hpp">
 			<Option target="Generate"/>
 		</Unit>
-		<Unit filename="/home/jacob/Documents/Projects/Raytracer/fog.h">
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/aabb.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/aarect.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/box.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/bvh.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/camera.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/color.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/common.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/constant_medium.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/fog.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/hittable.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/hittable_list.hpp">
 			<Option target="Generate"/>
 		</Unit>
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/main.cpp">
 			<Option target="Generate"/>
 		</Unit>
-		<Unit filename="/home/jacob/Documents/Projects/Raytracer/pdf.h">
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/material.hpp">
 			<Option target="Generate"/>
 		</Unit>
-		<Unit filename="/home/jacob/Documents/Projects/Raytracer/probability.h">
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/moving_sphere.hpp">
 			<Option target="Generate"/>
 		</Unit>
-		<Unit filename="/home/jacob/Documents/Projects/Raytracer/vec2.h">
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/pdf.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/perlin.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/probability.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/ray.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/render.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/scenes.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/sphere.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/texture.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/triangle.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/triangle_mesh.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/vec2.hpp">
+			<Option target="Generate"/>
+		</Unit>
+		<Unit filename="/home/jacob/Documents/Projects/Raytracer/vec3.hpp">
 			<Option target="Generate"/>
 		</Unit>
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/CMakeLists.txt">

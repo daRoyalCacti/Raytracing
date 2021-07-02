@@ -1,9 +1,9 @@
-#ifndef RAYTRACER_PROBABILITY_H
-#define RAYTRACER_PROBABILITY_H
+#ifndef RAYTRACER_PROBABILITY_HPP
+#define RAYTRACER_PROBABILITY_HPP
 
 #include <cmath>
-#include "vec3.h"
-#include "vec2.h"
+#include "vec3.hpp"
+#include "vec2.hpp"
 
 
 #include "Halton.hpp"
@@ -149,4 +149,4 @@ inline vec3 random_cosine_direction() {
 }
 
 
-#endif //RAYTRACER_PROBABILITY_H
+#endif //RAYTRACER_PROBABILITY_HPP

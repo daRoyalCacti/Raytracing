@@ -6,7 +6,7 @@
 #include <random>
 
 
-#include "probability.h"
+#include "probability.hpp"
 
 
 constexpr bool log_scanlines = false;  //prints the number of scalines remaining when rendering an image
@@ -42,7 +42,7 @@ inline double clamp(const double x, const double min, const double max) {
 
 
 //common headers
-#include "ray.h"
+#include "ray.hpp"
 //#include "vec3.h" //vec3 now included in probability.h
 
 

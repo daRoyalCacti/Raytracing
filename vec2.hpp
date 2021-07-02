@@ -2,8 +2,8 @@
 // Created by jacob on 30/6/21.
 //
 
-#ifndef RAYTRACER_VEC2_H
-#define RAYTRACER_VEC2_H
+#ifndef RAYTRACER_VEC2_HPP
+#define RAYTRACER_VEC2_HPP
 
 struct vec2 {
     double e[2];
@@ -30,4 +30,4 @@ inline vec2 operator + (const vec2 &v, const double t) {
     return t + v;
 }
 
-#endif //RAYTRACER_VEC2_H
+#endif //RAYTRACER_VEC2_HPP

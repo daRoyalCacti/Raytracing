@@ -1,9 +1,9 @@
-#ifndef RAYTRACER_PDF_H
-#define RAYTRACER_PDF_H
+#ifndef RAYTRACER_PDF_HPP
+#define RAYTRACER_PDF_HPP
 
-#include "ONB.h"
-#include "probability.h"
-#include "hittable.h"
+#include "ONB.hpp"
+#include "probability.hpp"
+#include "hittable.hpp"
 
 
 struct pdf {
@@ -99,4 +99,4 @@ struct Henyey_Greensteing_pdf : public pdf {
 
 
 
-#endif //RAYTRACER_PDF_H
+#endif //RAYTRACER_PDF_HPP

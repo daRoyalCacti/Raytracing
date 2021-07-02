@@ -1,7 +1,7 @@
 #pragma once
 
-#include "common.h"
-#include "aabb.h"
+#include "common.hpp"
+#include "aabb.hpp"
 
 struct material;
 

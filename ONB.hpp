@@ -1,7 +1,7 @@
 //ONB = orthonormal basis
 
-#ifndef RAYTRACER_ONB_H
-#define RAYTRACER_ONB_H
+#ifndef RAYTRACER_ONB_HPP
+#define RAYTRACER_ONB_HPP
 
 struct onb {
     const vec3 axis[3];
@@ -37,4 +37,4 @@ struct onb {
 
 };
 
-#endif //RAYTRACER_ONB_H
+#endif //RAYTRACER_ONB_HPP

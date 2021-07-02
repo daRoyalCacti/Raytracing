@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "hittable.h"
-#include "common.h"
+#include "hittable.hpp"
+#include "common.hpp"
 
 struct triangle : public hittable {
 	const std::shared_ptr<material> mp;

@@ -1,10 +1,10 @@
 
-#ifndef RAYTRACER_FOG_H
-#define RAYTRACER_FOG_H
+#ifndef RAYTRACER_FOG_HPP
+#define RAYTRACER_FOG_HPP
 
 #include <functional>
-#include "material.h"
-#include "pdf.h"
+#include "material.hpp"
+#include "pdf.hpp"
 
 struct participating_medium {
     const shared_ptr<pdf> prob_density;
@@ -36,4 +36,4 @@ struct basic_constant_fog : public participating_medium {
 
 };
 
-#endif //RAYTRACER_FOG_H
+#endif //RAYTRACER_FOG_HPP

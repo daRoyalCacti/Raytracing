@@ -2,20 +2,20 @@
 
 #include <utility>
 
-#include "camera.h"
-#include "hittable.h"
-#include "sphere.h"
-#include "moving_sphere.h"
-#include "aarect.h"
-#include "box.h"
-#include "constant_medium.h"
+#include "camera.hpp"
+#include "hittable.hpp"
+#include "sphere.hpp"
+#include "moving_sphere.hpp"
+#include "aarect.hpp"
+#include "box.hpp"
+#include "constant_medium.hpp"
 
-#include "common.h"
-#include "bvh.h"
-#include "fog.h"
+#include "common.hpp"
+#include "bvh.hpp"
+#include "fog.hpp"
 
-#include "triangle.h"
-#include "triangle_mesh.h"
+#include "triangle.hpp"
+#include "triangle_mesh.hpp"
 
 constexpr double aspec1 = 16.0/9.0;
 

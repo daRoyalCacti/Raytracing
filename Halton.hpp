@@ -9,8 +9,8 @@
 #include <array>
 #include <cmath>
 #include <algorithm>    //for std::shuffle
-#include "vec2.h"
-#include "vec3.h"
+#include "vec2.hpp"
+#include "vec3.hpp"
 
 
 #define run_time_Halton_set //must be defined above the include

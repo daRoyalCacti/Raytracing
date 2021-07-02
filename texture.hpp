@@ -1,8 +1,8 @@
 #pragma once
 
-#include "common.h"
+#include "common.hpp"
 
-#include "perlin.h"
+#include "perlin.hpp"
 #include "stb_image_ne.h"
 
 struct texture {

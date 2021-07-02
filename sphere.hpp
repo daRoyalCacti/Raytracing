@@ -1,8 +1,8 @@
 #pragma once
 
-#include "hittable.h"
-#include "vec3.h"
-#include "material.h"
+#include "hittable.hpp"
+#include "vec3.hpp"
+#include "material.hpp"
 
 struct sphere : public hittable {
 	const point3 center;

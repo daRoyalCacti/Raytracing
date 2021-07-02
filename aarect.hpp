@@ -1,9 +1,9 @@
 //axis aligned rectangle
 #pragma once
 
-#include "common.h"
+#include "common.hpp"
 
-#include "hittable.h"
+#include "hittable.hpp"
 
 struct xy_rect : public hittable {
 	const shared_ptr<material> mp;

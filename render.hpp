@@ -1,10 +1,10 @@
 #pragma once
 
-#include "common.h"
-#include "camera.h"
-#include "color.h"
-#include "hittable_list.h"
-#include "scenes.h"
+#include "common.hpp"
+#include "camera.hpp"
+#include "color.hpp"
+#include "hittable_list.hpp"
+#include "scenes.hpp"
 
 #include <fstream>
 #include <utility>

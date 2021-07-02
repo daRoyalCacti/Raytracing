@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include "common.hpp"
 
 class camera {
 	const point3 origin;    //camera is positioned

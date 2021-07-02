@@ -3,10 +3,10 @@
 
 #include <algorithm>
 
-#include "common.h"
+#include "common.hpp"
 
-#include "hittable.h"
-#include "hittable_list.h"
+#include "hittable.hpp"
+#include "hittable_list.hpp"
 
 struct bvh_node : public hittable {
 	shared_ptr<hittable> left;	//left and right nodes on the tree

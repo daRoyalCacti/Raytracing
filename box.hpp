@@ -1,9 +1,9 @@
 #pragma once
 
-#include "common.h"
+#include "common.hpp"
 
-#include "aarect.h"
-#include "hittable_list.h"
+#include "aarect.hpp"
+#include "hittable_list.hpp"
 
 struct box : public hittable {
 	const point3 box_min;		//min and max define the corners of the box

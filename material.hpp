@@ -1,11 +1,11 @@
 #pragma once
 
-#include "common.h"
-#include "ONB.h"
-#include "probability.h"
-#include "pdf.h"
+#include "common.hpp"
+#include "ONB.hpp"
+#include "probability.hpp"
+#include "pdf.hpp"
 
-#include "texture.h"
+#include "texture.hpp"
 
 struct hit_record;
 

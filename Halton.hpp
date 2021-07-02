@@ -87,11 +87,13 @@ struct Halton_set {
     std::array<vec2, N> halton_set_2D;
     std::array<vec3, N> halton_set_3D;
 
+    static constexpr unsigned leap = 409;
+
     Halton_set() {
         for (unsigned i = 0; i < N; i++) {
-            halton_set_1D[i] = Halton::get_halton<2>(i/2);
-            halton_set_2D[i] = vec2(halton_set_1D[i], Halton::get_halton<3>(i/2));
-            halton_set_3D[i] = vec3(halton_set_2D[i], Halton::get_halton<5>(i/2));
+            halton_set_1D[i] = Halton::get_halton<2>(leap*i);
+            halton_set_2D[i] = vec2(halton_set_1D[i], Halton::get_halton<3>(leap*i));
+            halton_set_3D[i] = vec3(halton_set_2D[i], Halton::get_halton<5>(leap*i));
         }
     }
 };

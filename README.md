@@ -99,7 +99,7 @@ This is planned on being accounted for by considering the rate of change of the 
 
 
 ## Halton sequence
-The raytracer originally generated pseudo-random numbers using the Mersenne Twister 19937 generator.
+The raytracer originally generated pseudo-random numbers using the [Mersenne Twister 19937 generator](https://en.wikipedia.org/wiki/Mersenne_twister).
 This was then replaced using the [Halton sequence](https://en.wikipedia.org/wiki/Halton_sequence).
 1D random numbers are generated with a base of 2,
 2D uses a base of 2 and a base of 3 (for each component respectively),

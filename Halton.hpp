@@ -87,6 +87,8 @@ struct Halton_set {
     std::array<vec2, N> halton_set_2D;
     std::array<vec3, N> halton_set_3D;
 
+    //only taking every <leap> value of the sequence
+    // can improve convergence, see https://en.wikipedia.org/wiki/Halton_sequence
     static constexpr unsigned leap = 409;
 
     Halton_set() {

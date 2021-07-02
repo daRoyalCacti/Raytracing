@@ -76,6 +76,44 @@ This is enough to maintain constant 100% CPU usage.
 
 It is planned to add SIMD in the future.
 
+
+## Drawing on convergence
+The method of drawing was originally to send a large number of rays from each pixel.
+I developed a method (I doubt I was the first to however) that sent initially only a small
+number of rays into the scene, and determined how quickly the colour was changing
+(see code for full details).
+The faster the colour of the pixel was changing the more rays were sent to it
+(as a quickly changing colour means the initial colour was very wrong, and an unchanging colour means the colour is correct).
+Once all pixels were converging slowly enough, the image was considered rendered.
+
+This method works for oscillating convergence.
+Even if the convergence is slow then rays are still sent to the pixel.
+If the convergence is oscillating, then these rays should cause a large change 
+in the colour which means next iteration more rays will be sent.
+
+This method does not work for long tailed convergence (i.e. the convergence is slow
+but the rate of convergence is slow meaning it will still take many more iterations to
+get an accurate value).
+This is planned on being accounted for by considering the rate of change of the convergence
+(i.e. considering the second derivative and the derivative).
+
+
+## Halton sequence
+The raytracer originally generated pseudo-random numbers using the Mersenne Twister 19937 generator.
+This was then replaced using the [Halton sequence](https://en.wikipedia.org/wiki/Halton_sequence).
+1D random numbers are generated with a base of 2,
+2D uses a base of 2 and a base of 3 (for each component respectively),
+and 3D uses a base of  2, 3 and 5.
+An array of these numbers was generated for each dimension. 
+Getting a random number involves reading from the next element in the array.
+
+Every instance where random numbers were used in the rendering (as opposed to, for example, setting object positions)
+was replaced with the Halton sequence.
+This lead to a 20% reduction in computation time.
+This does not conform with the results of [Berblinger and Schlier](https://doi.org/10.1016%2F0010-4655%2891%2990064-R) 
+which found an order of magnitude reduction in computation time.
+This is likely because the test case used only ran for 3 minutes.
+
 ## Images
 All images created are available in [/images](https://github.com/daRoyalCacti/Raytracing_GPU/tree/master/images). Some noteworthy images are seen below.
 

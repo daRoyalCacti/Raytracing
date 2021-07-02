@@ -1,23 +1,20 @@
 #pragma once
 
-#include "common.hpp"
-
 #include "hittable.hpp"
 #include "material.hpp"
-#include "texture.hpp"
 
 struct constant_medium : public hittable {
-	const shared_ptr<hittable> boundary;
-	const shared_ptr<material> phase_function;
+	const std::shared_ptr<hittable> boundary;
+	const std::shared_ptr<material> phase_function;
 	const double neg_inv_density;		//required to move info from constructor to hit
 	size_t halton_index = 0;
 	
 	//d for density
-	constant_medium(const shared_ptr<hittable> &b, const double d, const shared_ptr<texture> &a)
-		: boundary(b), neg_inv_density(-1/d), phase_function(make_shared<isotropic>(a)) {};
+	constant_medium(std::shared_ptr<hittable> b, const double d, const std::shared_ptr<texture> &a)
+		: boundary(std::move(b)), neg_inv_density(-1/d), phase_function(std::make_shared<isotropic>(a)) {};
 
-	constant_medium(const shared_ptr<hittable> &b, const double d, const color c)
-		: boundary(b), neg_inv_density(-1/d), phase_function(make_shared<isotropic>(c)) {};
+	constant_medium(std::shared_ptr<hittable> b, const double d, const color c)
+		: boundary(std::move(b)), neg_inv_density(-1/d), phase_function(std::make_shared<isotropic>(c)) {};
 
 	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
 

@@ -2,8 +2,8 @@
 #define RAYTRACER_PROBABILITY_HPP
 
 #include <cmath>
+#include <random>
 #include "vec3.hpp"
-#include "vec2.hpp"
 
 
 #include "Halton.hpp"

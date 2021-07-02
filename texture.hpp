@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common.hpp"
 
 #include "perlin.hpp"
 #include "stb_image_ne.h"
@@ -24,12 +23,12 @@ struct solid_color : public texture {
 
 
 struct checker_texture : public texture {
-	const shared_ptr<texture> odd;
-	const shared_ptr<texture> even;
+	const std::shared_ptr<texture> odd;
+	const std::shared_ptr<texture> even;
 
 	checker_texture() = delete;
-	checker_texture(const shared_ptr<texture>& _even, const shared_ptr<texture>& _odd) : even(_even), odd(_odd) {}
-	checker_texture(const color c1, const color c2) : even(make_shared<solid_color>(c1)), odd(make_shared<solid_color>(c2)) {}
+	checker_texture(std::shared_ptr<texture> _even, std::shared_ptr<texture> _odd) : even(std::move(_even)), odd(std::move(_odd)) {}
+	checker_texture(const color c1, const color c2) : even(std::make_shared<solid_color>(c1)), odd(std::make_shared<solid_color>(c2)) {}
 
 	[[nodiscard]] color value(const double u, const double v, const point3& p) const override {
 		const auto sines = sin(10*p.x()) * sin(10*p.y()) * sin(10*p.z());	//essentially a 4D sine wave
@@ -120,8 +119,8 @@ class image_texture : public texture {
 			return color(0, 1, 1);
 
 		//Clamp input texture coordinates to [0,1]^2
-		const auto uu = clamp(u, 0.0, 1.0);
-		const auto vv = 1.0 - clamp(v, 0.0, 1.0);	//Flip v to image coordinates
+		const auto uu = std::clamp(u, 0.0, 1.0);
+		const auto vv = 1.0 - std::clamp(v, 0.0, 1.0);	//Flip v to image coordinates
 
 		auto i = static_cast<int>(uu*width);
 		auto j = static_cast<int>(vv*height);

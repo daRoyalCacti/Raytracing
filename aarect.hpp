@@ -1,12 +1,10 @@
 //axis aligned rectangle
 #pragma once
 
-#include "common.hpp"
-
 #include "hittable.hpp"
 
 struct xy_rect : public hittable {
-	const shared_ptr<material> mp;
+	const std::shared_ptr<material> mp;
 	const double x0 = 0, x1 = 0, y0 = 0, y1 = 0, k = 0;	//x's and y's define a rectangle in the standard way
 					//k defines z position
 	const double area = 0;
@@ -15,19 +13,19 @@ struct xy_rect : public hittable {
 	size_t halton_index = 0;
 
 	xy_rect() = delete;
-	xy_rect(const double _x0, const double _x1, const double _y0, const double _y1, const double _k, const shared_ptr<material>& mat)
+	xy_rect(const double _x0, const double _x1, const double _y0, const double _y1, const double _k, const std::shared_ptr<material>& mat)
 		: x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(mat), area( (x1-x0)*(y1-y0)), lx(x1-x0), ly(y1-y0) {};
 
 	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
 
-	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+	inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		//just padding the z direction by a small amount
 		constexpr double small = 0.0001;
 		output_box = aabb(point3(x0, y0, k-small), point3(x1, y1, k+small));
 		return true;
 	}
 
-    [[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) override {
+    [[nodiscard]] inline double pdf_value(const point3 &origin, const vec3 &v) override {
         hit_record rec;
         if (!this->hit(ray(origin, v), 0.001, infinity, rec))
             return 0;
@@ -40,7 +38,7 @@ struct xy_rect : public hittable {
         return distance_squared / (cosine * area);
     }
 
-    [[nodiscard]] vec3 random(const point3 &origin) override {
+    [[nodiscard]] inline vec3 random(const point3 &origin) override {
         //const vec3 random_point = point3(random_double(x0, x1), random_double(y0, y1), k);
         const vec3 random_point = point3(random_halton_2D(x0, x1, y0, y1, halton_index), k);
         return random_point - origin;
@@ -49,25 +47,25 @@ struct xy_rect : public hittable {
 
 //very similar to xy rect -- see for comments
 struct xz_rect : public hittable {
-	const shared_ptr<material> mp;
+	const std::shared_ptr<material> mp;
 	const double x0 = 0, x1 = 0, z0 = 0, z1 = 0, k = 0;	//k defines y position
     const double area = 0;
 	const double lx = 0, lz = 0;
 	size_t halton_index = 0;
 
 	xz_rect() = delete;
-	xz_rect(const double _x0, const double _x1, const double _z0, const double _z1, const double _k, const shared_ptr<material>& mat)
+	xz_rect(const double _x0, const double _x1, const double _z0, const double _z1, const double _k, const std::shared_ptr<material>& mat)
 		: x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat), area((x1-x0)*(z1-z0) ), lx(x1-x0), lz(z1-z0) {};
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
-	
-	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+
+    inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		constexpr double small = 0.0001;
 		output_box = aabb(point3(x0, k-small, z1), point3(x1, k+small, z1));
 		return true;
 	}
 
-	[[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) override {
+	[[nodiscard]] inline double pdf_value(const point3 &origin, const vec3 &v) override {
 	    hit_record rec;
 	    if (!this->hit(ray(origin, v), 0.001, infinity, rec))
 	        return 0;
@@ -79,7 +77,7 @@ struct xz_rect : public hittable {
 	    return distance_squared / (cosine * area);
 	}
 
-	[[nodiscard]] vec3 random(const point3 &origin) override {
+	[[nodiscard]] inline vec3 random(const point3 &origin) override {
 	    //const auto random_point = point3(random_double(x0, x1), k, random_double(z0, z1));
 	    const auto r = random_halton_2D(x0, x1, z0, z1, halton_index);
         const auto random_point = point3(r.x(), k, r.y());
@@ -89,25 +87,25 @@ struct xz_rect : public hittable {
 
 //very similar to xy rect -- see for comments
 struct yz_rect : public hittable {
-	const shared_ptr<material> mp;
+	const std::shared_ptr<material> mp;
 	const double y0 = 0, y1 = 0, z0 = 0, z1 = 0, k = 0;	//k defines x position
     const double area = 0;
 	const double lz = 0, ly = 0;
 	size_t halton_index = 0;
 
 	yz_rect() = delete;
-	yz_rect(const double _y0, const double _y1, const double _z0, const double _z1, const double _k, const shared_ptr<material>& mat)
+	yz_rect(const double _y0, const double _y1, const double _z0, const double _z1, const double _k, const std::shared_ptr<material>& mat)
 		: y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(mat), area( (z1-z0)*(y1-y0) ), lz(z1-z0), ly(y1-y0) {};
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 
-	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+    inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		constexpr double small = 0.0001;
 		output_box = aabb(point3(k-small, y0, z0), point3(k+small, y1, z1));
 		return true;
 	}
 
-    [[nodiscard]] double pdf_value(const point3 &origin, const vec3 &v) override {
+    [[nodiscard]] inline double pdf_value(const point3 &origin, const vec3 &v) override {
         hit_record rec;
         if (!this->hit(ray(origin, v), 0.001, infinity, rec))
             return 0;
@@ -119,7 +117,7 @@ struct yz_rect : public hittable {
         return distance_squared / (cosine * area);
     }
 
-    [[nodiscard]] vec3 random(const point3 &origin) override {
+    [[nodiscard]] inline vec3 random(const point3 &origin) override {
         //const auto random_point = point3(k, random_double(y0, y1), random_double(z0, z1));
         const auto random_point = point3(k, random_halton_2D(y0, y1, z0, z1, halton_index));
         return random_point - origin;

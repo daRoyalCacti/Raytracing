@@ -1,9 +1,9 @@
 #ifndef RAYTRACER_PDF_HPP
 #define RAYTRACER_PDF_HPP
 
+#include "hittable.hpp"
 #include "ONB.hpp"
 #include "probability.hpp"
-#include "hittable.hpp"
 
 
 struct pdf {
@@ -36,10 +36,10 @@ struct cosine_pdf : public pdf {
 
 struct hittable_pdf : public pdf {
     const point3 o;
-    const shared_ptr<hittable> ptr;
+    const std::shared_ptr<hittable> ptr;
 
     hittable_pdf() = delete;
-    hittable_pdf(const shared_ptr<hittable> &p, const point3& origin) : ptr(p), o(origin) {}
+    hittable_pdf(std::shared_ptr<hittable> p, const point3& origin) : ptr(std::move(p)), o(origin) {}
 
     [[nodiscard]] double value(const vec3& incoming_dir, const vec3& out_direction) const override {
         return ptr->pdf_value(o, out_direction);
@@ -53,10 +53,10 @@ struct hittable_pdf : public pdf {
 
 
 struct mixture_pdf : public pdf {
-    const shared_ptr<pdf> p[2];
+    const std::shared_ptr<pdf> p[2];
 
     mixture_pdf() = delete;
-    mixture_pdf(const shared_ptr<pdf> &p0, const shared_ptr<pdf> &p1) : p{p0, p1} {
+    mixture_pdf(const std::shared_ptr<pdf> &p0, const std::shared_ptr<pdf> &p1) : p{p0, p1} {
         //p[0] = p0;
         //p[1]= p1;
     }

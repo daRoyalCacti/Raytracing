@@ -1,34 +1,30 @@
 #pragma once
 
-#include "hittable.hpp"
 #include "aabb.hpp"
-
-#include <memory>
+#include "hittable.hpp"
 #include <vector>
 
 
-using std::shared_ptr;
-using std::make_shared;
 
 struct hittable_list : public hittable {
-	std::vector<shared_ptr<hittable>> objects;
+	std::vector<std::shared_ptr<hittable>> objects;
     size_t halton_index= 0;
 
 	hittable_list() = default;
 	//explicit hittable_list(const shared_ptr<hittable> &object) {add(object);}
 
     [[maybe_unused]] void clear() {objects.clear();}
-	void add(const shared_ptr<hittable>& object) {objects.push_back(object);}
+	void add(const std::shared_ptr<hittable>& object) {objects.push_back(object);}
 	void reserve(const size_t N) {objects.reserve(N);}
 
-	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
+	inline bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
 	bool bounding_box(double time0, double time1, aabb& output_box) const override;
 
     [[nodiscard]] double pdf_value(const point3& o, const vec3& v) override;
     [[nodiscard]] vec3 random(const point3& o) override;
 };
 
-bool hittable_list::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
+inline bool hittable_list::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
 	hit_record temp_rec;
 	bool hit_anything = false;
 	auto closest_so_far = t_max;

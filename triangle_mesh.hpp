@@ -1,22 +1,20 @@
 #pragma once
 
 #include "triangle.hpp"
-
 #include <vector>
 #include <string>
 
 //for loading a model
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 
 struct triangle_mesh : public hittable {
-	const shared_ptr<bvh_node> tris;
+	const std::shared_ptr<bvh_node> tris;
 
 	triangle_mesh() = delete;
-	triangle_mesh(hittable_list &triangles, const double time0, const double time1) : tris(make_shared<bvh_node>(triangles,time0, time1)) {}
+	triangle_mesh(hittable_list &triangles, const double time0, const double time1) : tris(std::make_shared<bvh_node>(triangles,time0, time1)) {}
 
 
 	inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
@@ -146,7 +144,7 @@ std::shared_ptr<triangle_mesh> generate_model(const std::string& file_name, cons
 	std::string file_dir = file_name.substr(0, file_name.find_last_of('/') );
 	file_dir.append("/");
 
-	auto current_material = make_shared<lambertian>(make_shared<image_texture>(file_dir.append(tex_paths[0]).c_str()) );
+	auto current_material = make_shared<lambertian>(std::make_shared<image_texture>(file_dir.append(tex_paths[0]).c_str()) );
 
 	for (int i = 0; i < indices.size(); i += 3) {
 		triangles.add(make_shared<triangle>(	vec3(vertices[ 3*indices[i] ],		//each element of indices refers to 1 vertex
@@ -188,7 +186,7 @@ std::shared_ptr<triangle_mesh> generate_model(const std::string& file_name, cons
 
 	}
 
-	return make_shared<triangle_mesh>(triangles, 0, 1);
+	return std::make_shared<triangle_mesh>(triangles, 0, 1);
 
 }
 

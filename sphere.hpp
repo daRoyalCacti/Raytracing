@@ -7,12 +7,12 @@
 struct sphere : public hittable {
 	const point3 center;
 	const double radius = 0;
-	const shared_ptr<material> mat_ptr;
+	const std::shared_ptr<material> mat_ptr;
 
 	size_t halton_index = 0;
 
 	sphere() = delete;
-	sphere(const point3 cen, const double r, const shared_ptr<material>& m): center(cen), radius(r), mat_ptr(m) {}
+	sphere(const point3 cen, const double r, const std::shared_ptr<material>& m): center(cen), radius(r), mat_ptr(m) {}
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 	bool bounding_box(double time0, double time1, aabb& output_box) const override;

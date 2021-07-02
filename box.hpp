@@ -1,8 +1,5 @@
 #pragma once
 
-#include "common.hpp"
-
-#include "aarect.hpp"
 #include "hittable_list.hpp"
 
 struct box : public hittable {
@@ -11,19 +8,19 @@ struct box : public hittable {
 	hittable_list sides;
 
 	box() = delete;
-	box(const point3& p0, const point3& p1, const shared_ptr<material> &ptr);
+	box(const point3& p0, const point3& p1, const std::shared_ptr<material> &ptr);
 
-	bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
+    inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
 		return sides.hit(r, t_min, t_max, rec);
 	}
 
-	bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
+    inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		output_box = aabb(box_min, box_max);
 		return true;
 	}
 };
 
-box::box(const point3& p0, const point3& p1, const shared_ptr<material> &ptr) : box_min(p0), box_max(p1) {
+box::box(const point3& p0, const point3& p1, const std::shared_ptr<material> &ptr) : box_min(p0), box_max(p1) {
     sides.reserve(6);
 	sides.add(make_shared<xy_rect>(p0.x(), p1.x(), p0.y(), p1.y(), p1.z(), ptr));
 	sides.add(make_shared<xy_rect>(p0.x(), p1.x(), p0.y(), p1.y(), p0.z(), ptr));

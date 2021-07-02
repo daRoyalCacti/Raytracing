@@ -3,40 +3,35 @@
 
 #include <algorithm>
 
-#include "common.hpp"
-
-#include "hittable.hpp"
 #include "hittable_list.hpp"
 
 struct bvh_node : public hittable {
-	shared_ptr<hittable> left;	//left and right nodes on the tree
-	shared_ptr<hittable> right;
+    std::shared_ptr<hittable> left;	//left and right nodes on the tree
+    std::shared_ptr<hittable> right;
 	aabb box;			//the box for the current node
 
 	bvh_node() = default;
 	bvh_node(const hittable_list& list, const double time0, const double time1) : bvh_node(list.objects, 0, list.objects.size(), time0, time1) {}
-	bvh_node(const std::vector<shared_ptr<hittable>>& src_objects, size_t start, size_t end, double time0, double time1);
+	bvh_node(const std::vector<std::shared_ptr<hittable>>& src_objects, size_t start, size_t end, double time0, double time1);
 
-	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
-	bool bounding_box(double time0, double time1, aabb& output_box) const override;
+    inline bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override{
+        if (!box.hit(r, t_min, t_max)) return false;	//if it didn't hit the large bounding box
+
+        const bool hit_left = left->hit(r, t_min, t_max, rec);	//did the ray hit the left hittable
+        const bool hit_right = right->hit(r, t_min, hit_left ? rec.t : t_max, rec);	//did the ray hit the right hittable
+        //if the ray hit the left, check to make sure it hit the right before the left
+        // - so rec is set correctly
+        return hit_left || hit_right;
+    }
+
+	inline bool bounding_box(double time0, double time1, aabb& output_box) const override{
+        output_box = box;
+        return true;
+    }
 };
 
-bool bvh_node::bounding_box(const double time0, const double time1, aabb& output_box) const {
-	output_box = box;
-	return true;
-}
 
-bool bvh_node::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
-	if (!box.hit(r, t_min, t_max)) return false;	//if it didn't hit the large bounding box
-
-	const bool hit_left = left->hit(r, t_min, t_max, rec);	//did the ray hit the left hittable
-	const bool hit_right = right->hit(r, t_min, hit_left ? rec.t : t_max, rec);	//did the ray hit the right hittable
-											//if the ray hit the left, check to make sure it hit the right before the left
-											// - so rec is set correctly
-	return hit_left || hit_right;
-}
-
-inline bool box_compare(const shared_ptr<hittable>& a, const shared_ptr<hittable>& b, const int axis) {
+inline bool box_compare(const std::shared_ptr<hittable>& a, const std::shared_ptr<hittable>& b, const int axis) {
 	aabb box_a;
 	aabb box_b;
 
@@ -46,21 +41,21 @@ inline bool box_compare(const shared_ptr<hittable>& a, const shared_ptr<hittable
 	return box_a.min()[axis] < box_b.min()[axis];
 }
 
-bool box_x_compare (const shared_ptr<hittable> &a, const shared_ptr<hittable> &b) {
+inline bool box_x_compare (const std::shared_ptr<hittable> &a, const std::shared_ptr<hittable> &b) {
 	return box_compare(a, b, 0);
 }
 
 
-inline bool box_y_compare (const shared_ptr<hittable> &a, const shared_ptr<hittable> &b) {
+inline bool box_y_compare (const std::shared_ptr<hittable> &a, const std::shared_ptr<hittable> &b) {
 	return box_compare(a, b, 1);
 }
 
 
-inline bool box_z_compare (const shared_ptr<hittable> &a, const shared_ptr<hittable> &b) {
+inline bool box_z_compare (const std::shared_ptr<hittable> &a, const std::shared_ptr<hittable> &b) {
 	return box_compare(a, b, 2);
 }
 
-bvh_node::bvh_node(const std::vector<shared_ptr<hittable>>& src_objects, const size_t start, const size_t end, const double time0, const double time1) {
+bvh_node::bvh_node(const std::vector<std::shared_ptr<hittable>>& src_objects, const size_t start, const size_t end, const double time0, const double time1) {
 	auto objects = src_objects;	//Create a modifiable array for the source scene objects
 
 	const auto axis = random_int(0,2);

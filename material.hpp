@@ -1,10 +1,7 @@
 #pragma once
 
-#include "common.hpp"
 #include "ONB.hpp"
-#include "probability.hpp"
 #include "pdf.hpp"
-
 #include "texture.hpp"
 
 struct hit_record;
@@ -13,7 +10,7 @@ struct scatter_record {
     ray specular_ray;
     bool is_specular;
     color attenuation;
-    shared_ptr<pdf> pdf_ptr;
+    std::shared_ptr<pdf> pdf_ptr;
 };
 
 struct material {
@@ -30,16 +27,16 @@ struct material {
 };
 
 struct lambertian : public material {
-	const shared_ptr<texture> albedo;
+	const std::shared_ptr<texture> albedo;
 
 	lambertian() = delete;
-	explicit lambertian(const color& a) : albedo(make_shared<solid_color>(a)) {}
-	explicit lambertian(const shared_ptr<texture>& a) : albedo(a) {}
+	explicit lambertian(const color& a) : albedo(std::make_shared<solid_color>(a)) {}
+	explicit lambertian(std::shared_ptr<texture> a) : albedo(std::move(a)) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) override {
 		srec.is_specular = false;
 		srec.attenuation = albedo->value(rec.u, rec.v, rec.p);
-		srec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
+		srec.pdf_ptr = std::make_shared<cosine_pdf>(rec.normal);
 		return true;
 	}
 
@@ -51,15 +48,15 @@ struct lambertian : public material {
 
 
 struct metal : public material {
-	const shared_ptr<texture> albedo;
+	const std::shared_ptr<texture> albedo;
 	const double fuzz = 0;	//how much light spreads out on collision
 			//fuzz = 0 for perfect reflections
 			//fuzz = 1 for very fuzzy reflections
 	size_t halton_counter = 0;
 
 	metal() = delete;
-	explicit metal(const color& a, const double f = 0) : albedo(make_shared<solid_color>(a)), fuzz(f) {}
-	explicit metal(const shared_ptr<texture>& a, const double f = 0) : albedo(a), fuzz(f) {}
+	explicit metal(const color& a, const double f = 0) : albedo(std::make_shared<solid_color>(a)), fuzz(f) {}
+	explicit metal(std::shared_ptr<texture> a, const double f = 0) : albedo(std::move(a)), fuzz(f) {}
 
 	inline bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) override {
 		const vec3 reflected = reflect(unit_vector(ray_in.direction()), rec.normal);	//the incoming ray reflected about the normal
@@ -128,11 +125,11 @@ struct dielectric : public material {
 
 
 struct diffuse_light : public material {
-	const shared_ptr<texture> emit;
+	const std::shared_ptr<texture> emit;
 
 	diffuse_light() = delete;
-	explicit diffuse_light(const shared_ptr<texture>& a) : emit(a) {}
-	explicit diffuse_light(const color c) : emit(make_shared<solid_color>(c)) {}
+	explicit diffuse_light(std::shared_ptr<texture> a) : emit(std::move(a)) {}
+	explicit diffuse_light(const color c) : emit(std::make_shared<solid_color>(c)) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) override {
 		return false;
@@ -148,12 +145,12 @@ struct diffuse_light : public material {
 
 //for scattering
 struct isotropic : public material {
-	const shared_ptr<texture> albedo;
+	const std::shared_ptr<texture> albedo;
 	size_t halton_counter = 0;
 
 	isotropic() = delete;
-	explicit isotropic(const color c) : albedo(make_shared<solid_color>(c)) {}
-	explicit isotropic(const shared_ptr<texture> &a) : albedo(a) {}
+	explicit isotropic(const color c) : albedo(std::make_shared<solid_color>(c)) {}
+	explicit isotropic(std::shared_ptr<texture> a) : albedo(std::move(a)) {}
 
 	inline bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) override {
 	    srec.is_specular = true;    //not sure

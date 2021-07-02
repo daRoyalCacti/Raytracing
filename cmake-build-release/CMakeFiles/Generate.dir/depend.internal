@@ -10,10 +10,10 @@ CMakeFiles/Generate.dir/main.cpp.o
  /home/jacob/Documents/Projects/Raytracer/bvh.hpp
  /home/jacob/Documents/Projects/Raytracer/camera.hpp
  /home/jacob/Documents/Projects/Raytracer/color.hpp
- /home/jacob/Documents/Projects/Raytracer/common.hpp
  /home/jacob/Documents/Projects/Raytracer/constant_medium.hpp
  /home/jacob/Documents/Projects/Raytracer/external/stb_image.h
  /home/jacob/Documents/Projects/Raytracer/fog.hpp
+ /home/jacob/Documents/Projects/Raytracer/helpful.hpp
  /home/jacob/Documents/Projects/Raytracer/hittable.hpp
  /home/jacob/Documents/Projects/Raytracer/hittable_list.hpp
  /home/jacob/Documents/Projects/Raytracer/main.cpp

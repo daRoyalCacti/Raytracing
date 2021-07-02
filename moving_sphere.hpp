@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common.hpp"
 #include "hittable.hpp"
 
 
@@ -8,12 +7,12 @@ struct moving_sphere : public hittable {
 	const point3 center0;	//centres of spheres at time0 (at time1 not needed)
 	const double time0 = 0, time1 = 0;
 	const double radius = 0;
-	const shared_ptr<material> mat_ptr;
+	const std::shared_ptr<material> mat_ptr;
 	const vec3 dc_d_dt;    //(centre1 - centre0)/(time1 - time0)
 
 	moving_sphere() = delete;
-	moving_sphere(const point3 cen0, const point3 cen1, const double _time0, const double _time1, const double r, const shared_ptr<material>& m) :
-		center0(cen0), time0(_time0), time1(_time1), radius(r), mat_ptr(m), dc_d_dt( (cen1-cen0) / (_time1-_time0)) {};
+	moving_sphere(const point3 cen0, const point3 cen1, const double _time0, const double _time1, const double r, std::shared_ptr<material> m) :
+		center0(cen0), time0(_time0), time1(_time1), radius(r), mat_ptr(std::move(m)), dc_d_dt( (cen1-cen0) / (_time1-_time0)) {};
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 

@@ -2,6 +2,8 @@
 //are parallelepipeds that are aligned to the axes that bound objects in the scene
 //used to speed of light ray intersections
 
+#include "ray.hpp"
+
 #pragma once
 
 struct aabb {
@@ -26,10 +28,10 @@ struct aabb {
 									// d is the distance from origin to bounding box in a single direction
 									// - so d = (min.x - origin.x)   (see picture above)
 									// the ray is defined as r = r0 + dir*t
-									// this can be taken as r = r0 + speed * time assumine the speed is 1 
+									// this can be taken as r = r0 + speed * time assumine the speed is 1
 									// (speed is taken to be instant so any normalisation on the dir is irrelevent here)
 									// therefore, t = (min.x - orgin.x) / dir.x
-										
+
 			auto t1 = (max()[i] - r.origin()[i]) * invD;	//same as for t0 but for the 'max' side of the bounding box
 
 			if (invD < 0.0) {std::swap(t0, t1);}			//taking it as the ray hits 'min' first then 'max', if the ray is travelling towards the origin
@@ -44,13 +46,13 @@ struct aabb {
 			t_max = t1 < t_max ? t1 : t_max;
 
 			if (t_max <= t_min)		//tmax and tmin get changed for each component (i.e. first for x, then for y, then for z)
-				return false;		//the only way for this to return true is if the time taken for a ray to collided with 
+				return false;		//the only way for this to return true is if the time taken for a ray to collided with
 							// - max in say the y direction is smaller than the time taken for the ray to collide with min in the x direction
 							// - min in say the y direction is bigger than the time taken for the ray to collide with max in the x direction
 							//in both cases there is no time for which the ray is inside the box
 							// - the ray collides with max in 1 dimension then min in the other dimesion
 							//   -- once it collides with max, it is outside the box
-							//   -- i.e. ther ray is outside the box in 1D, inside (by colliding with min) in 1D, outside (by colliding with max), 
+							//   -- i.e. ther ray is outside the box in 1D, inside (by colliding with min) in 1D, outside (by colliding with max),
 							//      then inside in another dimension by colliding with min
 							// - still the ray collides with max in one dimension then the other
 							//   -- colliding with min in the y direction after colliding with max in the x direction means
@@ -97,13 +99,14 @@ struct aabb {
 							//right ray does not collide because collides with min in the y direction after max in the x direction
 							// - tmin.y > tmax.x
 							//middle ray is fine
-			}				
+			}
 		return true;
 	}
 
 };
 
-aabb surrounding_box(const aabb &box0, const aabb &box1) {		//creates a larger bounding box around 2 smaller bounding boxes
+//creates a larger bounding box around 2 smaller bounding boxes
+aabb inline surrounding_box(const aabb &box0, const aabb &box1) {
 	const point3 small(	fmin(box0.min().x(),  box1.min().x()),
 				fmin(box0.min().y(),  box1.min().y()),
 				fmin(box0.min().z(),  box1.min().z()) );

@@ -4,8 +4,6 @@
 #include <cmath>
 #include "vec2.hpp"
 
-using std::sqrt;
-
 
 struct vec3 {
 	double e[3];
@@ -126,4 +124,21 @@ inline vec3 refract(const vec3& uv, const vec3& n, const double etai_over_etat) 
 inline vec3 rotate(const vec3& vec, const vec3 &axis, const double angle) {
     const auto r = unit_vector(axis);
     return (1-cos(angle))*dot(vec,r)*r   +  cos(angle)*vec   +  sin(angle)*cross(r, vec);
+}
+
+//https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi0.wp.com%2Fwww.therightgate.com%2Fwp-content%2Fuploads%2F2018%2F05%2Fspherical-cartesian-conversion.jpg%3Fresize%3D640%252C159%26ssl%3D1&f=1&nofb=1
+[[maybe_unused]] inline vec3 cartesian_to_spherical(const vec3& input) {
+    const double r = input.length();
+    const double theta = acos(input.z() / r);
+    const double phi   = atan2(input.y(), input.x());
+
+    return vec3(r, theta, phi);
+}
+
+[[maybe_unused]] inline vec3 spherical_to_cartesian(const vec3& input) {
+    const double x = input[0]*sin(input[1])*cos(input[2]);
+    const double y = input[0]*sin(input[1])*sin(input[2]);
+    const double z = input[0]*cos(input[1]);
+
+    return vec3(x, y ,z);
 }

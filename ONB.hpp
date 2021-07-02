@@ -3,6 +3,8 @@
 #ifndef RAYTRACER_ONB_HPP
 #define RAYTRACER_ONB_HPP
 
+#include "vec3.hpp"
+
 struct onb {
     const vec3 axis[3];
 

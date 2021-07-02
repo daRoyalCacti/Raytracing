@@ -1,18 +1,14 @@
 #pragma once
 
-#include "common.hpp"
-#include "camera.hpp"
-#include "color.hpp"
-#include "hittable_list.hpp"
 #include "scenes.hpp"
-
-#include <fstream>
-#include <utility>
+#include "color.hpp"
 
 //for creating a directory
 #include <bits/stdc++.h> 
 #include <sys/stat.h> 
 #include <sys/types.h>
+
+constexpr bool log_scanlines = false;  //prints the number of scalines remaining when rendering an image
 
 //image width and height are what they say they are
 template<size_t image_width, size_t image_height>
@@ -154,7 +150,7 @@ struct render {
             }
             const auto end_buffer = std::chrono::high_resolution_clock::now();
             const std::chrono::duration<double> elapsed_seconds_buffer = end_buffer - start_buffer;
-            std::cout << " -- took " << elapsed_seconds_buffer.count() << "s" << std::endl;;
+            std::cout << " -- took " << elapsed_seconds_buffer.count() << "s" << std::endl;
             std::cout << "\tmax deviation : " << max_dev << "/" << tol << std::endl;
 
 

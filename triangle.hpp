@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "hittable.hpp"
-#include "common.hpp"
+#include "helpful.hpp"
 
 struct triangle : public hittable {
 	const std::shared_ptr<material> mp;
@@ -12,7 +12,7 @@ struct triangle : public hittable {
 	const vec3 v0, v1;	//edges of the triangle
     //precomputed quantities to find the uv coordinates
     //https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-	const double d00{}, d01{}, d11{}, invDenom{};	//helpful quantities for finding texture coords
+	const double d00{}, d01{}, d11{};	//helpful quantities for finding texture coords
 
 	const bool vertex_normals{};	//whether to use face normals or vertex normals
 
@@ -20,8 +20,8 @@ struct triangle : public hittable {
 	
 	 triangle() = delete;
 	 triangle(const vec3 &vec0, const vec3 &vec1, const vec3 &vec2, double u0_, double v0_, double u1_, double v1_, double u2_, double v2_,
-           const std::shared_ptr<material> &mat)
-		: vertex0(vec0), vertex1(vec1), vertex2(vec2), u_0(u0_), v_0(v0_), u_1(u1_), v_1(v1_), u_2(u2_), v_2(v2_),  mp(mat),
+           std::shared_ptr<material> mat)
+		: vertex0(vec0), vertex1(vec1), vertex2(vec2), u_0(u0_), v_0(v0_), u_1(u1_), v_1(v1_), u_2(u2_), v_2(v2_),  mp(std::move(mat)),
 		vertex_normals(false), v0(vec1 - vec0), v1(vec2 - vec0),
           d00(dot(v0, v0)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))), d01(dot(v0, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))),
            d11(dot(v1, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))),
@@ -38,8 +38,8 @@ struct triangle : public hittable {
 		}
 
 	 triangle(const vec3 &vec0, const vec3 &vec1, const vec3 &vec2, const vec3 &n0, const vec3 &n1, const vec3 &n2,
-           double u0_, double v0_, double u1_, double v1_, double u2_, double v2_,  const std::shared_ptr<material> &mat)
-           : vertex0(vec0), vertex1(vec1), vertex2(vec2), u_0(u0_), v_0(v0_), u_1(u1_), v_1(v1_), u_2(u2_), v_2(v2_),  mp(mat),
+           double u0_, double v0_, double u1_, double v1_, double u2_, double v2_,  std::shared_ptr<material> mat)
+           : vertex0(vec0), vertex1(vec1), vertex2(vec2), u_0(u0_), v_0(v0_), u_1(u1_), v_1(v1_), u_2(u2_), v_2(v2_),  mp(std::move(mat)),
              vertex_normals(true), v0(vec1 - vec0), v1(vec2 - vec0),
              d00(dot(v0, v0)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))), d01(dot(v0, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))),
               d11(dot(v1, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))), normal0(n0), normal1(n1), normal2(n2) {

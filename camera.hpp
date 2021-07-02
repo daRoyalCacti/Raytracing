@@ -1,6 +1,8 @@
 #pragma once
 
-#include "common.hpp"
+#include "ray.hpp"
+#include "Halton.hpp"
+#include "helpful.hpp"
 
 class camera {
 	const point3 origin;    //camera is positioned
@@ -37,7 +39,7 @@ class camera {
 			vertical(focus_dist * 2.0 * tan(degrees_to_radians(vfov)/2) * cross(unit_vector(lookfrom - lookat), unit_vector(cross(vup, unit_vector(lookfrom - lookat)))) ),
 			llc_m_o(- horizontal/2 - vertical/2 - focus_dist*unit_vector(lookfrom - lookat)){}
 
-	[[nodiscard]] ray get_ray(const double s, const double t) {
+	[[nodiscard]] inline ray get_ray(const double s, const double t) {
 		//uses the thin lens approximation to generate depth of field
 		const vec3 rd = lens_radius * halton_random_in_unit_disk(halton_counter);	//randomness is required to get blur (i.e. depth of field)
 		const vec3 offset = u * rd.x() + v*rd.y();		//offset for where the light is coming from

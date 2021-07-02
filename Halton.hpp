@@ -7,8 +7,6 @@
 
 #include <utility>
 #include <array>
-#include <cmath>
-#include <algorithm>    //for std::shuffle
 #include "vec2.hpp"
 #include "vec3.hpp"
 

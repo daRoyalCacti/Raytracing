@@ -11,90 +11,54 @@ utility
 -
 array
 -
-cmath
--
-algorithm
--
 vec2.hpp
 /home/jacob/Documents/Projects/Raytracer/vec2.hpp
 vec3.hpp
 /home/jacob/Documents/Projects/Raytracer/vec3.hpp
 
 /home/jacob/Documents/Projects/Raytracer/ONB.hpp
+vec3.hpp
+/home/jacob/Documents/Projects/Raytracer/vec3.hpp
 
 /home/jacob/Documents/Projects/Raytracer/aabb.hpp
+ray.hpp
+/home/jacob/Documents/Projects/Raytracer/ray.hpp
 
 /home/jacob/Documents/Projects/Raytracer/aarect.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
 hittable.hpp
 /home/jacob/Documents/Projects/Raytracer/hittable.hpp
 
 /home/jacob/Documents/Projects/Raytracer/box.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
-aarect.hpp
-/home/jacob/Documents/Projects/Raytracer/aarect.hpp
 hittable_list.hpp
 /home/jacob/Documents/Projects/Raytracer/hittable_list.hpp
 
 /home/jacob/Documents/Projects/Raytracer/bvh.hpp
 algorithm
 -
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
-hittable.hpp
-/home/jacob/Documents/Projects/Raytracer/hittable.hpp
 hittable_list.hpp
 /home/jacob/Documents/Projects/Raytracer/hittable_list.hpp
 
 /home/jacob/Documents/Projects/Raytracer/camera.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
+ray.hpp
+/home/jacob/Documents/Projects/Raytracer/ray.hpp
+Halton.hpp
+/home/jacob/Documents/Projects/Raytracer/Halton.hpp
+helpful.hpp
+/home/jacob/Documents/Projects/Raytracer/helpful.hpp
 
 /home/jacob/Documents/Projects/Raytracer/color.hpp
 vec3.hpp
 /home/jacob/Documents/Projects/Raytracer/vec3.hpp
-iostream
--
-iostream
--
-string
--
-fstream
--
-filesystem
--
-cctype
--
-vector
+cmath
 -
 png++/png.hpp
 -
 
-/home/jacob/Documents/Projects/Raytracer/common.hpp
-cmath
--
-limits
--
-memory
--
-random
--
-probability.hpp
-/home/jacob/Documents/Projects/Raytracer/probability.hpp
-ray.hpp
-/home/jacob/Documents/Projects/Raytracer/ray.hpp
-
 /home/jacob/Documents/Projects/Raytracer/constant_medium.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
 hittable.hpp
 /home/jacob/Documents/Projects/Raytracer/hittable.hpp
 material.hpp
 /home/jacob/Documents/Projects/Raytracer/material.hpp
-texture.hpp
-/home/jacob/Documents/Projects/Raytracer/texture.hpp
 
 /home/jacob/Documents/Projects/Raytracer/external/stb_image.h
 stb_image.h
@@ -131,24 +95,24 @@ arm_neon.h
 /home/jacob/Documents/Projects/Raytracer/fog.hpp
 functional
 -
-material.hpp
-/home/jacob/Documents/Projects/Raytracer/material.hpp
 pdf.hpp
 /home/jacob/Documents/Projects/Raytracer/pdf.hpp
 
-/home/jacob/Documents/Projects/Raytracer/hittable.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
-aabb.hpp
-/home/jacob/Documents/Projects/Raytracer/aabb.hpp
+/home/jacob/Documents/Projects/Raytracer/helpful.hpp
+limits
+-
 
-/home/jacob/Documents/Projects/Raytracer/hittable_list.hpp
-hittable.hpp
 /home/jacob/Documents/Projects/Raytracer/hittable.hpp
 aabb.hpp
 /home/jacob/Documents/Projects/Raytracer/aabb.hpp
 memory
 -
+
+/home/jacob/Documents/Projects/Raytracer/hittable_list.hpp
+aabb.hpp
+/home/jacob/Documents/Projects/Raytracer/aabb.hpp
+hittable.hpp
+/home/jacob/Documents/Projects/Raytracer/hittable.hpp
 vector
 -
 
@@ -159,40 +123,28 @@ iostream
 -
 chrono
 -
-vector
--
-string
--
 
 /home/jacob/Documents/Projects/Raytracer/material.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
 ONB.hpp
 /home/jacob/Documents/Projects/Raytracer/ONB.hpp
-probability.hpp
-/home/jacob/Documents/Projects/Raytracer/probability.hpp
 pdf.hpp
 /home/jacob/Documents/Projects/Raytracer/pdf.hpp
 texture.hpp
 /home/jacob/Documents/Projects/Raytracer/texture.hpp
 
 /home/jacob/Documents/Projects/Raytracer/moving_sphere.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
 hittable.hpp
 /home/jacob/Documents/Projects/Raytracer/hittable.hpp
 
 /home/jacob/Documents/Projects/Raytracer/pdf.hpp
+hittable.hpp
+/home/jacob/Documents/Projects/Raytracer/hittable.hpp
 ONB.hpp
 /home/jacob/Documents/Projects/Raytracer/ONB.hpp
 probability.hpp
 /home/jacob/Documents/Projects/Raytracer/probability.hpp
-hittable.hpp
-/home/jacob/Documents/Projects/Raytracer/hittable.hpp
 
 /home/jacob/Documents/Projects/Raytracer/perlin.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
 algorithm
 -
 numeric
@@ -201,10 +153,10 @@ numeric
 /home/jacob/Documents/Projects/Raytracer/probability.hpp
 cmath
 -
+random
+-
 vec3.hpp
 /home/jacob/Documents/Projects/Raytracer/vec3.hpp
-vec2.hpp
-/home/jacob/Documents/Projects/Raytracer/vec2.hpp
 Halton.hpp
 /home/jacob/Documents/Projects/Raytracer/Halton.hpp
 
@@ -213,20 +165,10 @@ vec3.hpp
 /home/jacob/Documents/Projects/Raytracer/vec3.hpp
 
 /home/jacob/Documents/Projects/Raytracer/render.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
-camera.hpp
-/home/jacob/Documents/Projects/Raytracer/camera.hpp
-color.hpp
-/home/jacob/Documents/Projects/Raytracer/color.hpp
-hittable_list.hpp
-/home/jacob/Documents/Projects/Raytracer/hittable_list.hpp
 scenes.hpp
 /home/jacob/Documents/Projects/Raytracer/scenes.hpp
-fstream
--
-utility
--
+color.hpp
+/home/jacob/Documents/Projects/Raytracer/color.hpp
 bits/stdc++.h
 -
 sys/stat.h
@@ -235,12 +177,8 @@ sys/types.h
 -
 
 /home/jacob/Documents/Projects/Raytracer/scenes.hpp
-utility
--
 camera.hpp
 /home/jacob/Documents/Projects/Raytracer/camera.hpp
-hittable.hpp
-/home/jacob/Documents/Projects/Raytracer/hittable.hpp
 sphere.hpp
 /home/jacob/Documents/Projects/Raytracer/sphere.hpp
 moving_sphere.hpp
@@ -251,8 +189,8 @@ box.hpp
 /home/jacob/Documents/Projects/Raytracer/box.hpp
 constant_medium.hpp
 /home/jacob/Documents/Projects/Raytracer/constant_medium.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
+helpful.hpp
+/home/jacob/Documents/Projects/Raytracer/helpful.hpp
 bvh.hpp
 /home/jacob/Documents/Projects/Raytracer/bvh.hpp
 fog.hpp
@@ -275,8 +213,6 @@ external/stb_image.h
 /home/jacob/Documents/Projects/Raytracer/external/stb_image.h
 
 /home/jacob/Documents/Projects/Raytracer/texture.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
 perlin.hpp
 /home/jacob/Documents/Projects/Raytracer/perlin.hpp
 stb_image_ne.h
@@ -287,8 +223,8 @@ utility
 -
 hittable.hpp
 /home/jacob/Documents/Projects/Raytracer/hittable.hpp
-common.hpp
-/home/jacob/Documents/Projects/Raytracer/common.hpp
+helpful.hpp
+/home/jacob/Documents/Projects/Raytracer/helpful.hpp
 
 /home/jacob/Documents/Projects/Raytracer/triangle_mesh.hpp
 triangle.hpp

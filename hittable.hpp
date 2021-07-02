@@ -1,14 +1,14 @@
 #pragma once
 
-#include "common.hpp"
 #include "aabb.hpp"
+#include <memory>
 
 struct material;
 
 struct hit_record {
 	point3 p;	//point where hit
 	vec3 normal;	//normal at hit point
-	shared_ptr<material> mat_ptr;
+	std::shared_ptr<material> mat_ptr;
 	double t;	//time point was hit
 	bool front_face;	//did the hit happen on the front or back of the face
 	double u;	//uv coords for textures
@@ -37,11 +37,11 @@ struct hittable {
 
 
 struct translate : public hittable {
-	const shared_ptr<hittable> ptr;
+	const std::shared_ptr<hittable> ptr;
 	const vec3 offset;
 
 	translate() = delete;
-	translate(const shared_ptr<hittable>& p, const vec3& displacement) : ptr(p), offset(displacement) {}
+	translate(const std::shared_ptr<hittable>& p, const vec3& displacement) : ptr(p), offset(displacement) {}
 
 	inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
 		const ray moved_r(r.origin() - offset, r.direction(), r.time());	//moving object by offset is same as translating axes by -offset
@@ -67,13 +67,13 @@ struct translate : public hittable {
 
 
 struct rotate_y : public hittable {
-	const shared_ptr<hittable> ptr;
+	const std::shared_ptr<hittable> ptr;
 	const double sin_theta, cos_theta;	//required to carry info from constructor to hit
 	bool hasbox;			//required to carry info from constructor to bounding_box
 	aabb bbox;
 
 	rotate_y() = delete;
-	rotate_y(const shared_ptr<hittable> &p, double angle);
+	rotate_y(const std::shared_ptr<hittable> &p, double angle);
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 
@@ -83,7 +83,7 @@ struct rotate_y : public hittable {
 	}
 };
 
-rotate_y::rotate_y(const shared_ptr<hittable> &p, const double angle) : ptr(p), sin_theta(sin(degrees_to_radians(angle))), cos_theta(cos(degrees_to_radians(angle))) {
+rotate_y::rotate_y(const std::shared_ptr<hittable> &p, const double angle) : ptr(p), sin_theta(sin(degrees_to_radians(angle))), cos_theta(cos(degrees_to_radians(angle))) {
 	hasbox = ptr->bounding_box(0, 1, bbox);		//sets bbox
 
 	//setting the bounding box
@@ -149,10 +149,10 @@ bool rotate_y::hit(const ray& r, const double t_min, const double t_max, hit_rec
 
 
 struct flip_face : public hittable {
-    const shared_ptr<hittable> ptr;
+    const std::shared_ptr<hittable> ptr;
 
     flip_face() = delete;
-    explicit flip_face(const shared_ptr<hittable> &p) : ptr(p) {}
+    explicit flip_face(const std::shared_ptr<hittable> &p) : ptr(p) {}
 
     inline bool hit(const ray& r, const double t_min, const double t_max, hit_record &rec) override {
         if (!ptr->hit(r, t_min, t_max, rec))

@@ -94,12 +94,6 @@ intrin.h
 arm_neon.h
 -
 
-/home/jacob/Documents/Projects/Raytracer/fog.hpp
-functional
--
-pdf.hpp
-/home/jacob/Documents/Projects/Raytracer/pdf.hpp
-
 /home/jacob/Documents/Projects/Raytracer/helpful.hpp
 limits
 -
@@ -193,8 +187,6 @@ helpful.hpp
 /home/jacob/Documents/Projects/Raytracer/helpful.hpp
 bvh.hpp
 /home/jacob/Documents/Projects/Raytracer/bvh.hpp
-fog.hpp
-/home/jacob/Documents/Projects/Raytracer/fog.hpp
 triangle.hpp
 /home/jacob/Documents/Projects/Raytracer/triangle.hpp
 triangle_mesh.hpp

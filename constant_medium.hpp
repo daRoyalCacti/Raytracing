@@ -11,11 +11,8 @@ struct constant_medium : public hittable {
 	size_t halton_index = 0;
 	
 	//d for density
-	constant_medium(std::shared_ptr<hittable> b, const double d, const std::shared_ptr<texture> &a)
-		: boundary(std::move(b)), neg_inv_density(-1/d), phase_function(std::make_shared<isotropic>(a)) {};
-
-	constant_medium(std::shared_ptr<hittable> b, const double d, const color c)
-		: boundary(std::move(b)), neg_inv_density(-1/d), phase_function(std::make_shared<isotropic>(c)) {};
+	constant_medium(std::shared_ptr<hittable> b, const double d, std::shared_ptr<material> mat)
+		: boundary(std::move(b)), neg_inv_density(-1/d), phase_function(std::move(mat)) {};
 
 	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
 
@@ -58,6 +55,7 @@ bool constant_medium::hit(const ray& r, const double t_min, const double t_max, 
 	const auto hit_distance = neg_inv_density * log(random_halton_1D(halton_index));	//randomly deciding if the ray should leave the medium
 	                                                                                        // - is choosing from an exponential distribution
 	                                                                                        //from STAT2003, in general we take -1/lambda * ln(U) for U~U[0,1]
+	                                                                                        //This is the same algorithm used in rand_exp_halton
 
 	if (hit_distance > distance_inside_boundary)	//if the randomly chosen distance is greater than the distance from the boundary to the ray origin
 		return false;                               // of it if happens outside of the interval [t_min, t_max]
@@ -71,3 +69,25 @@ bool constant_medium::hit(const ray& r, const double t_min, const double t_max, 
 
 	return true;
 }
+
+
+struct constant_isotropic_medium : public constant_medium {
+    //d for density
+    constant_isotropic_medium(const std::shared_ptr<hittable> &b, const double d, const std::shared_ptr<texture> &a)
+            : constant_medium(b, d, std::make_shared<isotropic>(a)) {}
+
+    constant_isotropic_medium(const std::shared_ptr<hittable> &b, const double d, const color c)
+            : constant_medium(b, d, std::make_shared<isotropic>(c))  {}
+
+};
+
+
+struct constant_Henyey_medium : public constant_medium {
+    //d for density
+    constant_Henyey_medium(const std::shared_ptr<hittable> &b, const double d, const double g, const std::shared_ptr<texture> &a)
+            : constant_medium(b, d, std::make_shared<Henyey_Greensteing>(a, g)) {}
+
+    constant_Henyey_medium(const std::shared_ptr<hittable> &b, const double d, const double g, const color c)
+            : constant_medium(b, d, std::make_shared<Henyey_Greensteing>(c, g))  {}
+
+};

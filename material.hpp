@@ -161,3 +161,22 @@ struct isotropic : public material {
 		return true;
 	}
 };
+
+//scatters evenly in all directions
+struct Henyey_Greensteing : public material {
+    const std::shared_ptr<texture> albedo;
+    Henyey_Greensteing_pdf henyeyGreensteingPdf;
+    size_t halton_counter = 0;
+
+    Henyey_Greensteing() = delete;
+    explicit Henyey_Greensteing(const color c, double g = 0.5) : albedo(std::make_shared<solid_color>(c)), henyeyGreensteingPdf(g) {}
+    explicit Henyey_Greensteing(std::shared_ptr<texture> a, double g = 0.5) : albedo(std::move(a)), henyeyGreensteingPdf(g) {}
+
+    inline bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) override {
+        srec.is_specular = true;    //not sure
+        srec.specular_ray = ray(rec.p, henyeyGreensteingPdf.generate(ray_in.direction()), ray_in.time());	//pick a random direction for the ray to scatter
+        srec.attenuation = albedo->value(rec.u, rec.v, rec.p);
+        srec.pdf_ptr = nullptr;
+        return true;
+    }
+};

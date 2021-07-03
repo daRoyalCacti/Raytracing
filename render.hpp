@@ -216,48 +216,6 @@ struct render {
             return curr_scene.background;
 
 
-        if (curr_scene.settings.has_fog) {
-            const auto fog_hit_time = curr_scene.fog->generate_hit_time();
-            if (fog_hit_time < rec.t) {     //ray hit fog
-                const auto scatter_pos = r.at(fog_hit_time);
-
-
-                if (curr_scene.settings.importance) {
-                    const auto light_ptr = make_shared<hittable_pdf>(curr_scene.settings.important, scatter_pos);
-                    mixture_pdf mixed_pdf(light_ptr, curr_scene.fog->prob_density);
-
-                    const auto scattered = ray(scatter_pos, mixed_pdf.generate(r.dir), r.time());
-                    const auto pdf_val = mixed_pdf.value(r.dir, scattered.direction());
-
-                    bool nothing_broke = true;
-                    if (!std::isfinite(pdf_val)) {
-                        nothing_broke = false;  //is not always cause for erroring out
-                        // - when importance sampling a dielectric sphere,
-                        //   the generated ray is moving through the sphere.
-                        //   Because the ray is inside the sphere, the
-                        //   importance sampling fails.
-                        //   However, it should fail because there is
-                        //   no fog inside the sphere
-                    }
-
-
-                    if (nothing_broke) {
-                        return curr_scene.fog->color_at(scatter_pos) * ray_color(scattered, depth - 1) *
-                               curr_scene.fog->prob_density->value(r.dir, scattered.direction()) / pdf_val;
-                    }
-
-                }
-                //else
-                return curr_scene.fog->color_at(scatter_pos) *
-                       ray_color(ray(scatter_pos, curr_scene.fog->prob_density->generate(r.dir), r.time()),
-                                 depth - 1);
-
-            }
-
-
-        }
-
-
 
         //else keep bouncing light
         const color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v,

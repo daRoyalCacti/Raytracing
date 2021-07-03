@@ -11,7 +11,6 @@ CMakeFiles/Generate.dir/main.cpp.o: ../camera.hpp
 CMakeFiles/Generate.dir/main.cpp.o: ../color.hpp
 CMakeFiles/Generate.dir/main.cpp.o: ../constant_medium.hpp
 CMakeFiles/Generate.dir/main.cpp.o: ../external/stb_image.h
-CMakeFiles/Generate.dir/main.cpp.o: ../fog.hpp
 CMakeFiles/Generate.dir/main.cpp.o: ../helpful.hpp
 CMakeFiles/Generate.dir/main.cpp.o: ../hittable.hpp
 CMakeFiles/Generate.dir/main.cpp.o: ../hittable_list.hpp

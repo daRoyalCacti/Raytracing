@@ -13,9 +13,17 @@ int main() {
 
 
 
-    scene weekend = 	big_scene1();
-    render<600, 400> ren_weekend(weekend);
-    ren_weekend.draw_on_convergence<100>("timing_test.png", 0.001);
+    /*scene test = 	big_scene1();
+    render<600, 400> ren_test(test);
+    ren_test.draw_on_convergence<100>("timing_test.png", 0.01);*/
+
+    scene scene1 = 	big_scene1_fog();
+    render<1920, 1080> ren_scene1(scene1);
+    ren_scene1.draw_on_convergence<100>("raytracing_in_one_weekend_main_image_foggy.png", 0.001);
+
+    scene conell_box = 	cornell_box_scene2_smokey();
+    render<1200, 1200> ren_box(conell_box);
+    ren_box.draw_on_convergence<200>("cornell_box_smokey.png", 0.001);
 
 
 

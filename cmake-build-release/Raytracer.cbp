@@ -111,9 +111,6 @@
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/constant_medium.hpp">
 			<Option target="Generate"/>
 		</Unit>
-		<Unit filename="/home/jacob/Documents/Projects/Raytracer/fog.hpp">
-			<Option target="Generate"/>
-		</Unit>
 		<Unit filename="/home/jacob/Documents/Projects/Raytracer/helpful.hpp">
 			<Option target="Generate"/>
 		</Unit>

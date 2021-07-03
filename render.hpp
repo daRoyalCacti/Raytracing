@@ -2,13 +2,10 @@
 
 #include "scenes.hpp"
 #include "color.hpp"
+#include <chrono>
 
-//for creating a directory
-#include <bits/stdc++.h> 
-#include <sys/stat.h> 
-#include <sys/types.h>
 
-constexpr bool log_scanlines = false;  //prints the number of scalines remaining when rendering an image
+constexpr bool log_scanlines = false;  //prints the number of scanlines remaining when rendering an image
 
 //image width and height are what they say they are
 template<size_t image_width, size_t image_height>
@@ -38,7 +35,7 @@ struct render {
         // - consider the plot of the number of rays per pixel against the color of the pixel (or some component of color, say red)
         // - then consider the plot of the derivative of this
         // - when the plot of the derivative reaches tol, we quit
-        // Basically, we keep on adding more rays into the convergence gets signficantly slow
+        // Basically, we keep on adding more rays into the convergence gets significantly slow
         //======================================
         constexpr long unsigned total_rays = samplespp*image_width*image_height;
 

@@ -4,8 +4,6 @@
 #include <cmath>
 #include <random>
 #include "vec3.hpp"
-
-
 #include "Halton.hpp"
 
 

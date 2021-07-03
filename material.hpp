@@ -26,6 +26,7 @@ struct material {
 	}
 };
 
+//idealisation of matte
 struct lambertian : public material {
 	const std::shared_ptr<texture> albedo;
 
@@ -143,7 +144,7 @@ struct diffuse_light : public material {
 	}
 };
 
-//for scattering
+//scatters evenly in all directions
 struct isotropic : public material {
 	const std::shared_ptr<texture> albedo;
 	size_t halton_counter = 0;
@@ -157,7 +158,6 @@ struct isotropic : public material {
 		srec.specular_ray = ray(rec.p, halton_random_in_unit_sphere(halton_counter), ray_in.time());	//pick a random direction for the ray to scatter
 		srec.attenuation = albedo->value(rec.u, rec.v, rec.p);
 		srec.pdf_ptr = nullptr;
-		//std::cout << halton_random_in_unit_sphere(--halton_counter) << "\n";
 		return true;
 	}
 };

@@ -98,6 +98,7 @@ struct Halton_set {
     }
 };
 
+//might be a better way to store the halton sequences that in global memory
 namespace global {
     Halton_set<halton_sequence_stored_size> Halton_rng;
 }
@@ -137,7 +138,6 @@ inline vec2 random_halton_2D(double min1, double max1, double min2, double max2,
 inline vec3 random_halton_3D(size_t &index) {
     const vec3 ret_val = global::Halton_rng.halton_set_3D[index];
     index = (index + 1) % global::halton_sequence_stored_size;
-
     return ret_val;
 }
 

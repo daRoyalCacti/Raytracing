@@ -4,6 +4,9 @@
 #include "Halton.hpp"
 #include "helpful.hpp"
 
+/*=================================================================
+ can be made better https://pbr-book.org/3ed-2018/Camera_Models/Realistic_Cameras (i.e. TODO)
+ ========================================================*/
 class camera {
 	const point3 origin;    //camera is positioned
 	const vec3 horizontal;    //defines the direction of horizontal through u, and how far horizontal to draw through viewport_width

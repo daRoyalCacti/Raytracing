@@ -14,13 +14,12 @@ struct pdf {
 };
 
 
+//pdf used by lambertian materials
 struct cosine_pdf : public pdf {
     const onb uvw;
     //size_t halton_index = 0;  //cannot make work (see below)
 
-    explicit cosine_pdf(const vec3& w) : uvw(w){
-        //uvw.build_from_w(w);
-    }
+    explicit cosine_pdf(const vec3& w) : uvw(w){}
 
     [[nodiscard]] inline double value(const vec3& incoming_dir, const vec3& out_direction) const override {
         const auto cosine = dot(unit_vector(out_direction), uvw.w());
@@ -33,7 +32,7 @@ struct cosine_pdf : public pdf {
     }
 };
 
-
+//used for importance sampling hittables
 struct hittable_pdf : public pdf {
     const point3 o;
     const std::shared_ptr<hittable> ptr;
@@ -56,10 +55,7 @@ struct mixture_pdf : public pdf {
     const std::shared_ptr<pdf> p[2];
 
     mixture_pdf() = delete;
-    mixture_pdf(const std::shared_ptr<pdf> &p0, const std::shared_ptr<pdf> &p1) : p{p0, p1} {
-        //p[0] = p0;
-        //p[1]= p1;
-    }
+    mixture_pdf(const std::shared_ptr<pdf> &p0, const std::shared_ptr<pdf> &p1) : p{p0, p1} {}
 
     [[nodiscard]] inline double value(const vec3& incoming_dir, const vec3& out_direction) const override {
         return 0.5 * p[0]->value(incoming_dir, out_direction) + 0.5 * p[1]->value(incoming_dir, out_direction);
@@ -86,7 +82,6 @@ struct Henyey_Greensteing_pdf : public pdf {
 
     //returns value in spherical coordinates
     [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) override {
-        //https://math.stackexchange.com/questions/1418262/given-a-vector-and-angle-find-new-vector
         const auto angle = rand_Henyey_Greensteing_halton(g, halton_index1);
 
         //select random vector to rotate around

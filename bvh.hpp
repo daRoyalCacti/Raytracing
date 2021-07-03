@@ -2,9 +2,30 @@
 #pragma once
 
 #include <algorithm>
-
 #include "hittable_list.hpp"
 
+/* ====================================================================================================================
+This can be made better (i.e. TODO)
+1. use SAH https://psgraphics.blogspot.com/2016/03/a-simple-sah-bvh-build.html,
+        https://pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies#TheSurfaceAreaHeuristic (e.q 4.1 helpful and the equation below it)
+  - break the volume up into sections that minimise the SA (didn't read fully)
+  - pbr better than blogspot
+2. need to keep track of if are at a leaf node (an end node)
+3. https://pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies#CompactBVHForTraversal
+  - align objects for better caching
+4. https://pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies#Traversal
+  - can update t_max on an obj collision to immediately discard a number of boxes
+  - do a front to back search through the node
+   -- if collision maximum collision time with bounding box is larger than t_max, no need to check children because by definition of a bounding box
+      any collision with any other bounding box or any other object must happen at a time after the collision with the bounding box
+  - "An efficient way to perform a front-to-back traversal without incurring the expense of intersecting the ray with both child nodes and comparing
+    the distances is to use the sign of the ray’s direction vector for the coordinate axis along which primitives were partitioned for the current node:
+    if the sign is negative, we should visit the second child before the first child, since the primitives that went into the second child’s subtree
+    were on the upper side of the partition point."
+   -- this requires the setup in the SAH link
+   -- still need to check collision of other nodes because bounding boxes can overlap (more generally the projection of the bounding box
+     onto any axis can - and almost certainly will - overlap)
+ ===============================================================================================================*/
 struct bvh_node : public hittable {
     std::shared_ptr<hittable> left;	//left and right nodes on the tree
     std::shared_ptr<hittable> right;

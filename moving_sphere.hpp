@@ -2,9 +2,9 @@
 
 #include "hittable.hpp"
 
-
+//a way to add motion blur to a sphere
 struct moving_sphere : public hittable {
-	const point3 center0;	//centres of spheres at time0 (at time1 not needed)
+	const point3 center0;	//centres of spheres at time0 (at time1 not needed --- stored in dc_d_dt)
 	const double time0 = 0, time1 = 0;
 	const double radius = 0;
 	const std::shared_ptr<material> mat_ptr;
@@ -26,7 +26,7 @@ struct moving_sphere : public hittable {
 
 bool moving_sphere::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
 	//essentially the same as sphere::hit but center is now center(time)
-	const vec3 oc = r.origin() - center(r.time());
+	const vec3 oc = r.origin() - center(r.time());  //vector for the origin to the center of the sphere
 	const auto a = r.direction().length_squared();
 	const auto half_b =  dot(oc, r.direction());	//uses half b to simplify the quadratic equation
 	const auto c = oc.length_squared() - radius * radius;
@@ -37,11 +37,11 @@ bool moving_sphere::hit(const ray& r, const double t_min, const double t_max, hi
 
     //Find the nearest root that lies in the acceptable range.
     const auto root1 = (-half_b - sqrtd) / a;	//first root
-    if (root1 < t_min || t_max < root1) {	//if the first root is ouside of the accepctable range
+    if (root1 < t_min || t_max < root1) {	//if the first root is outside of the acceptable range
         //if true, check the second root
         const auto root2 = (-half_b + sqrtd) / a;
         if (root2 < t_min || t_max < root2) {
-            //if the second root is ouside of the range, there is no hit
+            //if the second root is outside of the range, there is no hit
             return false;
         } else {
             rec.t = root2;

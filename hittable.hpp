@@ -22,6 +22,9 @@ struct hit_record {
 	}
 };
 
+//hitting needs to be updated
+// - hit needs to be broken up into hit_time and hit_info
+// - a number of times only the hit times are needed and computing the hit_info (e.g. normal vectors and texture coordinates) are unnecessary
 struct hittable {
 	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) = 0;	//function to tell when a ray hits the object
 	virtual bool bounding_box(double time0, double time1, aabb& output_box) const = 0;	//function that creates a bounding box around the object
@@ -41,7 +44,7 @@ struct translate : public hittable {
 	const vec3 offset;
 
 	translate() = delete;
-	translate(const std::shared_ptr<hittable>& p, const vec3& displacement) : ptr(p), offset(displacement) {}
+	translate(std::shared_ptr<hittable> p, const vec3& displacement) : ptr(std::move(p)), offset(displacement) {}
 
 	inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
 		const ray moved_r(r.origin() - offset, r.direction(), r.time());	//moving object by offset is same as translating axes by -offset
@@ -73,7 +76,7 @@ struct rotate_y : public hittable {
 	aabb bbox;
 
 	rotate_y() = delete;
-	rotate_y(const std::shared_ptr<hittable> &p, double angle);
+	rotate_y(std::shared_ptr<hittable> p, double angle);
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 
@@ -83,7 +86,7 @@ struct rotate_y : public hittable {
 	}
 };
 
-rotate_y::rotate_y(const std::shared_ptr<hittable> &p, const double angle) : ptr(p), sin_theta(sin(degrees_to_radians(angle))), cos_theta(cos(degrees_to_radians(angle))) {
+rotate_y::rotate_y(std::shared_ptr<hittable> p, const double angle) : ptr(std::move(p)), sin_theta(sin(degrees_to_radians(angle))), cos_theta(cos(degrees_to_radians(angle))) {
 	hasbox = ptr->bounding_box(0, 1, bbox);		//sets bbox
 
 	//setting the bounding box
@@ -152,7 +155,7 @@ struct flip_face : public hittable {
     const std::shared_ptr<hittable> ptr;
 
     flip_face() = delete;
-    explicit flip_face(const std::shared_ptr<hittable> &p) : ptr(p) {}
+    explicit flip_face(std::shared_ptr<hittable> p) : ptr(std::move(p)) {}
 
     inline bool hit(const ray& r, const double t_min, const double t_max, hit_record &rec) override {
         if (!ptr->hit(r, t_min, t_max, rec))

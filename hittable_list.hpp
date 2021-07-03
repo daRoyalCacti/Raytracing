@@ -5,13 +5,12 @@
 #include <vector>
 
 
-
+//stores a list of hittable objects
 struct hittable_list : public hittable {
 	std::vector<std::shared_ptr<hittable>> objects;
     size_t halton_index= 0;
 
 	hittable_list() = default;
-	//explicit hittable_list(const shared_ptr<hittable> &object) {add(object);}
 
     [[maybe_unused]] void clear() {objects.clear();}
 	void add(const std::shared_ptr<hittable>& object) {objects.push_back(object);}

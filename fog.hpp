@@ -5,6 +5,7 @@
 #include <functional>
 #include "pdf.hpp"
 
+//is going to be completely redone soon
 struct participating_medium {
     const std::shared_ptr<pdf> prob_density;
     participating_medium() = delete;

@@ -22,37 +22,36 @@ struct aabb {
 	[[nodiscard]] inline bool hit(const ray& r, double t_min, double t_max) const {
 		//Andrew Kensler (from Pixar) intersection method
 		for (int i = 0; i < 3; i++) {
-			const double invD = 1.0 / r.direction()[i];	// 1/x or 1/y or 1/z for the incomming ray
+			const double invD = 1.0 / r.direction()[i];	// 1/x or 1/y or 1/z for the incoming ray
 			auto t0 = (min()[i] - r.origin()[i]) * invD;	//the time it takes the ray to hit the 'min' side of bounding box
 									// s=d/t => t = d/s
 									// d is the distance from origin to bounding box in a single direction
 									// - so d = (min.x - origin.x)   (see picture above)
 									// the ray is defined as r = r0 + dir*t
-									// this can be taken as r = r0 + speed * time assumine the speed is 1
-									// (speed is taken to be instant so any normalisation on the dir is irrelevent here)
-									// therefore, t = (min.x - orgin.x) / dir.x
+									// this can be taken as r = r0 + vel * time assuming the speed is 1 (norm of velocity)
+									// therefore, t = (min.x - origin.x) / dir.x
 
 			auto t1 = (max()[i] - r.origin()[i]) * invD;	//same as for t0 but for the 'max' side of the bounding box
 
-			if (invD < 0.0) {std::swap(t0, t1);}			//taking it as the ray hits 'min' first then 'max', if the ray is travelling towards the origin
-										//the ray will hit max first then min
-										//so simplying swapping t0 and t1
-										//this really only saves 1 if statement and makes the code nearter
-			//shrinking the interval that a ray can collide
-			//in order for the ray to hit the box
-			// - if the ray collides with min after the previous smallest collision, this is the new smallest collision
-			// - similar for max
+			if (invD < 0.0) {std::swap(t0, t1);}	//enforcing that t0 < t1
+			                                            //this not the immediately the case if the ray is moving towards the origin
+			                                            // - see the picture above
+			                                            //really only saves 1 if statement and makes the code neater
+
+			//enforcing that the ray hit times are between [t_min, t_max]
+			// - tmax and tmin get changed for each component (i.e. first for x, then for y, then for z)
+			// - this is a way of determining which side of the box the ray enters and exits at
 			t_min = t0 > t_min ? t0 : t_min;
 			t_max = t1 < t_max ? t1 : t_max;
 
-			if (t_max <= t_min)		//tmax and tmin get changed for each component (i.e. first for x, then for y, then for z)
+			if (t_max <= t_min)		//as stated above tmax and tmin get changed for each component (i.e. first for x, then for y, then for z)
 				return false;		//the only way for this to return true is if the time taken for a ray to collided with
 							// - max in say the y direction is smaller than the time taken for the ray to collide with min in the x direction
 							// - min in say the y direction is bigger than the time taken for the ray to collide with max in the x direction
 							//in both cases there is no time for which the ray is inside the box
-							// - the ray collides with max in 1 dimension then min in the other dimesion
+							// - the ray collides with max in 1 dimension then min in the other dimension
 							//   -- once it collides with max, it is outside the box
-							//   -- i.e. ther ray is outside the box in 1D, inside (by colliding with min) in 1D, outside (by colliding with max),
+							//   -- i.e. the ray is outside the box in 1D, inside (by colliding with min) in 1D, outside (by colliding with max),
 							//      then inside in another dimension by colliding with min
 							// - still the ray collides with max in one dimension then the other
 							//   -- colliding with min in the y direction after colliding with max in the x direction means
@@ -94,7 +93,7 @@ struct aabb {
 							//			|  /			    /	|
 							//			| /	tmin.x		   / 	|
 							//
-							//left ray does not collide becasue collides with max in the y direction before min in the x direction
+							//left ray does not collide because collides with max in the y direction before min in the x direction
 							// - tmax.y < tmin.x
 							//right ray does not collide because collides with min in the y direction after max in the x direction
 							// - tmin.y > tmax.x

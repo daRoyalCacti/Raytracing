@@ -55,6 +55,8 @@ png++/png.hpp
 -
 
 /home/jacob/Documents/Projects/Raytracer/constant_medium.hpp
+helpful.hpp
+/home/jacob/Documents/Projects/Raytracer/helpful.hpp
 hittable.hpp
 /home/jacob/Documents/Projects/Raytracer/hittable.hpp
 material.hpp
@@ -145,6 +147,8 @@ probability.hpp
 /home/jacob/Documents/Projects/Raytracer/probability.hpp
 
 /home/jacob/Documents/Projects/Raytracer/perlin.hpp
+vec3.hpp
+/home/jacob/Documents/Projects/Raytracer/vec3.hpp
 algorithm
 -
 numeric
@@ -169,11 +173,7 @@ scenes.hpp
 /home/jacob/Documents/Projects/Raytracer/scenes.hpp
 color.hpp
 /home/jacob/Documents/Projects/Raytracer/color.hpp
-bits/stdc++.h
--
-sys/stat.h
--
-sys/types.h
+chrono
 -
 
 /home/jacob/Documents/Projects/Raytracer/scenes.hpp

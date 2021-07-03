@@ -7,14 +7,15 @@ struct xy_rect : public hittable {
 	const std::shared_ptr<material> mp;
 	const double x0 = 0, x1 = 0, y0 = 0, y1 = 0, k = 0;	//x's and y's define a rectangle in the standard way
 					//k defines z position
-	const double area = 0;
-	const double lx = 0, ly = 0;
+	const double area = 0;  //the area of the rectangle -- used to save computation when computing the pdf_value
+	const double lx = 0, ly = 0;    //the length of the box in the x and y directions
+	                                // - used to save computation in computing the collision
 
 	size_t halton_index = 0;
 
 	xy_rect() = delete;
-	xy_rect(const double _x0, const double _x1, const double _y0, const double _y1, const double _k, const std::shared_ptr<material>& mat)
-		: x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(mat), area( (x1-x0)*(y1-y0)), lx(x1-x0), ly(y1-y0) {};
+	xy_rect(const double _x0, const double _x1, const double _y0, const double _y1, const double _k, std::shared_ptr<material> mat)
+		: x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(std::move(mat)), area( (x1-x0)*(y1-y0)), lx(x1-x0), ly(y1-y0) {};
 
 	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
 
@@ -39,7 +40,6 @@ struct xy_rect : public hittable {
     }
 
     [[nodiscard]] inline vec3 random(const point3 &origin) override {
-        //const vec3 random_point = point3(random_double(x0, x1), random_double(y0, y1), k);
         const vec3 random_point = point3(random_halton_2D(x0, x1, y0, y1, halton_index), k);
         return random_point - origin;
     }
@@ -54,8 +54,8 @@ struct xz_rect : public hittable {
 	size_t halton_index = 0;
 
 	xz_rect() = delete;
-	xz_rect(const double _x0, const double _x1, const double _z0, const double _z1, const double _k, const std::shared_ptr<material>& mat)
-		: x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat), area((x1-x0)*(z1-z0) ), lx(x1-x0), lz(z1-z0) {};
+	xz_rect(const double _x0, const double _x1, const double _z0, const double _z1, const double _k, std::shared_ptr<material> mat)
+		: x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(std::move(mat)), area((x1-x0)*(z1-z0) ), lx(x1-x0), lz(z1-z0) {};
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 
@@ -78,7 +78,6 @@ struct xz_rect : public hittable {
 	}
 
 	[[nodiscard]] inline vec3 random(const point3 &origin) override {
-	    //const auto random_point = point3(random_double(x0, x1), k, random_double(z0, z1));
 	    const auto r = random_halton_2D(x0, x1, z0, z1, halton_index);
         const auto random_point = point3(r.x(), k, r.y());
 	    return random_point - origin;
@@ -94,8 +93,8 @@ struct yz_rect : public hittable {
 	size_t halton_index = 0;
 
 	yz_rect() = delete;
-	yz_rect(const double _y0, const double _y1, const double _z0, const double _z1, const double _k, const std::shared_ptr<material>& mat)
-		: y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(mat), area( (z1-z0)*(y1-y0) ), lz(z1-z0), ly(y1-y0) {};
+	yz_rect(const double _y0, const double _y1, const double _z0, const double _z1, const double _k, std::shared_ptr<material> mat)
+		: y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(std::move(mat)), area( (z1-z0)*(y1-y0) ), lz(z1-z0), ly(y1-y0) {};
 
 	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
 
@@ -118,7 +117,6 @@ struct yz_rect : public hittable {
     }
 
     [[nodiscard]] inline vec3 random(const point3 &origin) override {
-        //const auto random_point = point3(k, random_double(y0, y1), random_double(z0, z1));
         const auto random_point = point3(k, random_halton_2D(y0, y1, z0, z1, halton_index));
         return random_point - origin;
     }
@@ -182,7 +180,7 @@ bool xz_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 	if (!std::isfinite(rec.t)) std::cout << "xz_rec collision gave infinite time" << std::endl;
 #endif
 
-	const auto outward_normal = vec3(0, 1, 0);	//the trival normal vector
+	const auto outward_normal = vec3(0, 1, 0);	//the trivial normal vector
 	rec.set_face_normal(r, outward_normal);
 	rec.mat_ptr = mp;
 	rec.p = r.at(t);
@@ -215,7 +213,7 @@ bool yz_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 	if (!std::isfinite(rec.t)) std::cout << "yz_rec collision gave infinite time" << std::endl;
 #endif
 
-	const auto outward_normal = vec3(1, 0, 0);	//the trival normal vector
+	const auto outward_normal = vec3(1, 0, 0);	//the trivial normal vector
 	rec.set_face_normal(r, outward_normal);
 	rec.mat_ptr = mp;
 	rec.p = r.at(t);

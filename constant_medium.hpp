@@ -1,11 +1,12 @@
 #pragma once
 
+#include "helpful.hpp"
 #include "hittable.hpp"
 #include "material.hpp"
 
 struct constant_medium : public hittable {
-	const std::shared_ptr<hittable> boundary;
-	const std::shared_ptr<material> phase_function;
+	const std::shared_ptr<hittable> boundary;   //the boundary which the medium is contained in
+	const std::shared_ptr<material> phase_function; //is a material but only using the scatter function
 	const double neg_inv_density;		//required to move info from constructor to hit
 	size_t halton_index = 0;
 	
@@ -42,6 +43,9 @@ bool constant_medium::hit(const ray& r, const double t_min, const double t_max, 
 	if (rec1.t < t_min) rec1.t = t_min;	//if the entry collision happens before the min time
 	if (rec2.t > t_max) rec2.t = t_max;	//if the exit collision happens after the max time
 	//this is to only consider the ray moving between these times
+	// - required when comparing the time the ray hit the medium
+	// -- if the hit time is outside [t_min, t_max] we want to return no hit
+	// -- same reason as for why we want to return false if the hit time happens outside the boundary of the medium
 
 	if (rec1.t >= rec2.t)	//if the entry happens after or at the same time as the exit
 		return false;
@@ -56,7 +60,7 @@ bool constant_medium::hit(const ray& r, const double t_min, const double t_max, 
 	                                                                                        //from STAT2003, in general we take -1/lambda * ln(U) for U~U[0,1]
 
 	if (hit_distance > distance_inside_boundary)	//if the randomly chosen distance is greater than the distance from the boundary to the ray origin
-		return false;
+		return false;                               // of it if happens outside of the interval [t_min, t_max]
 
 	rec.t = rec1.t + hit_distance / ray_length;	//t_f = t_i + d/s
 	rec.p = r.at(rec.t);

@@ -8,6 +8,7 @@ struct texture {
 	[[nodiscard]] virtual color value(double u, double v, const point3& p) const = 0;
 };
 
+//texture that is all one colour
 struct solid_color : public texture {
 	solid_color() = delete;
 	explicit solid_color(const color c) : color_value(c) {}
@@ -21,7 +22,7 @@ struct solid_color : public texture {
 	const color color_value;
 };
 
-
+//checkerboard texture
 struct checker_texture : public texture {
 	const std::shared_ptr<texture> odd;
 	const std::shared_ptr<texture> even;
@@ -41,7 +42,7 @@ struct checker_texture : public texture {
 	}
 };
 
-
+//using perlin noise to generate a texture
 struct [[maybe_unused]] noise_texture : public texture {
 	const perlin noise;
 	const double scale;	//how detailed the noise is, bigger number := more noise
@@ -56,7 +57,7 @@ struct [[maybe_unused]] noise_texture : public texture {
 	}
 };
 
-
+//uses multiple layers of noise to generate a turbulent texture
 struct turbulent_texture : public texture {
 	const perlin noise;
 	const double scale;	//how detailed the noise is, bigger number := more noise
@@ -70,7 +71,7 @@ struct turbulent_texture : public texture {
 	}
 };
 
-
+//uses multiple layers of noise to generate a marbled texture
 struct marble_texture : public texture {
 	const perlin noise;
 	const double scale;	//how detailed the noise is, bigger number := more noise

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "vec3.hpp"
 #include <algorithm>
 #include <numeric>
 
@@ -12,15 +13,10 @@ class perlin {
 	const std::array<int, point_count> perm_z;
 
 	static std::array<int, point_count> perlin_generate_perm() {	//creates a permutation of the numbers from 0 to point_count
-		//auto p = new int[point_count];
         std::array<int, point_count> p;
-
-		//for (int i = 0; i < point_count; i++)
-		//	p[i] = i;
 		std::iota(&p[0], &p[point_count], 0);
 
 		permute(p, point_count);
-
 		return p;
 	}
 
@@ -57,7 +53,6 @@ class perlin {
 
 	public:
 	perlin() : perm_x(perlin_generate_perm()), perm_y(perlin_generate_perm()), perm_z(perlin_generate_perm()){
-		//ranvec = new vec3[point_count];
 		for (int i = 0; i < point_count; i++) {
 			ranvec[i] = unit_vector(random_vec3(-1,1));
 		}

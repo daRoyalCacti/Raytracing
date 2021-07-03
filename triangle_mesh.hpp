@@ -12,6 +12,9 @@
 
 struct triangle_mesh : public hittable {
 	const std::shared_ptr<bvh_node> tris;
+	//stored in a bvh node for 2 reasons
+	// 1. there will rarely be an instance where a mesh will not have enough triangles to gain a performance boost
+	// 2. so it is consider 1 hittable (i.e. 1 object) rather than multiple (more intuitive I think this way)
 
 	triangle_mesh() = delete;
 	triangle_mesh(hittable_list &triangles, const double time0, const double time1) : tris(std::make_shared<bvh_node>(triangles,time0, time1)) {}

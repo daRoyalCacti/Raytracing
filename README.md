@@ -119,11 +119,9 @@ All images created are available in [/images](https://github.com/daRoyalCacti/Ra
 
 <img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/cornell_box.png" width="400" height="400" alt="cornell box">
 
-<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/cornell_box_sphere.png" width="400" height="400" alt="cornell box with sphere">
+<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/cornell_box_smokey.png" width="400" height="400" alt="cornell box with sphere">
 
-<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/conell_box_foggy.png" width="400" height="400" alt="cornell box foggy">
-
-<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/raytracing_in_one_weekend_main_image.png" width="800" height="450" alt="raytracing in one weekend main image">
+<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/foggy_balls.png" width="800" height="450" alt="raytracing in one weekend main image">
 
 <img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/raytracing_the_next_week_main_image.png" width="400" height="400" alt="raytracing the next week main image">
 

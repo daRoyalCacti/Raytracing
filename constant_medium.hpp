@@ -4,6 +4,11 @@
 #include "hittable.hpp"
 #include "material.hpp"
 
+/*==================================================================================
+The medium should always be the first object sampled in a scene
+    - This is so the ray's t_max value can be updated first
+      and so increase the efficiency of collisions with the scene
+ =================================================================*/
 struct constant_medium : public hittable {
 	const std::shared_ptr<hittable> boundary;   //the boundary which the medium is contained in
 	const std::shared_ptr<material> phase_function; //is a material but only using the scatter function
@@ -52,10 +57,12 @@ bool constant_medium::hit(const ray& r, const double t_min, const double t_max, 
 
 	const auto ray_length = r.direction().length();
 	const auto distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
-	const auto hit_distance = neg_inv_density * log(random_halton_1D(halton_index));	//randomly deciding if the ray should leave the medium
+	//const auto hit_distance = neg_inv_density * log(random_halton_1D(halton_index));	//randomly deciding if the ray should leave the medium
 	                                                                                        // - is choosing from an exponential distribution
 	                                                                                        //from STAT2003, in general we take -1/lambda * ln(U) for U~U[0,1]
 	                                                                                        //This is the same algorithm used in rand_exp_halton
+    const auto hit_distance = neg_inv_density * log(random_double());   //using the halton sequence gives lines through the image
+                                                                        // - not sure why
 
 	if (hit_distance > distance_inside_boundary)	//if the randomly chosen distance is greater than the distance from the boundary to the ray origin
 		return false;                               // of it if happens outside of the interval [t_min, t_max]

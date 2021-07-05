@@ -14,7 +14,7 @@
 #define run_time_Halton_set //must be defined above the include
 // also must be a define (rather than a constexpr) by the implementation
 namespace global {  //must be declared before Halton.hpp is included
-    constexpr size_t halton_sequence_stored_size = 1e4;     //the number of elements to store in the Halton sequence
+    constexpr size_t halton_sequence_stored_size = 1e7;     //the number of elements to store in the Halton sequence
 }
 
 namespace Halton {
@@ -89,7 +89,7 @@ struct Halton_set {
     // can improve convergence, see https://en.wikipedia.org/wiki/Halton_sequence
     static constexpr unsigned leap = 409;
 
-    Halton_set() {
+    void init() {
         for (unsigned i = 0; i < N; i++) {
             halton_set_1D[i] = Halton::get_halton<2>(leap*i);
             halton_set_2D[i] = vec2(halton_set_1D[i], Halton::get_halton<3>(leap*i));
@@ -178,7 +178,10 @@ inline double Henyey_Greensteing_pdf_func(double g, double cos_theta) {
 }
 
 
+//Does not work
+// - gives lines through the images
 //returns a random angle
+
 inline double rand_Henyey_Greensteing_halton(double g, size_t &index) {
     //https://www.oceanopticsbook.info/view/scattering/level-2/the-henyey-greenstein-phase-function
     const double max_y = 1/(4*M_PI) * (1-g*g)/( pow(1+g*g - 2*fabs(g), 3/2.0f));

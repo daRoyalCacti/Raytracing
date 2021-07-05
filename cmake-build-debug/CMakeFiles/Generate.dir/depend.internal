@@ -3,32 +3,31 @@
 
 CMakeFiles/Generate.dir/main.cpp.o
  /home/jacob/Documents/Projects/Raytracer/Halton.hpp
- /home/jacob/Documents/Projects/Raytracer/ONB.h
- /home/jacob/Documents/Projects/Raytracer/aabb.h
- /home/jacob/Documents/Projects/Raytracer/aarect.h
- /home/jacob/Documents/Projects/Raytracer/box.h
- /home/jacob/Documents/Projects/Raytracer/bvh.h
- /home/jacob/Documents/Projects/Raytracer/camera.h
- /home/jacob/Documents/Projects/Raytracer/color.h
- /home/jacob/Documents/Projects/Raytracer/common.h
- /home/jacob/Documents/Projects/Raytracer/constant_medium.h
+ /home/jacob/Documents/Projects/Raytracer/ONB.hpp
+ /home/jacob/Documents/Projects/Raytracer/aabb.hpp
+ /home/jacob/Documents/Projects/Raytracer/aarect.hpp
+ /home/jacob/Documents/Projects/Raytracer/box.hpp
+ /home/jacob/Documents/Projects/Raytracer/bvh.hpp
+ /home/jacob/Documents/Projects/Raytracer/camera.hpp
+ /home/jacob/Documents/Projects/Raytracer/color.hpp
+ /home/jacob/Documents/Projects/Raytracer/constant_medium.hpp
  /home/jacob/Documents/Projects/Raytracer/external/stb_image.h
- /home/jacob/Documents/Projects/Raytracer/fog.h
- /home/jacob/Documents/Projects/Raytracer/hittable.h
- /home/jacob/Documents/Projects/Raytracer/hittable_list.h
+ /home/jacob/Documents/Projects/Raytracer/helpful.hpp
+ /home/jacob/Documents/Projects/Raytracer/hittable.hpp
+ /home/jacob/Documents/Projects/Raytracer/hittable_list.hpp
  /home/jacob/Documents/Projects/Raytracer/main.cpp
- /home/jacob/Documents/Projects/Raytracer/material.h
- /home/jacob/Documents/Projects/Raytracer/moving_sphere.h
- /home/jacob/Documents/Projects/Raytracer/pdf.h
- /home/jacob/Documents/Projects/Raytracer/perlin.h
- /home/jacob/Documents/Projects/Raytracer/probability.h
- /home/jacob/Documents/Projects/Raytracer/ray.h
- /home/jacob/Documents/Projects/Raytracer/render.h
- /home/jacob/Documents/Projects/Raytracer/scenes.h
- /home/jacob/Documents/Projects/Raytracer/sphere.h
+ /home/jacob/Documents/Projects/Raytracer/material.hpp
+ /home/jacob/Documents/Projects/Raytracer/moving_sphere.hpp
+ /home/jacob/Documents/Projects/Raytracer/pdf.hpp
+ /home/jacob/Documents/Projects/Raytracer/perlin.hpp
+ /home/jacob/Documents/Projects/Raytracer/probability.hpp
+ /home/jacob/Documents/Projects/Raytracer/ray.hpp
+ /home/jacob/Documents/Projects/Raytracer/render.hpp
+ /home/jacob/Documents/Projects/Raytracer/scenes.hpp
+ /home/jacob/Documents/Projects/Raytracer/sphere.hpp
  /home/jacob/Documents/Projects/Raytracer/stb_image_ne.h
- /home/jacob/Documents/Projects/Raytracer/texture.h
- /home/jacob/Documents/Projects/Raytracer/triangle.h
- /home/jacob/Documents/Projects/Raytracer/triangle_mesh.h
- /home/jacob/Documents/Projects/Raytracer/vec2.h
- /home/jacob/Documents/Projects/Raytracer/vec3.h
+ /home/jacob/Documents/Projects/Raytracer/texture.hpp
+ /home/jacob/Documents/Projects/Raytracer/triangle.hpp
+ /home/jacob/Documents/Projects/Raytracer/triangle_mesh.hpp
+ /home/jacob/Documents/Projects/Raytracer/vec2.hpp
+ /home/jacob/Documents/Projects/Raytracer/vec3.hpp

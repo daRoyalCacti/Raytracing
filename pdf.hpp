@@ -71,7 +71,7 @@ struct mixture_pdf : public pdf {
 
 struct Henyey_Greensteing_pdf : public pdf {
     const double g;
-    size_t halton_index1 = 0, hatlon_index2 = 0;
+    size_t halton_index1 = 0,hatlon_index2 = 0; //  //does not work - see below
 
     explicit Henyey_Greensteing_pdf(const double g1) : g(g1) {}
 
@@ -82,7 +82,7 @@ struct Henyey_Greensteing_pdf : public pdf {
 
     //returns value in spherical coordinates
     [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) override {
-        const auto angle = rand_Henyey_Greensteing_halton(g, halton_index1);
+        const auto angle = rand_Henyey_Greensteing_halton(g, halton_index1);  //gives lines through the images
 
         //select random vector to rotate around
         const auto rot = random_unit_vector_halton(hatlon_index2);

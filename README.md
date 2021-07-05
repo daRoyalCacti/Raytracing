@@ -3,6 +3,21 @@
 This is a CPU path tracer based on; [Raytracing in one weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html), [Raytracing the next week](https://raytracing.github.io/books/RayTracingTheNextWeek.html), 
 and [Raytracing the rest of your life](https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html)
 (a GPU implemention using CUDA was also done. See [Raytracing_GPU](https://github.com/daRoyalCacti/Raytracing_GPU)).
+
+
+## Images
+All images created are available in [/images](https://github.com/daRoyalCacti/Raytracing_GPU/tree/master/images). Some noteworthy images are seen below.
+
+<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/cornell_box.png" width="400" height="400" alt="cornell box">
+
+<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/cornell_box_smokey.png" width="400" height="400" alt="cornell box with sphere">
+
+<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/foggy_balls.png" width="800" height="450" alt="raytracing in one weekend main image">
+
+<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/raytracing_the_next_week_main_image.png" width="400" height="400" alt="raytracing the next week main image">
+
+
+
 ## From raytracing in one weekend
 As such it has the following features
 * Antialiasing (inherit to the path tracing method)  
@@ -113,15 +128,3 @@ This lead to a 20% reduction in computation time.
 This does not conform with the results of [Berblinger and Schlier](https://doi.org/10.1016%2F0010-4655%2891%2990064-R) 
 which found an order of magnitude reduction in computation time.
 This is likely because the test case used only ran for 3 minutes.
-
-## Images
-All images created are available in [/images](https://github.com/daRoyalCacti/Raytracing_GPU/tree/master/images). Some noteworthy images are seen below.
-
-<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/cornell_box.png" width="400" height="400" alt="cornell box">
-
-<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/cornell_box_smokey.png" width="400" height="400" alt="cornell box with sphere">
-
-<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/foggy_balls.png" width="800" height="450" alt="raytracing in one weekend main image">
-
-<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/raytracing_the_next_week_main_image.png" width="400" height="400" alt="raytracing the next week main image">
-

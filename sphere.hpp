@@ -12,9 +12,11 @@ struct sphere : public hittable {
 	size_t halton_index = 0;
 
 	sphere() = delete;
-	sphere(const point3 cen, const double r, const std::shared_ptr<material>& m): center(cen), radius(r), mat_ptr(m) {}
+	sphere(const point3 cen, const double r, std::shared_ptr<material> m): center(cen), radius(r), mat_ptr(std::move(m)) {}
 
-	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
+	bool hit_time(const ray&r, double t_min, double t_max, hit_record& rec) override;
+    void hit_info(const ray&r, double t_min, double t_max, hit_record& rec) override;
+
 	bool bounding_box(double time0, double time1, aabb& output_box) const override;
 
     [[nodiscard]] double pdf_value(const point3& o, const vec3& v) override;
@@ -37,7 +39,7 @@ struct sphere : public hittable {
 	}
 };
 
-bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
+bool sphere::hit_time(const ray& r, const double t_min, const double t_max, hit_record& rec) {
 	//using the quadratic equation to find if (and when) 'ray' collides with sphere centred at 'center' with radius 'radius'
 	
 	const vec3 oc = r.origin() - center;	
@@ -68,17 +70,21 @@ bool sphere::hit(const ray& r, const double t_min, const double t_max, hit_recor
 #ifndef NDEBUG
 	if (!std::isfinite(rec.t)) std::cout << "sphere collision gave infinite time" << std::endl;
 #endif
-	rec.p = r.at(rec.t);
-	const vec3 outward_normal = (rec.p - center) / radius;	//a normal vector is just a point on the sphere less the center
-								//dividing by radius to make it normalised
-	rec.set_face_normal(r, outward_normal);
-	rec.mat_ptr = mat_ptr;
 
-	get_sphere_uv(outward_normal, rec.u, rec.v);	//setting the texture coordinates
-							//outward_normal is technical a vec3 not a point3 but they are the same thing
-							// - it points to the correct position on a unit sphere
 
 	return true;	//the ray collides with the sphere
+}
+
+void sphere::hit_info(const ray& r, const double t_min, const double t_max, hit_record& rec) {
+    rec.p = r.at(rec.t);
+    const vec3 outward_normal = (rec.p - center) / radius;	//a normal vector is just a point on the sphere less the center
+    //dividing by radius to make it normalised
+    rec.set_face_normal(r, outward_normal);
+    rec.mat_ptr = mat_ptr;
+
+    get_sphere_uv(outward_normal, rec.u, rec.v);	//setting the texture coordinates
+    //outward_normal is technical a vec3 not a point3 but they are the same thing
+    // - it points to the correct position on a unit sphere
 }
 
 bool sphere::bounding_box(const double time0, const double time1, aabb& output_box) const {
@@ -89,7 +95,8 @@ bool sphere::bounding_box(const double time0, const double time1, aabb& output_b
 
 double sphere::pdf_value(const point3& o, const vec3& v) {
     hit_record rec;
-    if (!this->hit(ray(o,v), 0.001, infinity, rec))
+    const auto temp_ray = ray(o,v);
+    if (!this->hit_time(temp_ray, 0.001, infinity, rec))
         return 0;
 
     const auto cos_theta_max = sqrt(1 - radius*radius/(center-o).length_squared());

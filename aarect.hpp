@@ -17,7 +17,8 @@ struct xy_rect : public hittable {
 	xy_rect(const double _x0, const double _x1, const double _y0, const double _y1, const double _k, std::shared_ptr<material> mat)
 		: x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(std::move(mat)), area( (x1-x0)*(y1-y0)), lx(x1-x0), ly(y1-y0) {};
 
-	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
+	bool hit_time(const ray& r, double t_min, double t_max, hit_record& rec) override;
+    void hit_info(const ray& r, double t_min, double t_max, hit_record& rec) override;
 
 	inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		//just padding the z direction by a small amount
@@ -28,8 +29,10 @@ struct xy_rect : public hittable {
 
     [[nodiscard]] inline double pdf_value(const point3 &origin, const vec3 &v) override {
         hit_record rec;
-        if (!this->hit(ray(origin, v), 0.001, infinity, rec))
+        const auto temp_ray = ray(origin, v);
+        if (!this->hit_time(temp_ray, 0.001, infinity, rec))
             return 0;
+        this->hit_info(temp_ray, 0.001, infinity, rec);
 
 
         const auto v_length2 = v.length_squared();
@@ -57,7 +60,8 @@ struct xz_rect : public hittable {
 	xz_rect(const double _x0, const double _x1, const double _z0, const double _z1, const double _k, std::shared_ptr<material> mat)
 		: x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(std::move(mat)), area((x1-x0)*(z1-z0) ), lx(x1-x0), lz(z1-z0) {};
 
-	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
+    bool hit_time(const ray& r, double t_min, double t_max, hit_record& rec) override;
+    void hit_info(const ray& r, double t_min, double t_max, hit_record& rec) override;
 
     inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		constexpr double small = 0.0001;
@@ -67,8 +71,10 @@ struct xz_rect : public hittable {
 
 	[[nodiscard]] inline double pdf_value(const point3 &origin, const vec3 &v) override {
 	    hit_record rec;
-	    if (!this->hit(ray(origin, v), 0.001, infinity, rec))
-	        return 0;
+        const auto temp_ray = ray(origin, v);
+        if (!this->hit_time(temp_ray, 0.001, infinity, rec))
+            return 0;
+        this->hit_info(temp_ray, 0.001, infinity, rec);
 
         const auto v_length2 = v.length_squared();
 	    const double distance_squared = rec.t * rec.t * v_length2;
@@ -96,7 +102,8 @@ struct yz_rect : public hittable {
 	yz_rect(const double _y0, const double _y1, const double _z0, const double _z1, const double _k, std::shared_ptr<material> mat)
 		: y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(std::move(mat)), area( (z1-z0)*(y1-y0) ), lz(z1-z0), ly(y1-y0) {};
 
-	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
+    bool hit_time(const ray& r, double t_min, double t_max, hit_record& rec) override;
+    void hit_info(const ray& r, double t_min, double t_max, hit_record& rec) override;
 
     inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		constexpr double small = 0.0001;
@@ -106,8 +113,10 @@ struct yz_rect : public hittable {
 
     [[nodiscard]] inline double pdf_value(const point3 &origin, const vec3 &v) override {
         hit_record rec;
-        if (!this->hit(ray(origin, v), 0.001, infinity, rec))
+        const auto temp_ray = ray(origin, v);
+        if (!this->hit_time(temp_ray, 0.001, infinity, rec))
             return 0;
+        this->hit_info(temp_ray, 0.001, infinity, rec);
 
         const auto v_length2 = v.length_squared();
         const double distance_squared = rec.t * rec.t * v_length2;
@@ -123,7 +132,7 @@ struct yz_rect : public hittable {
 };
 
 
-bool xy_rect::hit(const ray&r, const double t_min, const double t_max, hit_record& rec)  {
+bool xy_rect::hit_time(const ray&r, const double t_min, const double t_max, hit_record& rec)  {
 	const double t = (k-r.origin().z()) / r.direction().z();	//time of collision - see aabb.h for why this is the case
 
 	if (t < t_min || t > t_max)	//if collision is outside of specified times
@@ -137,27 +146,31 @@ bool xy_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 	// - simply if the x and y components of the point of collision are outside the specified size of the rectangle
 	if (x < x0 || x > x1 || y < y0 || y > y1)
 		return false;	//there was no collision
-	
+
+    rec.t = t;
+
 	//normalise x and y to be used as texture coords
 	rec.u = (x-x0)/lx;
 	rec.v = (y-y0)/ly;
 
-	rec.t = t;
+
 #ifndef NDEBUG
 	if (!std::isfinite(rec.t)) std::cout << "xy_rec collision gave infinite time" << std::endl;
 #endif
 
-	const auto outward_normal = vec3(0, 0, 1);	//the trivial normal vector
-	rec.set_face_normal(r, outward_normal);
-	rec.mat_ptr = mp;
-	rec.p = r.at(t);
-
 	return true;
+}
+
+void xy_rect::hit_info(const ray&r, const double t_min, const double t_max, hit_record& rec) {
+    const auto outward_normal = vec3(0, 0, 1);	//the trivial normal vector
+    rec.set_face_normal(r, outward_normal);
+    rec.mat_ptr = mp;
+    rec.p = r.at(rec.t);
 }
 
 
 
-bool xz_rect::hit(const ray&r, const double t_min, const double t_max, hit_record& rec) {
+bool xz_rect::hit_time(const ray&r, const double t_min, const double t_max, hit_record& rec) {
 	const auto t = (k-r.origin().y()) / r.direction().y();	//time of collision - see aabb.h for why this is the case
 
 	if (t < t_min || t > t_max)	//if collision is outside of specified times
@@ -180,17 +193,19 @@ bool xz_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 	if (!std::isfinite(rec.t)) std::cout << "xz_rec collision gave infinite time" << std::endl;
 #endif
 
-	const auto outward_normal = vec3(0, 1, 0);	//the trivial normal vector
-	rec.set_face_normal(r, outward_normal);
-	rec.mat_ptr = mp;
-	rec.p = r.at(t);
 
 	return true;
 }
 
+void xz_rect::hit_info(const ray&r, const double t_min, const double t_max, hit_record& rec) {
+    const auto outward_normal = vec3(0, 1, 0);	//the trivial normal vector
+    rec.set_face_normal(r, outward_normal);
+    rec.mat_ptr = mp;
+    rec.p = r.at(rec.t);
+}
 
 
-bool yz_rect::hit(const ray&r, const double t_min, const double t_max, hit_record& rec) {
+bool yz_rect::hit_time(const ray&r, const double t_min, const double t_max, hit_record& rec) {
 	const auto t = (k-r.origin().x()) / r.direction().x();	//time of collision - see aabb.h for why this is the case
 
 	if (t < t_min || t > t_max)	//if collision is outside of specified times
@@ -213,11 +228,14 @@ bool yz_rect::hit(const ray&r, const double t_min, const double t_max, hit_recor
 	if (!std::isfinite(rec.t)) std::cout << "yz_rec collision gave infinite time" << std::endl;
 #endif
 
-	const auto outward_normal = vec3(1, 0, 0);	//the trivial normal vector
-	rec.set_face_normal(r, outward_normal);
-	rec.mat_ptr = mp;
-	rec.p = r.at(t);
+
 
 	return true;
 }
 
+void yz_rect::hit_info(const ray&r, const double t_min, const double t_max, hit_record& rec) {
+    const auto outward_normal = vec3(1, 0, 0);	//the trivial normal vector
+    rec.set_face_normal(r, outward_normal);
+    rec.mat_ptr = mp;
+    rec.p = r.at(rec.t);
+}

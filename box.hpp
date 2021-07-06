@@ -10,9 +10,13 @@ struct box : public hittable {
 	box() = delete;
 	box(const point3& p0, const point3& p1, const std::shared_ptr<material> &ptr);
 
-    inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
-		return sides.hit(r, t_min, t_max, rec);
+    inline bool hit_time(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
+		return sides.hit_time(r, t_min, t_max, rec);
 	}
+
+    inline void hit_info(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
+        sides.hit_info(r, t_min, t_max, rec);
+    }
 
     inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		output_box = aabb(box_min, box_max);    //the trivial bounding box

@@ -20,9 +20,13 @@ struct triangle_mesh : public hittable {
 	triangle_mesh(hittable_list &triangles, const double time0, const double time1) : tris(std::make_shared<bvh_node>(triangles,time0, time1)) {}
 
 
-	inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
-		return tris->hit(r, t_min, t_max, rec);
+	inline bool hit_time(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
+		return tris->hit_time(r, t_min, t_max, rec);
 	}
+
+    inline void hit_info(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
+        tris->hit_info(r, t_min, t_max, rec);
+    }
 
 	inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		return tris->bounding_box(time0, time1, output_box);	

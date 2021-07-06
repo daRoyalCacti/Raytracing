@@ -230,9 +230,9 @@ struct render {
             return color(0, 0, 0);
 
         //If the ray hits nothing, return the background color
-        if (!curr_scene.world.hit(r, 0.001, infinity, rec))
+        if (!curr_scene.world.hit_time(r, 0.001, infinity, rec))
             return curr_scene.background;
-
+        curr_scene.world.hit_info(r, 0.001, infinity, rec);
 
 
         //else keep bouncing light

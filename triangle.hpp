@@ -25,34 +25,18 @@ struct triangle : public hittable {
 		vertex_normals(false), v0(vec1 - vec0), v1(vec2 - vec0),
           d00(dot(v0, v0)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))), d01(dot(v0, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))),
            d11(dot(v1, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))),
-           normal0(cross(v1, v0)){
-          //invDenom(1.0 / (d00 * d11 - d01 * d01)) {
-
-		//v0 = vertex1 - vertex0;
-		//v1 = vertex2 - vertex0;
-
-		//d00 = dot(v0, v0);
-		//d01 = dot(v0, v1);
-		//d11 = dot(v1, v1);
-		//invDenom = 1.0f / (d00 * d11 - d01 * d01);
-		}
+           normal0(cross(v1, v0)) {}
 
 	 triangle(const vec3 &vec0, const vec3 &vec1, const vec3 &vec2, const vec3 &n0, const vec3 &n1, const vec3 &n2,
            double u0_, double v0_, double u1_, double v1_, double u2_, double v2_,  std::shared_ptr<material> mat)
            : vertex0(vec0), vertex1(vec1), vertex2(vec2), u_0(u0_), v_0(v0_), u_1(u1_), v_1(v1_), u_2(u2_), v_2(v2_),  mp(std::move(mat)),
              vertex_normals(true), v0(vec1 - vec0), v1(vec2 - vec0),
              d00(dot(v0, v0)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))), d01(dot(v0, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))),
-              d11(dot(v1, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))), normal0(n0), normal1(n1), normal2(n2) {
-		//: triangle(vec0, vec1, vec2, u0_, v0_, u1_, v1_, u2_, v2_, mat) {
-		//normal0 = n0;
-		//normal1 = n1;
-		//normal2 = n2;
-
-		//vertex_normals = true;
-		}
+              d11(dot(v1, v1)/(dot(v0, v0) * dot(v1, v1) - dot(v0, v1) * dot(v0, v1))), normal0(n0), normal1(n1), normal2(n2) {}
 
 	
-	 bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
+	 bool hit_time(const ray& r, double t_min, double t_max, hit_record& rec) override;
+	 void hit_info(const ray& r, double t_min, double t_max, hit_record& rec) override;
 
 	 bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		//finding the min and max of each coordinate
@@ -130,7 +114,7 @@ struct triangle : public hittable {
 
 };
 
- bool triangle::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
+ bool triangle::hit_time(const ray& r, const double t_min, const double t_max, hit_record& rec) {
 	//using the Moller-Trumbore intersection algorithm
 	//https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 	
@@ -166,27 +150,29 @@ struct triangle : public hittable {
 
 	rec.t = t;
 
-	rec.mat_ptr = mp;
-	rec.p = r.at(t);
+	return true;
+}
 
-	//finding the uv coords using interpolation with barycentric coordinates
-	double Bary0, Bary1, Bary2;
-	barycentric_coords(rec.p, Bary0, Bary1, Bary2);
-	barycentric_interp(rec.u, u_0, u_1, u_2, Bary0, Bary1, Bary2);
-	barycentric_interp(rec.v, v_0, v_1, v_2, Bary0, Bary1, Bary2);
-	
-	if (!vertex_normals) {
-		//rec.set_face_normal(r, cross(v1, v0) );
+
+void triangle::hit_info(const ray& r, const double t_min, const double t_max, hit_record& rec) {
+    rec.mat_ptr = mp;
+    rec.p = r.at(rec.t);
+
+    //finding the uv coords using interpolation with barycentric coordinates
+    double Bary0, Bary1, Bary2;
+    barycentric_coords(rec.p, Bary0, Bary1, Bary2);
+    barycentric_interp(rec.u, u_0, u_1, u_2, Bary0, Bary1, Bary2);
+    barycentric_interp(rec.v, v_0, v_1, v_2, Bary0, Bary1, Bary2);
+
+    if (!vertex_normals) {
+        //rec.set_face_normal(r, cross(v1, v0) );
         rec.set_face_normal(r, normal0 );
-	} else {
-		//interpolating the normal vectors
-		vec3 temp_norm_res;
-		for (int i = 0; i < 3; i++) {	//for the 3 components of the normal vector
-			barycentric_interp(temp_norm_res[i], normal0[i], normal1[i], normal2[i], Bary0, Bary1, Bary2);
-		}
-		rec.set_face_normal(r, temp_norm_res);
-	}
-
-
-	return true;	
+    } else {
+        //interpolating the normal vectors
+        vec3 temp_norm_res;
+        for (int i = 0; i < 3; i++) {	//for the 3 components of the normal vector
+            barycentric_interp(temp_norm_res[i], normal0[i], normal1[i], normal2[i], Bary0, Bary1, Bary2);
+        }
+        rec.set_face_normal(r, temp_norm_res);
+    }
 }

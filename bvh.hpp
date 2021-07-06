@@ -35,14 +35,27 @@ struct bvh_node : public hittable {
 	bvh_node(const hittable_list& list, const double time0, const double time1) : bvh_node(list.objects, 0, list.objects.size(), time0, time1) {}
 	bvh_node(const std::vector<std::shared_ptr<hittable>>& src_objects, size_t start, size_t end, double time0, double time1);
 
-    inline bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override{
+    inline bool hit_time(const ray& r, double t_min, double t_max, hit_record& rec) override{
         if (!box.hit(r, t_min, t_max)) return false;	//if it didn't hit the large bounding box
 
-        const bool hit_left = left->hit(r, t_min, t_max, rec);	//did the ray hit the left hittable
-        const bool hit_right = right->hit(r, t_min, hit_left ? rec.t : t_max, rec);	//did the ray hit the right hittable
+        const bool hit_left = left->hit_time(r, t_min, t_max, rec);	//did the ray hit the left hittable
+        const bool hit_right = right->hit_time(r, t_min, hit_left ? rec.t : t_max, rec);	//did the ray hit the right hittable
         //if the ray hit the left, check to make sure it hit the right before the left
         // - so rec is set correctly
+
+        if (hit_right) {
+            right->hit_info(r, t_min, hit_left ? rec.t : t_max, rec);
+        } else {
+            if (hit_left) {
+                left->hit_info(r, t_min, t_max, rec);
+            }
+        }
+
         return hit_left || hit_right;
+    }
+
+    inline void hit_info(const ray& r, double t_min, double t_max, hit_record& rec) override {
+        //no need here
     }
 
 	inline bool bounding_box(double time0, double time1, aabb& output_box) const override{

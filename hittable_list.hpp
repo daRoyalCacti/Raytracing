@@ -16,29 +16,42 @@ struct hittable_list : public hittable {
 	void add(const std::shared_ptr<hittable>& object) {objects.push_back(object);}
 	void reserve(const size_t N) {objects.reserve(N);}
 
-	inline bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
+	inline bool hit_time(const ray& r, double t_min, double t_max, hit_record& rec) override;
+    inline void hit_info(const ray& r, double t_min, double t_max, hit_record& rec) override;
 	bool bounding_box(double time0, double time1, aabb& output_box) const override;
 
     [[nodiscard]] double pdf_value(const point3& o, const vec3& v) override;
     [[nodiscard]] vec3 random(const point3& o) override;
 };
 
-inline bool hittable_list::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
+inline bool hittable_list::hit_time(const ray& r, const double t_min, const double t_max, hit_record& rec) {
 	hit_record temp_rec;
 	bool hit_anything = false;
 	auto closest_so_far = t_max;
+	unsigned best_index = 0;
 	
 	//testing to see if ray hits anyobject between the given times
-	for (const auto& object : objects) {	//iterating through all objects that could be hit
-		if (object->hit(r, t_min, closest_so_far, temp_rec)) {//checking to see if the ray hit the object
+	//for (const auto& object : objects) {	//iterating through all objects that could be hit
+	for (unsigned i = 0; i < objects.size(); i++) {
+		if (objects[i]->hit_time(r, t_min, closest_so_far, temp_rec)) {//checking to see if the ray hit the object
+		    best_index = i;
 			hit_anything = true;
 			closest_so_far = temp_rec.t;	//keep lowering max time to find closest object
 			rec = temp_rec;
 		}
 	}
 
+	if (hit_anything) {
+        objects[best_index]->hit_info(r, t_min, closest_so_far, rec);
+    }
+
 	return hit_anything;
 }
+
+inline void hittable_list::hit_info(const ray& r, const double t_min, const double t_max, hit_record& rec) {
+    //no need here
+}
+
 
 inline bool hittable_list::bounding_box(const double time0, const double time1, aabb& output_box) const {
 	if (objects.empty()) return false;	//no objects to create bounding boxes for

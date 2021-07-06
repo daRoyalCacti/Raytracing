@@ -26,7 +26,8 @@ struct hit_record {
 // - hit needs to be broken up into hit_time and hit_info
 // - a number of times only the hit times are needed and computing the hit_info (e.g. normal vectors and texture coordinates) are unnecessary
 struct hittable {
-	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) = 0;	//function to tell when a ray hits the object
+	virtual bool hit_time(const ray& r, double t_min, double t_max, hit_record& rec) = 0;	//function to tell when a ray hits the object
+    virtual void hit_info(const ray& r, double t_min, double t_max, hit_record& rec) = 0;	//function to get the information of hitting
 	virtual bool bounding_box(double time0, double time1, aabb& output_box) const = 0;	//function that creates a bounding box around the object
 
 	[[nodiscard]] virtual double pdf_value(const point3& o, const vec3 &v) {
@@ -46,16 +47,20 @@ struct translate : public hittable {
 	translate() = delete;
 	translate(std::shared_ptr<hittable> p, const vec3& displacement) : ptr(std::move(p)), offset(displacement) {}
 
-	inline bool hit(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
+	inline bool hit_time(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
 		const ray moved_r(r.origin() - offset, r.direction(), r.time());	//moving object by offset is same as translating axes by -offset
 		
-		if(!ptr->hit(moved_r, t_min, t_max, rec))	//if ray doesn't hits object in new axes
+		if(!ptr->hit_time(moved_r, t_min, t_max, rec))	//if ray doesn't hits object in new axes
 			return false;
 
-		rec.p += offset;
-		rec.set_face_normal(moved_r, rec.normal);
-
 		return true;
+	}
+
+    inline void hit_info(const ray& r, const double t_min, const double t_max, hit_record& rec) override {
+        const ray moved_r(r.origin() - offset, r.direction(), r.time());	//moving object by offset is same as translating axes by -offset
+        ptr->hit_info(moved_r, t_min, t_max, rec);
+        rec.p += offset;
+        rec.set_face_normal(moved_r, rec.normal);
 	}
 
 	inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
@@ -78,7 +83,8 @@ struct rotate_y : public hittable {
 	rotate_y() = delete;
 	rotate_y(std::shared_ptr<hittable> p, double angle);
 
-	bool hit(const ray&r, double t_min, double t_max, hit_record& rec) override;
+	bool hit_time(const ray&r, double t_min, double t_max, hit_record& rec) override;
+    void hit_info(const ray&r, double t_min, double t_max, hit_record& rec) override;
 
 	inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {
 		output_box = bbox;
@@ -117,7 +123,7 @@ rotate_y::rotate_y(std::shared_ptr<hittable> p, const double angle) : ptr(std::m
 	bbox = aabb(min,max);
 }
 
-bool rotate_y::hit(const ray& r, const double t_min, const double t_max, hit_record& rec) {
+bool rotate_y::hit_time(const ray& r, const double t_min, const double t_max, hit_record& rec) {
 	auto origin = r.origin();
 	auto direction = r.direction();
 	
@@ -131,9 +137,10 @@ bool rotate_y::hit(const ray& r, const double t_min, const double t_max, hit_rec
 
 	const ray rotated_r(origin, direction, r.time());	//where the ray is coming from in the new frame
 
-	if (!ptr->hit(rotated_r, t_min, t_max, rec))	//if the ray doesn't hit in the new frame
+	if (!ptr->hit_time(rotated_r, t_min, t_max, rec))	//if the ray doesn't hit in the new frame
 		return false;				//also sets rec
 
+    ptr->hit_info(rotated_r, t_min, t_max, rec);
 	auto p = rec.p; //temporary variable
 	auto normal = rec.normal;
 
@@ -150,6 +157,10 @@ bool rotate_y::hit(const ray& r, const double t_min, const double t_max, hit_rec
 	return true;
 }
 
+void rotate_y::hit_info(const ray& r, const double t_min, const double t_max, hit_record& rec) {
+    return; //inefficent to do any computations here
+}
+
 
 struct flip_face : public hittable {
     const std::shared_ptr<hittable> ptr;
@@ -157,12 +168,17 @@ struct flip_face : public hittable {
     flip_face() = delete;
     explicit flip_face(std::shared_ptr<hittable> p) : ptr(std::move(p)) {}
 
-    inline bool hit(const ray& r, const double t_min, const double t_max, hit_record &rec) override {
-        if (!ptr->hit(r, t_min, t_max, rec))
+    inline bool hit_time(const ray& r, const double t_min, const double t_max, hit_record &rec) override {
+        if (!ptr->hit_time(r, t_min, t_max, rec))
             return false;
 
-        rec.front_face = !rec.front_face;
         return true;
+    }
+
+    inline void hit_info(const ray& r, const double t_min, const double t_max, hit_record &rec) override {
+        ptr->hit_info(r, t_min, t_max, rec);
+
+        rec.front_face = !rec.front_face;
     }
 
     inline bool bounding_box(const double time0, const double time1, aabb& output_box) const override {

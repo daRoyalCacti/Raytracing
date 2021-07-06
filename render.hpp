@@ -68,6 +68,7 @@ struct render {
             for (unsigned j = 0; j < image_height; j++) {
                 samples[i][j] = samplespp;
                 curr_samples[i][j] = 0;
+                buffer[i][j] = vec3(0,0,0);
             }
         }
         const auto end_init = std::chrono::high_resolution_clock::now();

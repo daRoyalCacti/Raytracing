@@ -85,15 +85,20 @@ struct Halton_set {
     std::array<vec2, N> halton_set_2D;
     std::array<vec3, N> halton_set_3D;
 
+    bool is_initialised = false;
+
     //only taking every <leap> value of the sequence
     // can improve convergence, see https://en.wikipedia.org/wiki/Halton_sequence
     static constexpr unsigned leap = 409;
 
     void init() {
-        for (unsigned i = 0; i < N; i++) {
-            halton_set_1D[i] = Halton::get_halton<2>(leap*i);
-            halton_set_2D[i] = vec2(halton_set_1D[i], Halton::get_halton<3>(leap*i));
-            halton_set_3D[i] = vec3(halton_set_2D[i], Halton::get_halton<5>(leap*i));
+        if (!is_initialised) {
+            for (unsigned i = 0; i < N; i++) {
+                halton_set_1D[i] = Halton::get_halton<2>(leap * i);
+                halton_set_2D[i] = vec2(halton_set_1D[i], Halton::get_halton<3>(leap * i));
+                halton_set_3D[i] = vec3(halton_set_2D[i], Halton::get_halton<5>(leap * i));
+            }
+            is_initialised = true;
         }
     }
 };

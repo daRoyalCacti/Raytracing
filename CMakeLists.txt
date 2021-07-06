@@ -7,7 +7,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
-set(Header_files aabb.hpp aarect.hpp box.hpp bvh.hpp camera.hpp color.hpp helpful.hpp constant_medium.hpp Halton.hpp hittable.hpp hittable_list.hpp material.hpp moving_sphere.hpp ONB.hpp pdf.hpp perlin.hpp probability.hpp ray.hpp render.hpp scenes.hpp sphere.hpp texture.hpp triangle.hpp triangle_mesh.hpp vec2.hpp vec3.hpp)
+set(Header_files aabb.hpp aarect.hpp box.hpp bvh.hpp camera.hpp color.hpp helpful.hpp constant_medium.hpp Halton.hpp hittable.hpp hittable_list.hpp material.hpp moving_sphere.hpp ONB.hpp pdf.hpp perlin.hpp probability.hpp ray.hpp render.hpp scenes.hpp sphere.hpp texture.hpp triangle.hpp triangle_mesh.hpp vec2.hpp vec3.hpp timing_tests.hpp)
 add_executable(Generate main.cpp ${Header_files})
 
 find_package(OpenMP REQUIRED)

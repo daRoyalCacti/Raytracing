@@ -28,7 +28,7 @@ inline bool hittable_list::hit_time(const ray& r, const double t_min, const doub
 	hit_record temp_rec;
 	bool hit_anything = false;
 	auto closest_so_far = t_max;
-	unsigned best_index = 0;
+	unsigned best_index;
 	
 	//testing to see if ray hits anyobject between the given times
 	//for (const auto& object : objects) {	//iterating through all objects that could be hit

@@ -16,9 +16,9 @@ int main() {
     //test1 test;
     //test.run();
 
-    /*scene test = 	big_scene1();
+    scene test = 	big_scene1();
     render<600, 400> ren_test(test);
-    ren_test.draw_on_convergence<100>("timing_test.png", 0.001);*/
+    ren_test.draw_on_convergence<100>("timing_test.png", 0.001);
 
 	//start timing
 	/*const auto start = std::chrono::system_clock::now();

@@ -2,7 +2,7 @@
 
 
 #include "perlin.hpp"
-#include "stb_image_ne.h"
+#include "stb_image_ne.hpp"
 
 struct texture {
 	[[nodiscard]] virtual color value(double u, double v, const point3& p) const = 0;

@@ -158,7 +158,7 @@ bool rotate_y::hit_time(const ray& r, const double t_min, const double t_max, hi
 }
 
 void rotate_y::hit_info(const ray& r, const double t_min, const double t_max, hit_record& rec) {
-    return; //inefficent to do any computations here
+    //inefficent to do any computations here
 }
 
 

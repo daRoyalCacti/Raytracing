@@ -14,7 +14,22 @@ struct aabb {
 					//can't be const
 
 	aabb() = default;
-	aabb(const point3& a, const point3& b) : minimum(a), maximum(b) {}
+	aabb(const point3& a, const point3& b) : minimum(a), maximum(b) {
+	    //enforcing that minimnum is indeed the minimum and maximum is indeed the maximum
+	    for (size_t i = 0; i < 3; i++) {
+            if (minimum[i] > maximum[i]) {
+                std::swap(minimum[i], maximum[i]);
+            }
+        }
+	}
+
+	inline double surface_area() const {
+	    const double length = maximum.x() - minimum.x();
+	    const double width = maximum.y() - minimum.y();
+	    const double height = maximum.z() - minimum.z();
+
+	    return 2*length*width + 2*width*height + 2*length*height;
+	}
 
 	[[nodiscard]] point3 min() const {return minimum;}
 	[[nodiscard]] point3 max() const {return maximum;}

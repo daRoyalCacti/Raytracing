@@ -18,8 +18,8 @@ struct vec3 {
 	[[nodiscard]] double z() const {return e[2];}
 
 	vec3 operator -() const {return vec3(-e[0], -e[1], -e[2]); }
-	double operator [](int i) const {return e[i];}
-	double& operator [](int i) {return e[i];}
+	double operator [](unsigned i) const {return e[i];}
+	double& operator [](unsigned i) {return e[i];}
 
 	vec3& operator += (const vec3 &v) {
 		e[0] += v.e[0];
@@ -37,6 +37,10 @@ struct vec3 {
 
 	vec3& operator /= (const double t) {
 		return *this *= 1/t;
+	}
+
+	bool operator == (const vec3 &v) {
+        return (e[0] == v.e[0]) &&  (e[1] == v.e[1]) && (e[2] == v.e[2]);
 	}
 
 	[[nodiscard]] inline double length() const {

@@ -13,8 +13,8 @@ int main() {
     const std::chrono::duration<double> elapsed_seconds_Halton = end_Halton - start_Halton;
     std::cout << " -- took : " << elapsed_seconds_Halton.count() << "s" << std::endl;
 
-    test1 test;
-    test.run();
+    //test1 test;
+    //test.run();
 
     /*scene test = 	big_scene1();
     render<600, 400> ren_test(test);
@@ -26,11 +26,6 @@ int main() {
 	std::cout << "Rendering started at " << std::ctime(&start_time);
 
 
-
-    scene cornell_scene = 	cornell_box_scene();
-    render<1200, 1200> ren_conell(cornell_scene);
-    ren_conell.draw_on_convergence<500>("cornell_box.png", 0.001);
-
     scene scene2 = 	big_scene2();
     render<1920, 1080> ren_scene2(scene2);
     ren_scene2.draw_on_convergence<500>("raytracing_the_next_week_main_image.png", 0.001);
@@ -38,6 +33,10 @@ int main() {
     scene scene1 = 	big_scene1_fog();
     render<1920, 1080> ren_scene1(scene1);
     ren_scene1.draw_on_convergence<500>("foggy_balls.png", 0.001);
+
+	scene cornell_scene = 	cornell_box_scene();
+    render<1200, 1200> ren_conell(cornell_scene);
+    ren_conell.draw_on_convergence<500>("cornell_box.png", 0.001);
 
     scene earth_scene = 	earth_atm_scene();
     render<1920, 1080> ren_earth(earth_scene);

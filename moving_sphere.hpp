@@ -81,7 +81,7 @@ void moving_sphere::hit_info(const ray& r, const double t_min, const double t_ma
     rec.set_face_normal(r, outward_normal);
     rec.mat_ptr = mat_ptr;
 
-    //get_sphere_uv(outward_normal, rec.u, rec.v);	//setting the texture coordinates
+    get_sphere_uv(outward_normal, rec.u, rec.v);	//setting the texture coordinates
     //outward_normal is technical a vec3 not a point3 but they are the same thing
     // - it points to the correct position on a unit sphere
 }

@@ -285,9 +285,16 @@ struct [[maybe_unused]] big_scene2 : public scene{
 		//box of many spheres
 		hittable_list boxes2;
 		const auto white = std::make_shared<lambertian>(color(0.73, 0.73, 0.73));
-		const int ns = 1000;	//number of spheres
-		for (int j = 0; j < ns; j++)
-			boxes2.add(make_shared<sphere>(random_vec3(0, 165), 10, white) );
+        const auto met = std::make_shared<metal>(vec3(0.8, 0.8, 0.8), 1);
+		const size_t ns = 1000;	//number of spheres
+		for (size_t j = 0; j < ns; j++) {
+		    const auto ra = random_double();
+		    if (ra > 0.2) {
+                boxes2.add(make_shared<sphere>(random_vec3(0, 165), 10, white));
+            } else {
+                boxes2.add(make_shared<sphere>(random_vec3(0, 165), 10, met));
+		    }
+        }
 
 		world.add(make_shared<translate>(make_shared<rotate_y>(std::make_shared<bvh_node>(boxes2, 0.0, 1.0), 30), vec3(-100, 270, 395) ));
 
@@ -357,9 +364,10 @@ struct [[maybe_unused]] earth_atm_scene : public scene {
 
 		const auto difflight = std::make_shared<diffuse_light>(color(4.0, 4.0, 4.0));
 		world.add(std::make_shared<xy_rect>(-5, 5, -3, 3, -6, difflight));
+        add_important(std::make_shared<xy_rect>(-5, 5, -3, 3, -6, std::shared_ptr<material>()) );
 
 
-		const auto boundary = make_shared<sphere>(point3(0,0,0), 2.5, std::make_shared<dielectric>(1.5) );
+		const auto boundary = make_shared<sphere>(point3(0,0,0), 3, std::shared_ptr<material>() );
 		world.add(std::make_shared<constant_isotropic_medium>(boundary, 0.1, color(98.0/255.0, 140.0/255.0, 245.0/255.0)) );
 		
 
@@ -370,8 +378,12 @@ struct [[maybe_unused]] earth_atm_scene : public scene {
 
 
 struct [[maybe_unused]] cornell_box_scene : public scene {
-	cornell_box_scene() : scene(1.0) {
+	explicit cornell_box_scene(const double d = 0.0005) : scene(1.0) {
 		set_background(background_color::black);	//shouldn't matter -- can't see sky
+
+        //participating medium should be set first
+        const auto fog_bounds = std::make_shared<box>(vec3(0, 0, 0), vec3(555, 555, 555), nullptr);
+        world.add(std::make_shared<constant_isotropic_medium>(fog_bounds, d, color(0.8, 0.8, 0.8) ));
 
 		const auto red = std::make_shared<lambertian>(color(0.65, 0.05, 0.05));
 		const auto white = std::make_shared<lambertian>(color(0.73, 0.73, 0.73));
@@ -402,6 +414,7 @@ struct [[maybe_unused]] cornell_box_scene : public scene {
 		box2 = std::make_shared<rotate_y>(box2, -18);
 		box2 = std::make_shared<translate>(box2, vec3(130,0,65));
 		world.add(box2);
+
 
 
 		set_camera(vec3(278, 278, -800), vec3(278, 278, 0), 40.0, 0.0); 
@@ -441,7 +454,7 @@ struct [[maybe_unused]] cornell_box_scene2 : public scene {
         world.add(std::make_shared<sphere>(point3(190,90,190), 90, glass));
 
         //auto lights = make_shared<hittable_list>();
-        add_important(make_shared<sphere>(point3(190,90,190), 90, std::shared_ptr<material>()));
+        //add_important(make_shared<sphere>(point3(190,90,190), 90, std::shared_ptr<material>()));
         add_important(make_shared<xz_rect>(213, 343, 227, 332, 554, std::shared_ptr<material>()));
 
         set_camera(vec3(278, 278, -800), vec3(278, 278, 0), 40.0, 0.0);

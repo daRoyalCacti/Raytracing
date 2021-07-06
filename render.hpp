@@ -103,13 +103,18 @@ struct render {
         std::cout << " -- took " << elapsed_seconds_disk1.count() << "s" << std::endl;
 
         bool should_quit = false;
+        bool good;  //if the difference between the 2 images is less than tol
+        unsigned num_good = 0;  //the number of consecutive times the images have been good
+
+        constexpr unsigned num_good_req = 3; //the number of good images in a row
+
         unsigned counter = 0;
         double max_dev, max_dev_l;  //storing the quickest convergence and the color with the quickest convergence
         double sum; //summing over all max_dev_l --- acts as a normalising factor for redistributing the rays
         while (!should_quit) {
             max_dev = 0;
             sum = 0;
-            should_quit = true;
+            good = true;
             counter++;
 
             std::cout << "Generating image " << counter  << std::flush;
@@ -139,12 +144,24 @@ struct render {
 
                     //if the current pixel is converging too fast, then we must keep iterating
                     if ( max_dev_l > tol ) {
-                        should_quit = false;
+                        good = false;
                     }
 
                     buffer_prev[i][j] = buffer[i][j];
                 }
+
             }
+
+
+            if (good) {
+                num_good++;
+            } else {
+                num_good = 0;
+            }
+            if (num_good >= num_good_req) {
+                should_quit = true;
+            }
+
             const auto end_buffer = std::chrono::high_resolution_clock::now();
             const std::chrono::duration<double> elapsed_seconds_buffer = end_buffer - start_buffer;
             std::cout << " -- took " << elapsed_seconds_buffer.count() << "s" << std::endl;

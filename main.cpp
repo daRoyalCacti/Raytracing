@@ -22,16 +22,21 @@ int main() {
     render<600, 400> ren_test(test);
     ren_test.draw_on_convergence<100>("timing_test.png", 0.001);*/
 
+    /*scene cornell_scene = 	cornell_box_scene();
+    render<1200, 1200> ren_conell(cornell_scene);
+    ren_conell.draw_on_convergence<500>("cornell_box.png", 0.001);
 
-    /*scene scene1 = 	big_scene1_fog();
+    scene scene2 = 	big_scene2();
+    render<1920, 1080> ren_scene2(scene2);
+    ren_scene2.draw_on_convergence<500>("raytracing_the_next_week_main_image.png", 0.001);
+
+    scene scene1 = 	big_scene1_fog();
     render<1920, 1080> ren_scene1(scene1);
-    ren_scene1.draw_on_convergence<100>("raytracing_in_one_weekend_main_image_foggy.png", 0.001);*/
+    ren_scene1.draw_on_convergence<500>("foggy_balls.png", 0.001);
 
-    scene conell_box = 	cornell_box_scene2_smokey();
-    render<1200, 1200> ren_box(conell_box);
-    ren_box.draw_on_convergence<200>("cornell_box_smokey.png", 0.001);
-
-
+    scene earth_scene = 	earth_atm_scene();
+    render<1920, 1080> ren_earth(earth_scene);
+    ren_earth.draw_on_convergence<500>("earth.png", 0.001);*/
 
 
 	//end timing

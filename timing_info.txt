@@ -1,0 +1,66 @@
+28/6/21 big scene 1 (600x400)
+ - 216.031s
+ constifying sphere
+  - 215.751s
+  eigen with more iterators (different rng gives slower convergence for this particular case)
+  - 264.901
+  eigen (with same rng) 
+  - 219.793
+EIGEN MOVED TO NEW BRANCH because slow 
+29/6 aabb constified
+ - 150.83
+aarect constified 
+ - 132.762
+ camera constified 
+  - 132.174
+crate scene (600x400)
+Initial (started consitifying)
+ - 49.199
+reduction in multiplications
+ - 48.2909
+30/6 add halton set (big scene 1) (5% faster)
+ - 125.16 (saved an iteration)
+more used of halton set (15% faster)
+ - 106.095
+
+New timing test
+6/7 
+Time taken : 198.245s
+	Mean	: 39.649s
+	Std	: 0.883628s
+	Median	: 39.7759s
+	Min	: 38.5942s
+	Max	: 40.8912s
+
+splitting hit into hit time and hit info (19.9s faster, 90% the time, 10.2% time improvement)
+Time taken : 178.367s
+	Mean	: 35.6734s
+	Std	: 1.12183s
+	Median	: 35.4023s
+	Min	: 34.3686s
+	Max	: 36.8654s
+
+
+7/7 SAH (realised test being used is not effective -- not long enough)
+Time taken : 172.164s
+	Mean	: 34.4329s
+	Std	: 0.744161s
+	Median	: 34.3168s
+	Min	: 33.3713s
+	Max	: 35.2865s
+
+Test2
+Time taken : 2579.2s
+	Mean	: 128.96s
+	Std	: 3.72857s
+	Median	: 129.798s
+	Min	: 123.888s
+	Max	: 135.933s
+
+Old BVH (no SAH) (7% slower)
+Time taken : 2772.48s
+	Mean	: 138.624s
+	Std	: 3.32166s
+	Median	: 138.908s
+	Min	: 132.534s
+	Max	: 143.611s

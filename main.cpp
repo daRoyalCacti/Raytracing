@@ -27,8 +27,8 @@ int main() {
 
 
     scene scene2 = 	big_scene2();
-    render<1920, 1080> ren_scene2(scene2);
-    ren_scene2.draw_on_convergence<500>("raytracing_the_next_week_main_image.png", 0.001);
+    render<1200, 1200> ren_scene2(scene2);
+    ren_scene2.draw_on_convergence<100>("raytracing_the_next_week_main_image.png", 0.001);
 
     scene scene1 = 	big_scene1_fog();
     render<1920, 1080> ren_scene1(scene1);
@@ -50,6 +50,7 @@ int main() {
 	
 	const std::chrono::duration<double> elapsed_seconds = end - start;
 	std::cout << "elapsed time: " << elapsed_seconds.count() << "s  or  " << elapsed_seconds.count() / 60.0 << "m  or  " << elapsed_seconds.count() / (60.0 * 60.0) << "h\n";*/
+
 	return 0;
 
 }

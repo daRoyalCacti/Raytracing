@@ -289,7 +289,7 @@ struct [[maybe_unused]] big_scene2 : public scene{
 		const size_t ns = 1000;	//number of spheres
 		for (size_t j = 0; j < ns; j++) {
 		    const auto ra = random_double();
-		    if (ra > 0.2) {
+		    if (ra > 0.4) {
                 boxes2.add(make_shared<sphere>(random_vec3(0, 165), 10, white));
             } else {
                 boxes2.add(make_shared<sphere>(random_vec3(0, 165), 10, met));

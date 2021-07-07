@@ -4,10 +4,6 @@
 #include <algorithm>
 #include "hittable_list.hpp"
 
-//says if we should use basic splitting of the objects for only a small number of objs in a node
-// - pbr does this
-#define basic_small_split
-
 /* ====================================================================================================================
 This can be made better (i.e. TODO)
 1. use SAH https://psgraphics.blogspot.com/2016/03/a-simple-sah-bvh-build.html,
@@ -163,10 +159,10 @@ struct cost_info {
 bvh_node::bvh_node(const std::vector<std::shared_ptr<hittable>>& src_objects, const double time0, const double time1) {
     const auto num_objs = src_objects.size();
 
-#ifdef basic_small_split
+
     //if <=4, use basic splitting
     // else use SAH
-    if (num_objs <= 4) {
+    if (num_objs <= 4) {    //used to be 4
         auto objs_0 = src_objects;
 
         std::vector<aabb> boxes_0;
@@ -220,148 +216,148 @@ bvh_node::bvh_node(const std::vector<std::shared_ptr<hittable>>& src_objects, co
             right = make_shared<bvh_node>(objs_right, time0, time1);
         }
 
-    } else {
-#endif
-        int best_dim = -1;
-        cost_info c;   //best cost
-        double min_cost = infinity;
+     } else {
+
+         int best_dim = -1;
+         cost_info c;   //best cost
+         double min_cost = infinity;
 
 
-        for (unsigned dim = 0; dim < 3; ++dim) {
-            const auto comparator = (dim == 0)
-                                    ? box_x_compare    //used to sort boxes into close and far to a given axis
-                                    : (dim == 1) ? box_y_compare
-                                                 : box_z_compare;
-            constexpr size_t num_buckets = 12;   //find a good number (TODO)
-            // - also allow to just have every obj in its own buffer (TODO)
-            auto objs_0 = src_objects;
-            std::sort(objs_0.begin(), objs_0.end(), comparator);
-            std::vector<aabb> boxes_0;
-            boxes_0.resize(num_objs);
+         for (unsigned dim = 0; dim < 3; ++dim) {
+             const auto comparator = (dim == 0)
+                                     ? box_x_compare    //used to sort boxes into close and far to a given axis
+                                     : (dim == 1) ? box_y_compare
+                                                  : box_z_compare;
+             constexpr size_t num_buckets = 12;   //find a good number (TODO)
+             // - also allow to just have every obj in its own buffer (TODO)
+             auto objs_0 = src_objects;
+             std::sort(objs_0.begin(), objs_0.end(), comparator);
+             std::vector<aabb> boxes_0;
+             boxes_0.resize(num_objs);
 
-            for (size_t i = 0; i < num_objs; i++) {
-                objs_0[i]->bounding_box(0, 0, boxes_0[i]);
-            }
+             for (size_t i = 0; i < num_objs; i++) {
+                 objs_0[i]->bounding_box(0, 0, boxes_0[i]);
+             }
 
-            const double min = boxes_0[0].mid_point()[dim];
-            const double max = boxes_0[num_objs - 1].mid_point()[dim];
-            const double range = max - min;
+             const double min = boxes_0[0].mid_point()[dim];
+             const double max = boxes_0[num_objs - 1].mid_point()[dim];
+             const double range = max - min;
 
-            //setting buckets
-            // - finding the number of objects in each bucket
-            // - finding the bounds for the objects in the bucket
-            std::array<bucket_info, num_buckets> buckets;
-            for (size_t i = 0; i < num_objs; i++) {
-                const double mid_point = boxes_0[i].mid_point()[dim];
-                if (range == 0) {
-                    continue;//2 objects with same bounding box is not supported
-                    //std::cout << "need to pick another axis\n";
-                }
-                const double normalized_mid_point =
-                        (mid_point - min) / range * num_buckets;    //midpoint mapped to [0,num_buckets]
-#ifndef NDEBUG
-                auto b = std::min(static_cast<size_t>(normalized_mid_point),
-                if (b == num_buckets) { b = num_buckets - 1; }    //happens at the endpoints
-                if (b > num_buckets) {  //some error checking
-                    std::cerr << "trying to fill bucket out of range\n";
-                }
-#else
-                const auto b = std::min(static_cast<size_t>(normalized_mid_point),
-                                        static_cast<size_t>(num_buckets - 1));//gives an index in the buckets array
-                                                                    //b = num_buckets - 1 happens at the endpoints
-#endif
-                buckets[b].add_obj(objs_0[i]);
-                buckets[b].set_bounds(boxes_0[i]);
-            }
+             //setting buckets
+             // - finding the number of objects in each bucket
+             // - finding the bounds for the objects in the bucket
+             std::array<bucket_info, num_buckets> buckets;
+             for (size_t i = 0; i < num_objs; i++) {
+                 const double mid_point = boxes_0[i].mid_point()[dim];
+                 if (range == 0) {
+                     continue;//2 objects with same bounding box is not supported
+                     //std::cout << "need to pick another axis\n";
+                 }
+                 const double normalized_mid_point =
+                         (mid_point - min) / range * num_buckets;    //midpoint mapped to [0,num_buckets]
+ #ifndef NDEBUG
+                 auto b = std::min(static_cast<size_t>(normalized_mid_point),
+                 if (b == num_buckets) { b = num_buckets - 1; }    //happens at the endpoints
+                 if (b > num_buckets) {  //some error checking
+                     std::cerr << "trying to fill bucket out of range\n";
+                 }
+ #else
+                 const auto b = std::min(static_cast<size_t>(normalized_mid_point),
+                                         static_cast<size_t>(num_buckets - 1));//gives an index in the buckets array
+                                                                     //b = num_buckets - 1 happens at the endpoints
+ #endif
+                 buckets[b].add_obj(objs_0[i]);
+                 buckets[b].set_bounds(boxes_0[i]);
+             }
 
-            //computing the cost of each reasonable combination of buckets (i.e. all on the left or right of some point)
-            std::array<cost_info, num_buckets - 1> cost;
-            for (size_t i = 0; i < num_buckets - 1; i++) {
-                cost[i].b0 = buckets[0].bounds;     //the bounds for each combination of buckets
-                cost[i].b1 = buckets[i + 1].bounds;
-                unsigned counter0 = buckets[0].count(), counter1 = buckets[i + 1].count();
+             //computing the cost of each reasonable combination of buckets (i.e. all on the left or right of some point)
+             std::array<cost_info, num_buckets - 1> cost;
+             for (size_t i = 0; i < num_buckets - 1; i++) {
+                 cost[i].b0 = buckets[0].bounds;     //the bounds for each combination of buckets
+                 cost[i].b1 = buckets[i + 1].bounds;
+                 unsigned counter0 = buckets[0].count(), counter1 = buckets[i + 1].count();
 
-                cost[i].add_hittables_0(buckets[0].objs);
-                cost[i].add_hittables_1(buckets[i + 1].objs);
+                 cost[i].add_hittables_0(buckets[0].objs);
+                 cost[i].add_hittables_1(buckets[i + 1].objs);
 
-                for (size_t j = 1; j <= i; j++) {
-                    cost[i].b0 = surrounding_box(cost[i].b0, buckets[j].bounds);
-                    cost[i].add_hittables_0(buckets[j].objs);
-                    counter0 += buckets[j].count();
-                }
-                for (size_t j = i + 2; j < num_buckets; j++) {
-                    cost[i].b1 = surrounding_box(cost[i].b1, buckets[j].bounds);
-                    cost[i].add_hittables_1(buckets[j].objs);
-                    counter1 += buckets[j].count();
-                }
+                 for (size_t j = 1; j <= i; j++) {
+                     cost[i].b0 = surrounding_box(cost[i].b0, buckets[j].bounds);
+                     cost[i].add_hittables_0(buckets[j].objs);
+                     counter0 += buckets[j].count();
+                 }
+                 for (size_t j = i + 2; j < num_buckets; j++) {
+                     cost[i].b1 = surrounding_box(cost[i].b1, buckets[j].bounds);
+                     cost[i].add_hittables_1(buckets[j].objs);
+                     counter1 += buckets[j].count();
+                 }
 
-                //eq 4.1 of pbr, p_a = area(a) / total_area, all objects take equal time to intersect (can remove this assumption; TODO)
-                // - https://pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies
-                cost[i].cost = 0.125 + (counter0 * cost[i].b0.surface_area() + counter1 * cost[i].b1.surface_area()) /
-                                       surrounding_box(cost[i].b0, cost[i].b1).surface_area();
-            }
+                 //eq 4.1 of pbr, p_a = area(a) / total_area, all objects take equal time to intersect (can remove this assumption; TODO)
+                 // - https://pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies
+                 cost[i].cost = 0.125 + (counter0 * cost[i].b0.surface_area() + counter1 * cost[i].b1.surface_area()) /
+                                        surrounding_box(cost[i].b0, cost[i].b1).surface_area();
+             }
 
-            //finding the minimum cost
-            double minCost = infinity;
-            int minCost_id = -1;
-            for (size_t i = 0; i < cost.size(); i++) {
-                if (cost[i].objs0.empty() || cost[i].objs1.empty()) {//is possible not the have any hittalbes in bucket
-                    continue;
-                }
-                if (cost[i].cost < minCost) {
-                    minCost = cost[i].cost;
-                    minCost_id = i;
-                }
+             //finding the minimum cost
+             double minCost = infinity;
+             int minCost_id = -1;
+             for (size_t i = 0; i < cost.size(); i++) {
+                 if (cost[i].objs0.empty() || cost[i].objs1.empty()) {//is possible not the have any hittalbes in bucket
+                     continue;
+                 }
+                 if (cost[i].cost < minCost) {
+                     minCost = cost[i].cost;
+                     minCost_id = i;
+                 }
 
-            }
+             }
 
-            if (minCost_id == -1) {
-                continue;
-                //std::cerr << "Could not find split that gave non-zero hittables\n";
-            }
+             if (minCost_id == -1) {
+                 continue;
+                 //std::cerr << "Could not find split that gave non-zero hittables\n";
+             }
 
-            //finding the best axis
-            if (cost[minCost_id].cost < min_cost) {
-                c = cost[minCost_id];
-                best_dim = static_cast<int>(dim);
-            }
-        }
-#ifndef NDEBUG
-        if (best_dim == -1) {
-            std::cerr << "could not find dimension to split axis objects\n";
-        }
-#endif
+             //finding the best axis
+             if (cost[minCost_id].cost < min_cost) {
+                 c = cost[minCost_id];
+                 best_dim = static_cast<int>(dim);
+             }
+         }
+ #ifndef NDEBUG
+         if (best_dim == -1) {
+             std::cerr << "could not find dimension to split axis objects\n";
+         }
+ #endif
 
-        box = surrounding_box(c.b0, c.b1);
-        split_axis = best_dim;
+         box = surrounding_box(c.b0, c.b1);
+         split_axis = best_dim;
 
-        //setting the left and right objects
-        if (c.objs0.size() > 1) {
-            left = std::make_shared<bvh_node>(c.objs0, time0, time1);
-        } else {
-#ifndef NDEBUG
-            if (c.objs0.empty()) {
-                std::cerr << "creation of bvh gave 0 objects in left hittable\n";
-                std::cerr << "\tthe right hittable got " << c.objs1.size() << " hittables\n";
-            }
-#endif
-            left = c.objs0[0];
-        }
+         //setting the left and right objects
+         if (c.objs0.size() > 1) {
+             left = std::make_shared<bvh_node>(c.objs0, time0, time1);
+         } else {
+ #ifndef NDEBUG
+             if (c.objs0.empty()) {
+                 std::cerr << "creation of bvh gave 0 objects in left hittable\n";
+                 std::cerr << "\tthe right hittable got " << c.objs1.size() << " hittables\n";
+             }
+ #endif
+             left = c.objs0[0];
+         }
 
-        if (c.objs1.size() > 1) {
-            right = std::make_shared<bvh_node>(c.objs1, time0, time1);
-        } else {
-#ifndef NDEBUG
-            if (c.objs1.empty()) {
-                std::cerr << "creation of bvh gave 0 objects in right hittable\n";
-                std::cerr << "\tthe left hittable got " << c.objs0.size() << " hittables\n";
-            }
-#endif
-            right = c.objs1[0];
-        }
-#ifdef basic_small_split
-    }
-#endif
+         if (c.objs1.size() > 1) {
+             right = std::make_shared<bvh_node>(c.objs1, time0, time1);
+         } else {
+ #ifndef NDEBUG
+             if (c.objs1.empty()) {
+                 std::cerr << "creation of bvh gave 0 objects in right hittable\n";
+                 std::cerr << "\tthe left hittable got " << c.objs0.size() << " hittables\n";
+             }
+ #endif
+             right = c.objs1[0];
+         }
+
+     }
+
     //std::cout << "F\n";
 }
 
@@ -467,7 +463,3 @@ bvh_node::bvh_node(const std::vector<std::shared_ptr<hittable>>& src_objects, co
 }
  */
 
-
-#ifdef basic_small_split
-#undef basic_small_split
-#endif

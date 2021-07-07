@@ -42,12 +42,13 @@ struct timing_test {
 
     void run() {
         for (size_t i = 0; i < num_runs; i++) {
-            std::cerr << i << "\n";
+            //std::cerr << i << "\n";
             const auto start = std::chrono::high_resolution_clock::now();
             ren.draw_to_buffer(buffer, samples);
             const auto end = std::chrono::high_resolution_clock::now();
             const std::chrono::duration<double> elapsed = end - start;
             times[i] = elapsed.count();
+            std::cout << times[i] << "\n";
         }
 
         const double res_mean = mean(times);
@@ -67,9 +68,11 @@ struct timing_test {
     }
 };
 
+//quick and dirty
 struct test1 : public timing_test<300, 200, 5, 100> {
     test1() : timing_test(big_scene1_fog()) {}
 };
+
 
 
 #endif //RAYTRACER_TIMING_TESTS_HPP

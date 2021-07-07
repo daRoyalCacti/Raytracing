@@ -23,12 +23,39 @@ struct aabb {
         }
 	}
 
-	inline double surface_area() const {
+	[[nodiscard]] inline double surface_area() const {
 	    const double length = maximum.x() - minimum.x();
 	    const double width = maximum.y() - minimum.y();
 	    const double height = maximum.z() - minimum.z();
 
 	    return 2*length*width + 2*width*height + 2*length*height;
+	}
+
+    [[nodiscard]] inline size_t longest_axis() const {
+	    double longest = -1;
+	    size_t index;
+        const double length = maximum.x() - minimum.x();
+        const double width = maximum.y() - minimum.y();
+        const double height = maximum.z() - minimum.z();
+
+        if (length > longest) {
+            longest = length;
+            index = 0;
+        }
+        if (width > longest) {
+            longest = width;
+            index = 1;
+        }
+        if (height > longest) {
+            longest = height;
+            index = 2;
+        }
+
+        return index;
+    }
+
+    [[nodiscard]] inline vec3 mid_point() const {
+	    return (minimum + maximum) / 2.0;
 	}
 
 	[[nodiscard]] point3 min() const {return minimum;}

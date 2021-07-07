@@ -16,7 +16,7 @@ int main() {
     //test1 test;
     //test.run();
 
-    scene test = 	big_scene1();
+    scene test = 	big_scene1_fog();
     render<600, 400> ren_test(test);
     ren_test.draw_on_convergence<100>("timing_test.png", 0.001);
 

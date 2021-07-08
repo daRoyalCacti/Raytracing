@@ -64,3 +64,11 @@ Time taken : 2772.48s
 	Median	: 138.908s
 	Min	: 132.534s
 	Max	: 143.611s
+
+Linear BVH (5% faster)
+Time taken : 2442.82s
+	Mean	: 122.141s
+	Std	: 3.49688s
+	Median	: 122.165s
+	Min	: 115.291s
+	Max	: 128.49s

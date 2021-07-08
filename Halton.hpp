@@ -11,77 +11,29 @@
 #include "vec3.hpp"
 
 
-#define run_time_Halton_set //must be defined above the include
-// also must be a define (rather than a constexpr) by the implementation
 namespace global {  //must be declared before Halton.hpp is included
     constexpr size_t halton_sequence_stored_size = 1e7;     //the number of elements to store in the Halton sequence
 }
 
-namespace Halton {
-#ifdef run_time_Halton_set
+
 //https://en.wikipedia.org/wiki/Halton_sequence
-    template<unsigned base>
-    //templated to align with the compile time version
-    double get_halton(size_t index) {
-        double f = 1;
-        double r = 0;
+template <unsigned base>
+double get_halton(size_t index) {
+    double f = 1;
+    double r = 0;
 
-        while (index > 0) {
-            f = f / base;
-            r = r + f * static_cast<double>(index % base);
-            index = static_cast<size_t>(index / base);
-        }
-
-        return r;
+    while (index > 0) {
+        f = f / base;
+        r = r + f * static_cast<double>(index % base);
+        index = static_cast<size_t>(index / base);
     }
 
-#endif
-
-#ifndef run_time_Halton_set
-    //https://en.wikipedia.org/wiki/Halton_sequence
-    constexpr size_t halton_sequence_size = global::halton_sequence_stored_size;
-
-    template <size_t Index, size_t Base, size_t counter>
-    struct Halton {
-        static constexpr size_t i = Halton<Index, Base, counter+1>::i/ Base;
-        static constexpr double f = Halton<Index, Base, counter+1>::f/Base;
-        static constexpr double r = (Halton<Index, Base, counter+1>::i>0) ? (Halton<Index, Base, counter+1>::r + f*(Halton<Index, Base, counter+1>::i % Base)) : Halton<Index, Base, counter+1>::r;
-    };
-
-
-    template <size_t Index, size_t Base>
-    struct Halton<Index, Base, 100> {   //some testing showed that for the first million numbers, only a depth of 20 was required --- 100 then should be plenty
-        static constexpr size_t i = Index;
-        static constexpr double f = 1;
-        static constexpr double r = 0;
-    };
-
-    template <size_t Index, size_t Base>
-    struct Halton_i {
-        static constexpr size_t i = Halton<Index, Base, 1>::i;
-        static constexpr double f = Halton<Index, Base, 1>::f;
-        static constexpr double r = Halton<Index, Base, 1>::r;
-    };
-
-
-    //for making the numbers accessible at runtime
-    template<size_t Base, size_t ... I>
-    double Halton_impl(std::index_sequence<I...>, size_t i) {
-        constexpr std::array<double, sizeof...(I)> a = {Halton_i<I, Base>::r...};
-
-        return a[i];
-    }
-    template<size_t Base>
-    double get_Halton(size_t i) {
-        return Halton_impl<Base>(std::make_index_sequence<halton_sequence_size+1>(), i);
-    }
-#endif
-
+    return r;
 }
 
 template <size_t N>
 struct Halton_set {
-    std::array<double, N> halton_set_1D;
+    std::array<double, N> halton_set_1D;    //cannot be initialised with {} else compiling uses too much ram
     std::array<vec2, N> halton_set_2D;
     std::array<vec3, N> halton_set_3D;
 
@@ -94,9 +46,9 @@ struct Halton_set {
     void init() {
         if (!is_initialised) {
             for (unsigned i = 0; i < N; i++) {
-                halton_set_1D[i] = Halton::get_halton<2>(leap * i);
-                halton_set_2D[i] = vec2(halton_set_1D[i], Halton::get_halton<3>(leap * i));
-                halton_set_3D[i] = vec3(halton_set_2D[i], Halton::get_halton<5>(leap * i));
+                halton_set_1D[i] = get_halton<2>(leap * i);
+                halton_set_2D[i] = vec2(halton_set_1D[i], get_halton<3>(leap * i));
+                halton_set_3D[i] = vec3(halton_set_2D[i], get_halton<5>(leap * i));
             }
             is_initialised = true;
         }
@@ -192,7 +144,7 @@ inline double rand_Henyey_Greensteing_halton(double g, size_t &index) {
     const double max_y = 1/(4*M_PI) * (1-g*g)/( pow(1+g*g - 2*fabs(g), 3/2.0f));
     #ifndef NDEBUG
       unsigned counter = 0;
-      constexpr auto max_loops = 100;
+      constexpr auto max_loops = 1e5;//100;
     #endif
     while (true) {
         #ifndef NDEBUG
@@ -256,8 +208,10 @@ inline vec3 random_to_sphere_halton(double radius, double distance_squared, size
     const auto z = 1 + r.y()* ( sqrt(1 - radius*radius/distance_squared) - 1);
     const auto phi = 2*M_PI*r.x();
 
+#ifndef NDEBUG
     if (z > 1)
         std::cerr << "random_to_sphere failed" << std::endl;
+#endif
 
     const auto x = cos(phi)*sqrt(1-z*z);
     const auto y = sin(phi)*sqrt(1-z*z);
@@ -265,7 +219,7 @@ inline vec3 random_to_sphere_halton(double radius, double distance_squared, size
     return vec3(x, y, z);
 }
 
-inline double rand_exp_halton(double lambda, size_t &index) {
+[[maybe_unused]] inline double rand_exp_halton(double lambda, size_t &index) {
     return -1/lambda*log(random_halton_1D(index));
 }
 

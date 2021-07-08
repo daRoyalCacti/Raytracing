@@ -24,6 +24,7 @@ struct render {
                 halton_indices[i][j] = 0;
             }
         }
+
     }
 
 

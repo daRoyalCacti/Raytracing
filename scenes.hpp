@@ -8,7 +8,7 @@
 #include "constant_medium.hpp"
 
 #include "helpful.hpp"
-#include "bvh.hpp"
+#include "bvh_node.hpp"
 
 #include "triangle.hpp"
 #include "triangle_mesh.hpp"
@@ -150,7 +150,7 @@ struct [[maybe_unused]] big_scene1 : public scene {
 		const auto material3 = std::make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
 		obj.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
-		world.add(std::make_shared<bvh_node>(obj, 0, 1));
+		world.add(std::make_shared<bvh>(obj, 0, 1));
 
 
 		set_camera(vec3(13.0, 2.0, 3.0), vec3(0.0, 0.0, 0.0));
@@ -215,10 +215,11 @@ struct [[maybe_unused]] big_scene1_fog : public scene {
         const auto material3 = std::make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
         obj.add(std::make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
-        world.add(std::make_shared<bvh_node>(obj, 0, 1));
+        world.add(std::make_shared<bvh>(obj, 0, 1));
 
 
         set_camera(vec3(13.0, 2.0, 3.0), vec3(0.0, 0.0, 0.0));
+
     }
 
 };
@@ -247,7 +248,7 @@ struct [[maybe_unused]] big_scene2 : public scene{
 				boxes1.add(make_shared<box>(point3(x0, y0, z0), point3(x1, y1, z1), ground));
 			}
 
-		world.add(std::make_shared<bvh_node>(boxes1, 0, 1));
+		world.add(std::make_shared<bvh>(boxes1, 0, 1));
 		
 		//main light
 		const auto light = std::make_shared<diffuse_light>(color(7, 7, 7));
@@ -296,7 +297,7 @@ struct [[maybe_unused]] big_scene2 : public scene{
 		    }
         }
 
-		world.add(make_shared<translate>(make_shared<rotate_y>(std::make_shared<bvh_node>(boxes2, 0.0, 1.0), 30), vec3(-100, 270, 395) ));
+		world.add(make_shared<translate>(make_shared<rotate_y>(std::make_shared<bvh>(boxes2, 0.0, 1.0), 30), vec3(-100, 270, 395) ));
 
 		set_camera(point3(478, 278, -600), point3(278, 278, 0), 40.0, 0.0);
 	}

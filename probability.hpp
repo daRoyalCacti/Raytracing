@@ -25,12 +25,20 @@ inline int random_int(const int min, const int max) {
 }
 
 
-inline static vec3 random_vec3() {	//static because does not need a particular vec3
+inline vec3 random_vec3() {
     return vec3(random_double(), random_double(), random_double());
 }
 
-inline static vec3 random_vec3(const double min, const double max) {
+inline vec3 random_vec3(const double min, const double max) {
     return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+}
+
+inline vec2 random_vec2() {	//static because does not need a particular vec3
+    return vec2(random_double(), random_double());
+}
+
+inline vec2 random_vec2(const double min, const double max) {
+    return vec2(random_double(min, max), random_double(min, max));
 }
 
 
@@ -73,7 +81,18 @@ inline vec3 random_in_unit_sphere() {
 
 
 [[maybe_unused]] inline vec3 random_unit_vector() {
-    return unit_vector(random_in_unit_sphere());
+    vec2 r;
+    while (true) {
+        r = random_vec2(-1, 1);
+        if (r.x() * r.x() + r.y() * r.y() < 1) break;
+    }
+
+    const auto x1 = r.x();
+    const auto x2 = r.y();
+
+    const auto x12_p_x22 = x1 * x1 + x2 * x2;
+
+    return vec3(2 * x1 * sqrt(1 - x12_p_x22), 2 * x2 * sqrt(1 - x12_p_x22), 1 - 2 * x12_p_x22);
 }
 
 
@@ -94,25 +113,9 @@ inline vec3 random_in_unit_sphere() {
 
 //returns a random angle
 [[maybe_unused]] inline double rand_Henyey_Greensteing(double g) {
-    //https://www.oceanopticsbook.info/view/scattering/level-2/the-henyey-greenstein-phase-function
-    const double max_y = 1/(4*M_PI) * (1-g*g)/( pow(1+g*g - 2*fabs(g), 3/2.0f));
-    #ifndef NDEBUG
-        unsigned counter = 0;
-        constexpr auto max_loops = 100;
-    #endif
-    while (true) {
-        #ifndef NDEBUG
-            ++counter;
-            if (counter > max_loops) {
-                throw std::runtime_error("Infinite loop in rand_Henyey_Greensteing");
-            }
-        #endif
-        const auto x = random_double(-1, 1);
-        const auto y = random_double(0, max_y);
-        if (y < Henyey_Greensteing_pdf_func(g, x)) {
-            return acos(x);
-        }
-    }
+    const auto r = random_double();
+    const double mu = 1/ (2*g) * (1 + g*g - ( (1-g*g) / (1-g+2*g*r) )*( (1-g*g) / (1-g+2*g*r) )  );
+    return acos(mu);
 }
 
 inline vec3 random_cosine_direction() {

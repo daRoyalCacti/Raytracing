@@ -139,6 +139,7 @@ inline vec3 rotate(const vec3& vec, const vec3 &axis, const double angle) {
     return vec3(r, theta, phi);
 }
 
+//input = (r, theta, phi)
 [[maybe_unused]] inline vec3 spherical_to_cartesian(const vec3& input) {
     const double x = input[0]*sin(input[1])*cos(input[2]);
     const double y = input[0]*sin(input[1])*sin(input[2]);

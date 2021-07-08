@@ -130,35 +130,15 @@ inline vec3 random_cosine_direction_halton(size_t &index) {
 
 //https://www.astro.umd.edu/~jph/HG_note.pdf
 //https://www.desmos.com/calculator/84ypsmsy95
-inline double Henyey_Greensteing_pdf_func(double g, double cos_theta) {
-    return 1/(4*M_PI) * (1-g*g)/( pow(1+g*g - 2*g*cos_theta, 3/2.0f));
-}
-
-
-//Does not work
-// - gives lines through the images
+//https://www.oceanopticsbook.info/view/scattering/level-2/the-henyey-greenstein-phase-function
 //returns a random angle
-
-inline double rand_Henyey_Greensteing_halton(double g, size_t &index) {
-    //https://www.oceanopticsbook.info/view/scattering/level-2/the-henyey-greenstein-phase-function
-    const double max_y = 1/(4*M_PI) * (1-g*g)/( pow(1+g*g - 2*fabs(g), 3/2.0f));
-    #ifndef NDEBUG
-      unsigned counter = 0;
-      constexpr auto max_loops = 1e5;//100;
-    #endif
-    while (true) {
-        #ifndef NDEBUG
-            ++counter;
-            if (counter > max_loops) {
-                throw std::runtime_error("Infinite loop in rand_Henyey_Greensteing_halton");
-            }
-        #endif
-        const auto r = random_halton_2D(-1, 1, 0, max_y, index);
-        if (r.y() < Henyey_Greensteing_pdf_func(g, r.x())) {
-            return acos(r.x());
-        }
-    }
+//on sampling of scattering phase functions -- J. Zhang
+inline double rand_Henyey_Greensteing_halton(const double g, size_t &index) {
+    const auto r = random_halton_1D(index);
+    const double mu = 1/ (2*g) * (1 + g*g - ( (1-g*g) / (1-g+2*g*r) )*( (1-g*g) / (1-g+2*g*r) )  );
+    return acos(mu);
 }
+
 
 
 inline vec3 halton_random_in_unit_sphere(size_t &index) {
@@ -196,10 +176,20 @@ inline vec3 halton_random_in_unit_disk(size_t &index) {
 }
 
 
+//https://mathworld.wolfram.com/SpherePointPicking.html
 inline vec3 random_unit_vector_halton(size_t &index) {
-    return unit_vector(halton_random_in_unit_sphere(index));    //random value must be from unit sphere else there would be
-                                                                    // a larger probability of the random vector pointing towards
-                                                                    // the corner of the cube (sample from U([a,b]x[c.d]) is from a rectangular prism)
+    vec2 r;
+    while (true) {
+        r = random_halton_2D(-1, 1, index);
+        if (r.x() * r.x() + r.y() * r.y() < 1) break;
+    }
+
+    const auto x1 = r.x();
+    const auto x2 = r.y();
+
+    const auto x12_p_x22 = x1 * x1 + x2 * x2;
+
+    return vec3(2 * x1 * sqrt(1 - x12_p_x22), 2 * x2 * sqrt(1 - x12_p_x22), 1 - 2 * x12_p_x22);
 }
 
 inline vec3 random_to_sphere_halton(double radius, double distance_squared, size_t &index) {

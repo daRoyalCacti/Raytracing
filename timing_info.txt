@@ -72,3 +72,11 @@ Time taken : 2442.82s
 	Median	: 122.165s
 	Min	: 115.291s
 	Max	: 128.49s
+
+Updated rng for HG (33% faster -- 67% time improvement)
+Time taken : 809.889s
+	Mean	: 40.4945s
+	Std	: 1.45597s
+	Median	: 39.82s
+	Min	: 39.5565s
+	Max	: 43.9859s

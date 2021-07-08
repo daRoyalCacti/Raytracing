@@ -13,19 +13,21 @@ int main() {
     const std::chrono::duration<double> elapsed_seconds_Halton = end_Halton - start_Halton;
     std::cout << " -- took : " << elapsed_seconds_Halton.count() << "s" << std::endl;
 
-    //test2 test;
-    //test.run();
+    test2 test;
+    test.run();
 
-    scene test = 	big_scene1_fog();
-    render<600, 400> ren_test(test);
-    ren_test.draw_on_convergence<100>("timing_test.png", 0.001);
+
 
 	//start timing
 	/*const auto start = std::chrono::system_clock::now();
 	const std::time_t start_time = std::chrono::system_clock::to_time_t(start);
-	std::cout << "Rendering started at " << std::ctime(&start_time);
+	std::cout << "Rendering started at " << std::ctime(&start_time);*/
 
+	/* scene test = 	big_scene1_fog();
+    render<600, 400> ren_test(test);
+    ren_test.draw_on_convergence<100>("timing_test.png", 0.001);*/
 
+/*
     scene scene2 = 	big_scene2();
     render<1200, 1200> ren_scene2(scene2);
     ren_scene2.draw_on_convergence<100>("raytracing_the_next_week_main_image.png", 0.001);
@@ -40,11 +42,11 @@ int main() {
 
     scene earth_scene = 	earth_atm_scene();
     render<1920, 1080> ren_earth(earth_scene);
-    ren_earth.draw_on_convergence<500>("earth.png", 0.001);
+    ren_earth.draw_on_convergence<500>("earth.png", 0.001);*/
 
 
 	//end timing
-	const auto end = std::chrono::system_clock::now();
+	/*const auto end = std::chrono::system_clock::now();
 	const std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 	std::cout << "Computation ended at " << std::ctime(&end_time);
 	

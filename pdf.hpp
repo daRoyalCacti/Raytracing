@@ -82,7 +82,7 @@ struct Henyey_Greensteing_pdf : public pdf {
 
     //returns value in spherical coordinates
     [[nodiscard]] inline vec3 generate(const vec3& incoming_dir) override {
-        const auto angle = rand_Henyey_Greensteing_halton(g, halton_index1);  //gives lines through the images
+        const auto angle = rand_Henyey_Greensteing_halton(g, halton_index1);
 
         //select random vector to rotate around
         const auto rot = random_unit_vector_halton(hatlon_index2);

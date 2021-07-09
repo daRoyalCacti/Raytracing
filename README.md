@@ -14,9 +14,6 @@ All images created are available in [/images](https://github.com/daRoyalCacti/Ra
 
 <img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/foggy_balls.png" width="800" height="450" alt="raytracing in one weekend main image">
 
-<img src="https://raw.githubusercontent.com/daRoyalCacti/Raytracing/master/images/raytracing_the_next_week_main_image.png" width="400" height="400" alt="raytracing the next week main image">
-
-
 
 ## From raytracing in one weekend
 As such it has the following features

@@ -87,8 +87,10 @@ void moving_sphere::hit_info(const ray& r, const double t_min, const double t_ma
 }
 
 bool moving_sphere::bounding_box(const double _time0, const double _time1, aabb& output_box) const {
-	aabb box0(center(_time0) - vec3(radius,radius,radius), center(_time0) + vec3(radius,radius,radius));
-	aabb box1(center(_time1) - vec3(radius,radius,radius), center(_time1) + vec3(radius,radius,radius));
+	//aabb box0(center(_time0) - vec3(radius,radius,radius), center(_time0) + vec3(radius,radius,radius));
+	//aabb box1(center(_time1) - vec3(radius,radius,radius), center(_time1) + vec3(radius,radius,radius));
+    aabb box0(center(time0) - vec3(radius,radius,radius), center(time0) + vec3(radius,radius,radius));
+    aabb box1(center(time1) - vec3(radius,radius,radius), center(time1) + vec3(radius,radius,radius));
 	output_box = surrounding_box(box0, box1);
 	return true;
 }

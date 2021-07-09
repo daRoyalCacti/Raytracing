@@ -77,7 +77,8 @@ struct Henyey_Greensteing_pdf : public pdf {
 
     [[nodiscard]] inline double value(const vec3& incoming_dir, const vec3& out_direction) const override {
         //http://www.pbr-book.org/3ed-2018/Volume_Scattering/Phase_Functions.html#PhaseHG
-        return Henyey_Greensteing_pdf_func(g, dot(incoming_dir, out_direction));
+        const double cos_theta = dot(incoming_dir, out_direction);
+        return 1/(4*M_PI) * (1-g*g)/( pow(1+g*g - 2*g*cos_theta, 3/2.0f));
     }
 
     //returns value in spherical coordinates

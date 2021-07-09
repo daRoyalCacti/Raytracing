@@ -48,7 +48,7 @@ struct bvh : public hittable {
                             closest_hit = curr_node->primitives_offset+1;
                         }
                     } else {    //else didn't hit left object
-                        //checking hitting with right object+
+                        //checking hitting with right object
                         if (objs[curr_node->primitives_offset + 1]->hit_time(r, t_min, rec.t, rec)) {
                             did_hit = true;
                             closest_hit = curr_node->primitives_offset+1;

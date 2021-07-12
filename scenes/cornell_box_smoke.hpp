@@ -5,6 +5,7 @@
 #ifndef RAYTRACER_CORNELL_BOX_SMOKE_HPP
 #define RAYTRACER_CORNELL_BOX_SMOKE_HPP
 
+#include "../scene.hpp"
 
 struct [[maybe_unused]] cornell_box_scene_smokey : public scene {
     explicit cornell_box_scene_smokey(const double d = 0.002) : scene(1.0) {

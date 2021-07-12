@@ -5,6 +5,8 @@
 #ifndef RAYTRACER_RT_WEEKEND_HPP
 #define RAYTRACER_RT_WEEKEND_HPP
 
+#include "../scene.hpp"
+
 
 struct [[maybe_unused]] rt_weekend : public scene {
     explicit rt_weekend() : scene(aspec1) {

@@ -5,6 +5,7 @@
 #ifndef RAYTRACER_CORNELL_BOX_SPHERE_HPP
 #define RAYTRACER_CORNELL_BOX_SPHERE_HPP
 
+#include "../scene.hpp"
 
 struct [[maybe_unused]] cornell_box_sphere_scene : public scene {
     cornell_box_sphere_scene() : scene(1.0) {

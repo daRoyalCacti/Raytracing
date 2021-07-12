@@ -5,6 +5,7 @@
 #ifndef RAYTRACER_EARTH_ATM_HPP
 #define RAYTRACER_EARTH_ATM_HPP
 
+#include "../scene.hpp"
 
 struct [[maybe_unused]] earth_atm_scene : public scene {
     earth_atm_scene() : scene(aspec1) {

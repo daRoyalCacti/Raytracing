@@ -5,6 +5,8 @@
 #ifndef RAYTRACER_EARTH_HPP
 #define RAYTRACER_EARTH_HPP
 
+#include "../scene.hpp"
+
 struct [[maybe_unused]] earth_scene : public scene {
     earth_scene() : scene(aspec1) {
         set_background(background_color::black);

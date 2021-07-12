@@ -5,7 +5,7 @@
 #ifndef RAYTRACER_CORNELL_BOX_GAS_BOXES_HPP
 #define RAYTRACER_CORNELL_BOX_GAS_BOXES_HPP
 
-
+#include "../scene.hpp"
 
 struct [[maybe_unused]] cornell_box_gas_boxes_scene : public scene {
     cornell_box_gas_boxes_scene() : scene(1.0) {

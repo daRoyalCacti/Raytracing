@@ -5,8 +5,10 @@
 #ifndef RAYTRACER_CORNELL_BOX_FOG_HPP
 #define RAYTRACER_CORNELL_BOX_FOG_HPP
 
-struct [[maybe_unused]] cornell_box_scene2_fog : public scene {
-    explicit cornell_box_scene2_fog(const double lambda = 0.005) : scene(1.0) {
+#include "../scene.hpp"
+
+struct [[maybe_unused]] cornell_box_scene_fog : public scene {
+    explicit cornell_box_scene_fog(const double lambda = 0.005) : scene(1.0) {
         set_background(background_color::black);
 
         const auto red = std::make_shared<lambertian>(color(0.65, 0.05, 0.05));

@@ -5,6 +5,8 @@
 #ifndef RAYTRACER_FOGGY_BALLS_HPP
 #define RAYTRACER_FOGGY_BALLS_HPP
 
+#include "../scene.hpp"
+
 struct [[maybe_unused]] foggy_balls : public scene {
     explicit foggy_balls(const double d=0.07) : scene(aspec1) {
         set_background(background_color::sky);

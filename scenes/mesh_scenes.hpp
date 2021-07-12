@@ -5,6 +5,8 @@
 #ifndef RAYTRACER_MESH_SCENES_HPP
 #define RAYTRACER_MESH_SCENES_HPP
 
+#include "../scene.hpp"
+
 
 struct [[maybe_unused]] door_scene : public scene {
     door_scene() : scene(aspec1) {

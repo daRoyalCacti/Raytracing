@@ -5,6 +5,7 @@
 #ifndef RAYTRACER_TWO_SPHERES_HPP
 #define RAYTRACER_TWO_SPHERES_HPP
 
+#include "../scene.hpp"
 
 
 struct [[maybe_unused]] two_spheres_scene : public scene {

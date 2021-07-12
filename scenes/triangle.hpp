@@ -5,7 +5,7 @@
 #ifndef RAYTRACER_TRIANGLE_HPP
 #define RAYTRACER_TRIANGLE_HPP
 
-
+#include "../scene.hpp"
 
 
 struct [[maybe_unused]] triangle_scene : public scene {

@@ -5,6 +5,8 @@
 #ifndef RAYTRACER_TWO_PERLIN_SPHERES_HPP
 #define RAYTRACER_TWO_PERLIN_SPHERES_HPP
 
+#include "../scene.hpp"
+
 struct [[maybe_unused]] two_perlin_spheres_scene : public scene {
     two_perlin_spheres_scene() : scene(aspec1) {
         set_background(background_color::sky);

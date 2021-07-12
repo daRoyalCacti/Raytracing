@@ -6,6 +6,7 @@
 #define RAYTRACER_TIMING_TESTS_HPP
 
 #include "render.hpp"
+#include "scenes/foggy_balls.hpp"
 
 template <size_t image_width, size_t image_height, size_t num_runs, size_t num_samples>
 struct timing_test {
@@ -70,12 +71,12 @@ struct timing_test {
 
 //quick and dirty -- around 3min
 struct test1 : public timing_test<300, 200, 5, 100> {
-    test1() : timing_test(big_scene1_fog()) {}
+    test1() : timing_test(foggy_balls()) {}
 };
 
 //more complete -- around an hour
 struct test2 : public timing_test<600, 400, 20, 100> {
-    test2() : timing_test(big_scene1_fog()) {}
+    test2() : timing_test(foggy_balls()) {}
 };
 
 

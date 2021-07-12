@@ -1,4 +1,5 @@
 #include "timing_tests.hpp"
+#include "scenes/all_scenes.hpp"
 
 #include <iostream>
 #include <chrono>
@@ -23,9 +24,9 @@ int main() {
 	const std::time_t start_time = std::chrono::system_clock::to_time_t(start);
 	std::cout << "Rendering started at " << std::ctime(&start_time);
 
-	/*scene test = 	big_scene1_fog();
+	scene test = 	first_scene();//foggy_balls();
     render<600, 400> ren_test(test);
-    ren_test.draw_on_convergence<100>("timing_test.png", 0.001);*/
+    ren_test.draw_on_convergence<100>("timing_test.png", 0.001);
 
 
 

@@ -7,7 +7,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
-set(Header_files aabb.hpp aarect.hpp box.hpp bvh.hpp bvh_node.hpp camera.hpp color.hpp helpful.hpp constant_medium.hpp Halton.hpp hittable.hpp hittable_list.hpp material.hpp moving_sphere.hpp ONB.hpp pdf.hpp perlin.hpp probability.hpp ray.hpp render.hpp scenes.hpp sphere.hpp texture.hpp timing_tests.hpp triangle.hpp triangle_mesh.hpp vec2.hpp vec3.hpp)
+set(Header_files aabb.hpp aarect.hpp box.hpp bvh.hpp bvh_node.hpp camera.hpp color.hpp helpful.hpp constant_medium.hpp Halton.hpp hittable.hpp hittable_list.hpp material.hpp moving_sphere.hpp ONB.hpp pdf.hpp perlin.hpp probability.hpp ray.hpp render.hpp scene.hpp sphere.hpp texture.hpp timing_tests.hpp triangle.hpp triangle_mesh.hpp vec2.hpp vec3.hpp scenes/first_scene.hpp scenes/all_scenes.hpp scenes/rt_weekend.hpp scenes/foggy_balls.hpp scenes/rt_week.hpp scenes/two_spheres.hpp scenes/two_perlin_spheres.hpp scenes/earth.hpp scenes/earth_atm.hpp scenes/cornell_box.hpp scenes/cornell_box_sphere.hpp scenes/cornell_box_fog.hpp scenes/cornell_box_smoke.hpp scenes/cornell_box_gas_boxes.hpp scenes/mesh_scenes.hpp scenes/triangle.hpp)
 add_executable(Generate main.cpp ${Header_files})
 
 find_package(OpenMP REQUIRED)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scenes.hpp"
+#include "scene.hpp"
 #include "color.hpp"
 #include <chrono>
 
